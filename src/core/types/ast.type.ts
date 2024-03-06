@@ -22,7 +22,7 @@ export interface IBinaryExpression extends IExpressionNode {
 
 export interface IIdentifierNode extends IExpressionNode {
   kind: NodeType.Identifier
-  symbole: string
+  symbol: string
 }
 
 export interface INumberNode extends IExpressionNode {

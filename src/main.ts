@@ -1,16 +1,18 @@
 import { Parser } from './frontend/parser';
+import { evaluate } from './runtime/interpreter';
 
 
 
 const code = `
-  10 + null
+  0 - (10 + 2) * 2
 `;
 
 try {
   const parser = new Parser();
   const program = parser.parse(code);
+  const result = evaluate(program);
 
-  console.log(JSON.stringify(program, null, 2));
+  console.log(result);
 } catch (err) {
   console.error(`Error: ${err}`);
 }

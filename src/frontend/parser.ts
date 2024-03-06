@@ -85,7 +85,7 @@ export class Parser {
       case TokenType.Identifier: {
         return {
           kind: NodeType.Identifier,
-          symbole: this.eat().value
+          symbol: this.eat().value
         } as IIdentifierNode;
       }
 
