@@ -1,3 +1,1 @@
-import { test } from './../dist/langkama.js';
-
-test();
+import './../dist/langkama.js';
