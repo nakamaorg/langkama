@@ -1,7 +1,16 @@
-import { tokenize } from './frontend/lexer';
+import { Parser } from './frontend/parser';
 
-const srcCode = 'let x = 45 * (4 / 3).';
 
-for (const token of tokenize(srcCode)) {
-  console.log(token);
+
+const code = `
+  10 + null
+`;
+
+try {
+  const parser = new Parser();
+  const program = parser.parse(code);
+
+  console.log(JSON.stringify(program, null, 2));
+} catch (err) {
+  console.error(`Error: ${err}`);
 }

@@ -1,25 +1,15 @@
-export enum TokenType {
-  Dot,
-  Number,
-  Identifier,
-  Equals,
-  OpenP,
-  CloseP,
-  BinaryOp,
-  Let
-}
+import { keywords } from '../core/consts/keywords.const';
+import { TokenType } from '../core/enums/token-type.enum';
 
-const keywords: Record<string, TokenType> = {
-  let: TokenType.Let
-}
 
-export type Token = {
-  value: string
+
+export type TToken = {
+  value?: string
   type: TokenType
 }
 
-function token(value: string = '', type: TokenType): Token {
-  return { value, type };
+function token(type: TokenType, value?: string): TToken {
+  return { type, value };
 }
 
 function isskippable(src: string) {
@@ -37,24 +27,24 @@ function isnumber(src: string): boolean {
   return c >= bounds[0] && c <= bounds[1];
 }
 
-export function tokenize(sourceCode: string): Array<Token> {
-  const tokens: Array<Token> = [];
+export function tokenize(sourceCode: string): Array<TToken> {
+  const tokens: Array<TToken> = [];
   const src = sourceCode.split('');
 
   while (src.length > 0) {
     if (src[0] === '.') {
-      tokens.push(token(src.shift(), TokenType.Dot));
+      tokens.push(token(TokenType.Dot, src.shift()));
     }
     else if (src[0] === '(') {
-      tokens.push(token(src.shift(), TokenType.OpenP));
+      tokens.push(token(TokenType.OpenP, src.shift()));
     } else if (src[0] === ')') {
-      tokens.push(token(src.shift(), TokenType.CloseP));
+      tokens.push(token(TokenType.CloseP, src.shift()));
     } else if (src[0] === ')') {
-      tokens.push(token(src.shift(), TokenType.CloseP));
-    } else if (src[0] === '+' || src[0] === '-' || src[0] === '*' || src[0] === '/') {
-      tokens.push(token(src.shift(), TokenType.BinaryOp));
+      tokens.push(token(TokenType.CloseP, src.shift()));
+    } else if (src[0] === '+' || src[0] === '-' || src[0] === '*' || src[0] === '/' || src[0] === '%') {
+      tokens.push(token(TokenType.BinaryOp, src.shift()));
     } else if (src[0] === '=') {
-      tokens.push(token(src.shift(), TokenType.Equals));
+      tokens.push(token(TokenType.Equals, src.shift()));
     } else {
       if (isnumber(src[0])) {
         let num = '';
@@ -63,7 +53,7 @@ export function tokenize(sourceCode: string): Array<Token> {
           num += src.shift();
         }
 
-        tokens.push(token(num, TokenType.Number));
+        tokens.push(token(TokenType.Number, num));
       } else if (isalpha(src[0])) {
         let ident = '';
 
@@ -71,14 +61,18 @@ export function tokenize(sourceCode: string): Array<Token> {
           ident += src.shift();
         }
 
-        tokens.push(token(ident, keywords[ident] ?? TokenType.Identifier));
+        const keyword = keywords[ident];
+        const isKeyword = typeof keyword === 'number';
+
+        tokens.push(token(isKeyword ? keyword : TokenType.Identifier, ident));
       } else if (isskippable(src[0])) {
         src.shift();
       } else {
-        throw `unrecognized character ${src[0]}`;
+        throw `Unrecognized character ${src[0]}`;
       }
     }
   }
 
+  tokens.push(token(TokenType.EOF));
   return tokens;
 }
