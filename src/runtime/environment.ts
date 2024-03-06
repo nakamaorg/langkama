@@ -5,18 +5,25 @@ import { IRuntimeVal } from '../core/types/runtime-values.type';
 export class Environment {
   private parent?: Environment;
   private variables: Map<string, IRuntimeVal>;
+  private constants: Set<string>;
 
   constructor(parent?: Environment) {
     this.parent = parent;
+    this.constants = new Set();
     this.variables = new Map();
   }
 
-  public declareVariable(name: string, value: IRuntimeVal): IRuntimeVal {
+  public declareVariable(name: string, value: IRuntimeVal, constant: boolean = false): IRuntimeVal {
     if (this.variables.has(name)) {
       throw `Cannot declare variable ${name} as it's already defined`
     }
 
     this.variables.set(name, value);
+
+    if (constant) {
+      this.constants.add(name);
+    }
+
     return value;
   }
 
@@ -26,6 +33,11 @@ export class Environment {
     }
 
     const env = this.resolve(name);
+
+    if (env.constants.has(name)) {
+      throw 'Constant can\'t be reassigned';
+    }
+
     env.variables.set(name, value);
 
     return value;

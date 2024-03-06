@@ -1,7 +1,7 @@
 import { TToken, tokenize } from './lexer';
 import { NodeType } from '../core/enums/node-type.enum';
 import { TokenType } from '../core/enums/token-type.enum';
-import { IBinaryExpression, IExpressionNode, IIdentifierNode, INumberNode, IProgramNode, IStatementNode } from '../core/types/ast.type';
+import { IBinaryExpression, IExpressionNode, IIdentifierNode, INumberNode, IProgramNode, IStatementNode, IVariableDeclarationNode } from '../core/types/ast.type';
 
 
 
@@ -35,7 +35,16 @@ export class Parser {
   }
 
   private parseStatement(): IStatementNode {
-    return this.parseExpression();
+    switch (this.at().type) {
+      case TokenType.Let:
+      case TokenType.Const: {
+        return this.parseVariableDeclaration();
+      }
+
+      default: {
+        return this.parseExpression();
+      }
+    }
   }
 
   private parseExpression(): IExpressionNode {
@@ -105,9 +114,37 @@ export class Parser {
       }
 
       default: {
-        throw `Upexpected token ${this.at()}}`;
+        throw `Parser - Unexpected token ${JSON.stringify(this.at())}}`;
       }
     }
+  }
+
+  private parseVariableDeclaration(): IExpressionNode {
+    const isConstant = this.eat().type === TokenType.Const;
+    const identifier = this.expect(TokenType.Identifier, 'Expected identifier name').value;
+
+    if (this.at().type === TokenType.Dot) {
+      this.eat();
+
+      if (isConstant) {
+        throw 'No value provided';
+      }
+
+      return { kind: NodeType.VariableDeclaration, identifier, constant: false } as IVariableDeclarationNode;
+    }
+
+    this.expect(TokenType.Equals, 'Expected equals token following the identifier in variable declaration');
+
+    const declaration = {
+      identifier,
+      constant: isConstant,
+      value: this.parseExpression(),
+      kind: NodeType.VariableDeclaration
+    } as IVariableDeclarationNode;
+
+    this.expect(TokenType.Dot, 'Variable declaration must end with a dot');
+
+    return declaration;
   }
 
   public parse(sourceCode: string): IProgramNode {

@@ -34,8 +34,7 @@ export function tokenize(sourceCode: string): Array<TToken> {
   while (src.length > 0) {
     if (src[0] === '.') {
       tokens.push(token(TokenType.Dot, src.shift()));
-    }
-    else if (src[0] === '(') {
+    } else if (src[0] === '(') {
       tokens.push(token(TokenType.OpenP, src.shift()));
     } else if (src[0] === ')') {
       tokens.push(token(TokenType.CloseP, src.shift()));

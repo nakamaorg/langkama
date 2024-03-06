@@ -11,6 +11,13 @@ export interface IProgramNode extends IStatementNode {
   body: Array<IStatementNode>
 }
 
+export interface IVariableDeclarationNode extends IStatementNode {
+  kind: NodeType.VariableDeclaration
+  constant: boolean
+  identifier: string
+  value?: IExpressionNode
+}
+
 export interface IExpressionNode extends IStatementNode { }
 
 export interface IBinaryExpression extends IExpressionNode {

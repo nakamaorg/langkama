@@ -1,10 +1,12 @@
 export enum TokenType {
+  EOF,
   Dot,
-  Number,
-  Identifier,
-  Equals,
+  Let,
+  Const,
   OpenP,
+  Number,
   CloseP,
+  Equals,
   BinaryOp,
-  EOF
+  Identifier
 }
