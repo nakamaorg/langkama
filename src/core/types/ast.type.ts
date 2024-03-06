@@ -29,8 +29,3 @@ export interface INumberNode extends IExpressionNode {
   kind: NodeType.Number
   value: number
 }
-
-export interface INullNode extends IExpressionNode {
-  kind: NodeType.Null
-  value: 'null'
-}

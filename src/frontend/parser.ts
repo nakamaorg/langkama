@@ -1,7 +1,7 @@
 import { TToken, tokenize } from './lexer';
-import { IBinaryExpression, IExpressionNode, IIdentifierNode, INullNode, INumberNode, IProgramNode, IStatementNode } from '../core/types/ast.type';
 import { NodeType } from '../core/enums/node-type.enum';
 import { TokenType } from '../core/enums/token-type.enum';
+import { IBinaryExpression, IExpressionNode, IIdentifierNode, INumberNode, IProgramNode, IStatementNode } from '../core/types/ast.type';
 
 
 
@@ -87,14 +87,6 @@ export class Parser {
           kind: NodeType.Identifier,
           symbol: this.eat().value
         } as IIdentifierNode;
-      }
-
-      case TokenType.Null: {
-        this.eat();
-        return {
-          kind: NodeType.Null,
-          value: 'null'
-        } as INullNode;
       }
 
       case TokenType.Number: {

@@ -1,28 +1,29 @@
+import { Environment } from './environment';
 import { NodeType } from '../core/enums/node-type.enum';
-import { INullVal, INumberVal, IRuntimeVal } from './values';
-import { IBinaryExpression, INumberNode, IProgramNode, IStatementNode } from '../core/types/ast.type';
+import { INumberVal, IRuntimeVal, MK_NULL } from '../core/types/runtime-values.type';
+import { IBinaryExpression, IIdentifierNode, INumberNode, IProgramNode, IStatementNode } from '../core/types/ast.type';
 
 
 
-function evaluateProgram(program: IProgramNode): IRuntimeVal {
-  let lastEvaluated: IRuntimeVal = { type: 'null', value: 'null' } as INullVal;
+function evaluateProgram(program: IProgramNode, env: Environment): IRuntimeVal {
+  let lastEvaluated: IRuntimeVal = MK_NULL();
 
   for (const statement of program.body) {
-    lastEvaluated = evaluate(statement);
+    lastEvaluated = evaluate(statement, env);
   }
 
   return lastEvaluated;
 }
 
-function evaluateBinaryExpression(binaryExpression: IBinaryExpression): IRuntimeVal {
-  const lhs = evaluate(binaryExpression.left);
-  const rhs = evaluate(binaryExpression.right);
+function evaluateBinaryExpression(binaryExpression: IBinaryExpression, env: Environment): IRuntimeVal {
+  const lhs = evaluate(binaryExpression.left, env);
+  const rhs = evaluate(binaryExpression.right, env);
 
   if (lhs.type === 'number' && rhs.type === 'number') {
     return evaluateNumericBinaryExpression(lhs as INumberVal, rhs as INumberVal, binaryExpression.operator);
   }
 
-  return { type: 'null', value: 'null' } as INullVal;
+  return MK_NULL();
 }
 
 function evaluateNumericBinaryExpression(lhs: INumberVal, rhs: INumberVal, operator: string): INumberVal {
@@ -61,22 +62,27 @@ function evaluateNumericBinaryExpression(lhs: INumberVal, rhs: INumberVal, opera
   return { value: result, type: 'number' };
 }
 
-export function evaluate(node: IStatementNode): IRuntimeVal {
+function evaluateIdentifier(identifier: IIdentifierNode, env: Environment): IRuntimeVal {
+  const val = env.getValue(identifier.symbol);
+  return val;
+}
+
+export function evaluate(node: IStatementNode, env: Environment): IRuntimeVal {
   switch (node.kind) {
     case NodeType.Number: {
       return { type: 'number', value: (node as INumberNode).value } as INumberVal;
     }
 
-    case NodeType.Null: {
-      return { value: 'null', type: 'null' } as INullVal;
+    case NodeType.Identifier: {
+      return evaluateIdentifier(node as IIdentifierNode, env);
     }
 
     case NodeType.BinaryExpression: {
-      return evaluateBinaryExpression(node as IBinaryExpression);
+      return evaluateBinaryExpression(node as IBinaryExpression, env);
     }
 
     case NodeType.Program: {
-      return evaluateProgram(node as IProgramNode);
+      return evaluateProgram(node as IProgramNode, env);
     }
 
     default: {
