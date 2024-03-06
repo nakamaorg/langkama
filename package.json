@@ -1,0 +1,28 @@
+{
+  "private": true,
+  "type": "module",
+  "name": "langkama",
+  "version": "0.0.1",
+  "license": "Apache-2.0",
+  "packageManager": "pnpm@8.13.1",
+  "description": "Retard complete programming language.",
+  "keywords": [
+    "programming-language"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nakamaorg/langkama.git"
+  },
+  "bugs": {
+    "url": "https://github.com/nakamaorg/langkama/issues"
+  },
+  "scripts": {
+    "build": "tsc && vite build",
+    "test": "node ./test/main.js",
+    "start": "pnpm build && pnpm test"
+  },
+  "devDependencies": {
+    "typescript": "^5.2.2",
+    "vite": "^5.1.4"
+  }
+}
