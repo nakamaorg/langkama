@@ -1,4 +1,4 @@
-import { TToken, tokenize } from './lexer';
+import { TToken } from '../core/types/token.type';
 import { NodeType } from '../core/enums/node-type.enum';
 import { TokenType } from '../core/enums/token-type.enum';
 import { IAssignmentNode, IBinaryExpression, IExpressionNode, IIdentifierNode, INumberNode, IProgramNode, IStatementNode, IVariableDeclarationNode } from '../core/types/ast.type';
@@ -161,8 +161,8 @@ export class Parser {
     return declaration;
   }
 
-  public parse(sourceCode: string): IProgramNode {
-    this.tokens = tokenize(sourceCode);
+  public parse(tokens: Array<TToken>): IProgramNode {
+    this.tokens = [...tokens];
 
     const program: IProgramNode = {
       kind: NodeType.Program,

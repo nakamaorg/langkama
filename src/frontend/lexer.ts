@@ -1,88 +1,201 @@
+import { TToken } from '../core/types/token.type';
+import { TNullable } from '../core/types/nullable.type';
 import { keywords } from '../core/consts/keywords.const';
+import { CherHelper } from '../core/helpers/char.helper';
 import { TokenType } from '../core/enums/token-type.enum';
+import { LangKamaError } from '../core/errors/langkama.error';
 
 
 
-export type TToken = {
-  value?: string
-  type: TokenType
-}
+/**
+ * @description
+ * Tokenizes source code
+ */
+export class Lexer {
 
-function token(type: TokenType, value?: string): TToken {
-  return { type, value };
-}
+  /**
+   * @description
+   * Source code to tokenize
+  */
+  private code!: string;
 
-function isskippable(src: string) {
-  return src === ' ' || src === '\t' || src === '\n' || src === '\r';
-}
+  /**
+   * @description
+   * The index where the lexer is currently looking
+   */
+  private index!: number;
 
-function isalpha(src: string): boolean {
-  return src.toLowerCase() !== src.toUpperCase();
-}
+  /**
+   * @description
+   * The number of the current line
+   */
+  private row!: number;
 
-function isnumber(src: string): boolean {
-  const c = src.charCodeAt(0);
-  const bounds = ['0'.charCodeAt(0), '9'.charCodeAt(0)];
+  /**
+   * @description
+   * The number of the current character on the current line
+   */
+  private col!: number;
 
-  return c >= bounds[0] && c <= bounds[1];
-}
+  /**
+   * @description
+   * The array of tokens
+   */
+  private tokens!: Array<TToken>;
 
-export function tokenize(sourceCode: string): Array<TToken> {
-  const tokens: Array<TToken> = [];
-  const src = sourceCode.split('');
-
-  while (src.length > 0) {
-    if (src[0] === '.') {
-      tokens.push(token(TokenType.Dot, src.shift()));
-    } else if (src[0] === '(') {
-      tokens.push(token(TokenType.OpenP, src.shift()));
-    } else if (src[0] === ')') {
-      tokens.push(token(TokenType.CloseP, src.shift()));
-    } else if (src[0] === ')') {
-      tokens.push(token(TokenType.CloseP, src.shift()));
-    } else if (src[0] === '+' || src[0] === '-' || src[0] === '*' || src[0] === '/' || src[0] === '%') {
-      tokens.push(token(TokenType.BinaryOp, src.shift()));
-    } else if (src[0] === '=') {
-      tokens.push(token(TokenType.Equals, src.shift()));
-    } else {
-      if (isnumber(src[0])) {
-        let num = '';
-
-        while (src.length > 0 && isnumber(src[0])) {
-          num += src.shift();
-        }
-
-        tokens.push(token(TokenType.Number, num));
-      } else if (isalpha(src[0])) {
-        let ident = '';
-
-        while (src.length > 0 && isalpha(src[0])) {
-          ident += src.shift();
-        }
-
-        const keys = Object.keys(keywords);
-        const key = keys.find(e => e.startsWith(ident)) as string;
-        const keyword = keywords[key];
-
-        if (keyword) {
-          while (src.length > 0 && (isalpha(src[0]) || isnumber(src[0]) || src[0] === ' ')) {
-            if (ident === key) {
-              break;
-            }
-            
-            ident += src.shift();
-          }
-        }
-
-        tokens.push(token(keyword ?? TokenType.Identifier, ident.trim()));
-      } else if (isskippable(src[0])) {
-        src.shift();
-      } else {
-        throw `Unrecognized character ${src[0]}`;
-      }
-    }
+  /**
+   * @description
+   * Get the current character
+   */
+  private at(): string {
+    return this.code[this.index];
   }
 
-  tokens.push(token(TokenType.EOF));
-  return tokens;
+  /**
+   * @description
+   * Get the current character and advance
+   */
+  private eat(): TNullable<string> {
+    this.col++;
+    return this.code[this.index++] ?? null;
+  }
+
+  /**
+   * @description
+   * Creates a token object
+   *
+   * @param type The type of the token
+   * @param value The value of the token
+   */
+  private createToken(type: TokenType, value?: TNullable<string>): TToken {
+    return {
+      type,
+      row: this.row,
+      value: value ?? null,
+      col: Math.abs((value?.length ?? 0) - this.col)
+    };
+  }
+
+  /**
+   * @description
+   * Adds token to the collection of tokens
+   *
+   * @param type The type of the token
+   * @param value The value of the token
+   */
+  private addToken(type: TokenType, value?: TNullable<string>): void {
+    this.tokens.push(this.createToken(type, value));
+  }
+
+  /**
+   * @description
+   * Initializes the lexer
+   *
+   * @param code The source code to process next
+   */
+  private init(code: string = ''): void {
+    this.row = 1;
+    this.col = 0;
+    this.index = 0;
+    this.code = code;
+    this.tokens = [];
+  }
+
+  /**
+   * @description
+   * Instantiates a lexer instance
+   */
+  constructor() {
+    this.init();
+  }
+
+  /**
+   * @description
+   * Transform source code into an array of tokens
+   *
+   * @param code The source code to tokenize
+   */
+  public tokenize(code: string): Array<TToken> {
+    this.init(code);
+
+    while (this.at()) {
+      switch (this.at()) {
+        case '.': {
+          this.addToken(TokenType.Dot, this.eat());
+          break;
+        }
+
+        case '(': {
+          this.addToken(TokenType.OpenP, this.eat());
+          break;
+        }
+
+        case ')': {
+          this.addToken(TokenType.CloseP, this.eat());
+          break;
+        }
+
+        case '=': {
+          this.addToken(TokenType.Equals, this.eat());
+          break;
+        }
+
+        case '+':
+        case '-':
+        case '*':
+        case '/':
+        case '%': {
+          this.addToken(TokenType.BinaryOp, this.eat());
+          break;
+        }
+
+        default: {
+          if (CherHelper.isNumber(this.at())) {
+            let num = '';
+
+            while (this.code.length > 0 && CherHelper.isNumber(this.at())) {
+              num += this.eat();
+            }
+
+            this.addToken(TokenType.Number, num);
+          } else if (CherHelper.isAlpha(this.at())) {
+            let ident = '';
+
+            while (this.code.length > 0 && CherHelper.isAlpha(this.at())) {
+              ident += this.eat();
+            }
+
+            const keys = Object.keys(keywords);
+            const key = keys.find(e => e.startsWith(ident)) as string;
+            const keyword = keywords[key];
+
+            if (keyword) {
+              while (this.code.length > 0 && (CherHelper.isAlpha(this.at()) || CherHelper.isNumber(this.at()) || this.at() === ' ')) {
+                if (ident === key) {
+                  break;
+                }
+
+                ident += this.eat();
+              }
+            }
+
+            this.addToken(keyword ?? TokenType.Identifier, ident.trim());
+          } else if (CherHelper.isSkippable(this.at())) {
+            if (this.at() === '\n') {
+              this.row++;
+              this.col = 0;
+            }
+
+            this.eat();
+          } else {
+            throw new LangKamaError(this.row, this.col, `unrecognized token "${this.at()}"`);
+          }
+        }
+      }
+    }
+
+    this.addToken(TokenType.EOF);
+
+    return this.tokens;
+  }
 }
