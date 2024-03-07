@@ -60,10 +60,21 @@ export function tokenize(sourceCode: string): Array<TToken> {
           ident += src.shift();
         }
 
-        const keyword = keywords[ident];
-        const isKeyword = typeof keyword === 'number';
+        const keys = Object.keys(keywords);
+        const key = keys.find(e => e.startsWith(ident)) as string;
+        const keyword = keywords[key];
 
-        tokens.push(token(isKeyword ? keyword : TokenType.Identifier, ident));
+        if (keyword) {
+          while (src.length > 0 && (isalpha(src[0]) || isnumber(src[0]) || src[0] === ' ')) {
+            if (ident === key) {
+              break;
+            }
+            
+            ident += src.shift();
+          }
+        }
+
+        tokens.push(token(keyword ?? TokenType.Identifier, ident.trim()));
       } else if (isskippable(src[0])) {
         src.shift();
       } else {

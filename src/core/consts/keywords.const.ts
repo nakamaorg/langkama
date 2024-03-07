@@ -3,6 +3,7 @@ import { TokenType } from '../enums/token-type.enum';
 
 
 export const keywords: Record<string, TokenType> = {
-  let: TokenType.Let,
-  const: TokenType.Const
+  'is': TokenType.Equals,
+  'hear me out': TokenType.Let,
+  'a sa7 hear me out': TokenType.Const
 }
