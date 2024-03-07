@@ -1,4 +1,4 @@
-import { IRuntimeVal } from '../core/types/runtime-values.type';
+import { IRuntimeVal, MK_BOOL, MK_NULL } from '../core/types/runtime-values.type';
 
 
 
@@ -11,6 +11,12 @@ export class Environment {
     this.parent = parent;
     this.constants = new Set();
     this.variables = new Map();
+
+    if (!parent) {
+      this.declareVariable('null', MK_NULL(), true);
+      this.declareVariable('true', MK_BOOL(true), true);
+      this.declareVariable('false', MK_BOOL(false), true);
+    }
   }
 
   public declareVariable(name: string, value: IRuntimeVal, constant: boolean = false): IRuntimeVal {
