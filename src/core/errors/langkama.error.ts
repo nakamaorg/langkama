@@ -11,6 +11,6 @@ export class LangKamaError extends Error {
   }
 
   public toString(): string {
-    return `[${this.row}:${this.col}] ${this.message}.`;
+    return `[${this.row}:${this.col}] ${this.name} - ${this.message}.`;
   }
 }

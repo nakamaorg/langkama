@@ -3,7 +3,7 @@ import { TNullable } from '../core/types/nullable.type';
 import { keywords } from '../core/consts/keywords.const';
 import { CherHelper } from '../core/helpers/char.helper';
 import { TokenType } from '../core/enums/token-type.enum';
-import { LangKamaError } from '../core/errors/langkama.error';
+import { UnrecognizedTokenError } from '../core/errors/unrecognized-token.error';
 
 
 
@@ -188,7 +188,7 @@ export class Lexer {
 
             this.eat();
           } else {
-            throw new LangKamaError(this.row, this.col, `unrecognized token "${this.at()}"`);
+            throw new UnrecognizedTokenError(this.row, this.col, this.at());
           }
         }
       }
