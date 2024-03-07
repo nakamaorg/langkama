@@ -1,8 +1,8 @@
 export enum NodeType {
-  Number,
-  Program,
-  Identifier,
-  BinaryExpression,
-  VariableDeclaration,
-  AssignmentExpression
+  Number = 'Number',
+  Program = 'Program',
+  Identifier = 'Identifier',
+  BinaryExpression = 'BinaryExpression',
+  VariableDeclaration = 'VariableDeclaration',
+  AssignmentExpression = 'AssignmentExpression'
 }
