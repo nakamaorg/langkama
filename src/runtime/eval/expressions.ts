@@ -1,8 +1,9 @@
 import { evaluate } from '../interpreter';
 import { Environment } from '../environment';
+import { Type } from '../../core/enums/type.enum';
+import { NodeType } from '../../core/enums/node-type.enum';
 import { IAssignmentNode, IBinaryExpression, IIdentifierNode } from '../../core/types/ast.type';
 import { INumberVal, IRuntimeVal, MK_NULL } from '../../core/types/runtime-values.type';
-import { NodeType } from '../../core/enums/node-type.enum';
 
 
 
@@ -10,7 +11,7 @@ export function evaluateBinaryExpression(binaryExpression: IBinaryExpression, en
   const lhs = evaluate(binaryExpression.left, env);
   const rhs = evaluate(binaryExpression.right, env);
 
-  if (lhs.type === 'number' && rhs.type === 'number') {
+  if (lhs.type === Type.number && rhs.type === Type.number) {
     return evaluateNumericBinaryExpression(lhs as INumberVal, rhs as INumberVal, binaryExpression.operator);
   }
 
@@ -50,7 +51,7 @@ export function evaluateNumericBinaryExpression(lhs: INumberVal, rhs: INumberVal
     }
   }
 
-  return { value: result, type: 'number' };
+  return { value: result, type: Type.number };
 }
 
 export function evaluateIdentifier(identifier: IIdentifierNode, env: Environment): IRuntimeVal {

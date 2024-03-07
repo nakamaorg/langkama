@@ -1,32 +1,34 @@
-export type TValueType = 'null' | 'number' | 'boolean';
+import { Type } from '../enums/type.enum';
+
+
 
 export interface IRuntimeVal {
-  type: TValueType;
+  type: Type;
 }
 
 export interface INullVal extends IRuntimeVal {
-  type: 'null';
+  type: Type.null;
   value: null;
 }
 
 export interface INumberVal extends IRuntimeVal {
-  type: 'number';
+  type: Type.number;
   value: number;
 }
 
 export interface IBoolVal extends IRuntimeVal {
-  type: 'boolean';
+  type: Type.boolean;
   value: boolean;
 }
 
 export function MK_NULL(): INullVal {
-  return { type: 'null', value: null };
+  return { type: Type.null, value: null };
 }
 
 export function MK_NUMBER(num: number): INumberVal {
-  return { type: 'number', value: num };
+  return { type: Type.number, value: num };
 }
 
 export function MK_BOOL(bool: boolean): IBoolVal {
-  return { type: 'boolean', value: bool };
+  return { type: Type.boolean, value: bool };
 }
