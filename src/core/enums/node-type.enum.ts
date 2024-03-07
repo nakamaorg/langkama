@@ -3,5 +3,6 @@ export enum NodeType {
   Program,
   Identifier,
   BinaryExpression,
-  VariableDeclaration
+  VariableDeclaration,
+  AssignmentExpression
 }

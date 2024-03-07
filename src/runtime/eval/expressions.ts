@@ -1,7 +1,8 @@
 import { evaluate } from '../interpreter';
 import { Environment } from '../environment';
-import { IBinaryExpression, IIdentifierNode } from '../../core/types/ast.type';
+import { IAssignmentNode, IBinaryExpression, IIdentifierNode } from '../../core/types/ast.type';
 import { INumberVal, IRuntimeVal, MK_NULL } from '../../core/types/runtime-values.type';
+import { NodeType } from '../../core/enums/node-type.enum';
 
 
 
@@ -55,4 +56,13 @@ export function evaluateNumericBinaryExpression(lhs: INumberVal, rhs: INumberVal
 export function evaluateIdentifier(identifier: IIdentifierNode, env: Environment): IRuntimeVal {
   const val = env.getValue(identifier.symbol);
   return val;
+}
+
+export function evaluateAssignment(node: IAssignmentNode, env: Environment): IRuntimeVal {
+  if (node.assigne.kind !== NodeType.Identifier) {
+    throw 'Invalid LHS inside assignment expression';
+  }
+
+  const name = (node.assigne as IIdentifierNode).symbol;
+  return env.assignVariable(name, evaluate(node.value, env));
 }

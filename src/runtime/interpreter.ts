@@ -2,8 +2,8 @@ import { Environment } from './environment';
 import { NodeType } from '../core/enums/node-type.enum';
 import { INumberVal, IRuntimeVal } from '../core/types/runtime-values.type';
 import { evaluateProgram, evaluateVariableDeclaration } from './eval/statements';
-import { evaluateBinaryExpression, evaluateIdentifier } from './eval/expressions';
-import { IBinaryExpression, IIdentifierNode, INumberNode, IProgramNode, IStatementNode, IVariableDeclarationNode } from '../core/types/ast.type';
+import { evaluateAssignment, evaluateBinaryExpression, evaluateIdentifier } from './eval/expressions';
+import { IAssignmentNode, IBinaryExpression, IIdentifierNode, INumberNode, IProgramNode, IStatementNode, IVariableDeclarationNode } from '../core/types/ast.type';
 
 
 
@@ -16,6 +16,10 @@ export function evaluate(node: IStatementNode, env: Environment): IRuntimeVal {
     case NodeType.Identifier: {
       return evaluateIdentifier(node as IIdentifierNode, env);
     }
+
+     case NodeType.AssignmentExpression: {
+      return evaluateAssignment(node as IAssignmentNode, env);
+     }
 
     case NodeType.BinaryExpression: {
       return evaluateBinaryExpression(node as IBinaryExpression, env);
@@ -30,7 +34,7 @@ export function evaluate(node: IStatementNode, env: Environment): IRuntimeVal {
     }
 
     default: {
-      throw 'AST node has not been setup for interpretation - ' + JSON.stringify(node);
+      throw `AST node has not been setup for interpretation\n -> ${JSON.stringify(node, null, 2)}`;
     }
   }
 }

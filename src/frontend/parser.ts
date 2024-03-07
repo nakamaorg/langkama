@@ -1,7 +1,7 @@
 import { TToken, tokenize } from './lexer';
 import { NodeType } from '../core/enums/node-type.enum';
 import { TokenType } from '../core/enums/token-type.enum';
-import { IBinaryExpression, IExpressionNode, IIdentifierNode, INumberNode, IProgramNode, IStatementNode, IVariableDeclarationNode } from '../core/types/ast.type';
+import { IAssignmentNode, IBinaryExpression, IExpressionNode, IIdentifierNode, INumberNode, IProgramNode, IStatementNode, IVariableDeclarationNode } from '../core/types/ast.type';
 
 
 
@@ -48,7 +48,21 @@ export class Parser {
   }
 
   private parseExpression(): IExpressionNode {
-    return this.parseAdditiveExpression();
+    return this.parseAssignmentExpression();
+  }
+
+  private parseAssignmentExpression(): IExpressionNode {
+    const left = this.parseAdditiveExpression();
+
+    if (this.at().type === TokenType.Equals) {
+      this.eat();
+      const right = this.parseAssignmentExpression();
+      this.expect(TokenType.Dot, 'Assignment must end with a dot');
+
+      return { kind: NodeType.AssignmentExpression, assigne: left, value: right } as IAssignmentNode;
+    }
+
+    return left;
   }
 
   private parseAdditiveExpression(): IExpressionNode {

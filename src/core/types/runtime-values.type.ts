@@ -1,22 +1,22 @@
 export type TValueType = 'null' | 'number' | 'boolean';
 
 export interface IRuntimeVal {
-  type: TValueType
+  type: TValueType;
 }
 
 export interface INullVal extends IRuntimeVal {
-  type: 'null',
-  value: null
+  type: 'null';
+  value: null;
 }
 
 export interface INumberVal extends IRuntimeVal {
-  type: 'number',
-  value: number
+  type: 'number';
+  value: number;
 }
 
 export interface IBoolVal extends IRuntimeVal {
-  type: 'boolean',
-  value: boolean
+  type: 'boolean';
+  value: boolean;
 }
 
 export function MK_NULL(): INullVal {
