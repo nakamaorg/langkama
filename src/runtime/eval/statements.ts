@@ -20,5 +20,5 @@ export function evaluateVariableDeclaration(declaration: IVariableDeclarationNod
     ? evaluate(declaration.value, env)
     : MK_NULL();
 
-  return env.declareVariable(declaration.identifier, value);
+  return env.declareVariable(declaration.identifier, value, declaration.constant);
 }

@@ -8,7 +8,6 @@ import { MK_BOOL, MK_NULL, MK_NUMBER } from './core/types/runtime-values.type';
 const code = `
   const birthyear = 1998.
   let curryear = 2024.
-  birthyear = 2050.
   let age = curryear - birthyear.
 
   age
