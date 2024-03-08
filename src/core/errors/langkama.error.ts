@@ -1,21 +1,29 @@
+import { Errno } from '../enums/errno.enum';
+
+
+
 export class LangKamaError extends Error {
 
-  private row: number;
-  private col: number;
+  public errno: Errno;
+  private row?: number;
+  private col?: number;
 
-  constructor(row: number, col: number, message: string) {
+  constructor(message: string, row?: number, col?: number) {
     super(message);
 
     this.row = row;
     this.col = col;
 
     this.name = 'LangKamaError';
+    this.errno = Errno.LangKamaError;
   }
 
   public toString(): string {
+    const loc = (this.row || this.col) ? `${[this.row, this.col].join(':')}` : null;
+
     return [
       `\t[${this.name}] - ${this.message}.`,
-      `\t[${this.row}:${this.col}] - show line here`
+      loc ? `\t${loc} - show line here` : ''
     ].join('\n');
   }
 }
