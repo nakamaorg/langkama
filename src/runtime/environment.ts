@@ -13,9 +13,9 @@ export class Environment {
     this.variables = new Map();
 
     if (!parent) {
-      this.declareVariable('null', MK_NULL(), true);
-      this.declareVariable('true', MK_BOOL(true), true);
-      this.declareVariable('false', MK_BOOL(false), true);
+      this.declareVariable('bruh', MK_NULL(), true);
+      this.declareVariable('W', MK_BOOL(true), true);
+      this.declareVariable('L', MK_BOOL(false), true);
     }
   }
 

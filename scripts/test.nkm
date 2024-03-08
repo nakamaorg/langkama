@@ -1,14 +1,5 @@
-hear me out add (a, b) {
-  reda a + b.
-}
+hear me out x = bruh.
+hear me out true = W.
+hear me out false = L.
 
-hear me out x is 8.
-hear me out y is 2.
-hear me out show is W.
-hear me out z is add(x, y).
-
-big if true (show) {
-  loncina("result:" + z).
-} else {
-  loncina("calculated!").
-}
+bruh
