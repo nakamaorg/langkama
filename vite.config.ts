@@ -6,11 +6,17 @@ import { defineConfig } from 'vite';
 export default defineConfig({
   build: {
     lib: {
-      entry: resolve(__dirname, 'src/main.ts'),
       name: 'Langkama',
+      formats: ['umd'],
       fileName: 'langkama',
+      entry: resolve(__dirname, 'src/main.ts')
     },
     minify: true,
     emptyOutDir: true,
+    rollupOptions: {
+      output: {
+        entryFileNames: () => `langkama.cjs`
+      }
+    }
   }
 });

@@ -19,9 +19,10 @@
   "scripts": {
     "build": "tsc && vite build",
     "test": "node ./test/main.js",
-    "start": "pnpm build && pnpm test"
+    "start": "node ./bin/langkama.js"
   },
   "devDependencies": {
+    "@types/node": "^20.11.25",
     "typescript": "^5.2.2",
     "vite": "^5.1.4"
   }

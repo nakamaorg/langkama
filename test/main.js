@@ -1,1 +1,1 @@
-import './../dist/langkama.js';
+import './../dist/langkama.cjs';
