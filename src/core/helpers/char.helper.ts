@@ -1,3 +1,7 @@
+import { Char } from '../enums/char.enum';
+
+
+
 /**
  * @description
  * Helps with single character operations and checks
@@ -11,7 +15,7 @@ export class CherHelper {
    * @param char The character to check
    */
   public static isSkippable(char: string): boolean {
-    return char === ' ' || char === '\t' || char === '\n' || char === '\r';
+    return char === Char.Space || char === Char.Tabulation || char === Char.NewLine || char === Char.CarriageReturn;
   }
 
   /**

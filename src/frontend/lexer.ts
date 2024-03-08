@@ -1,3 +1,4 @@
+import { Char } from '../core/enums/char.enum';
 import { TToken } from '../core/types/token.type';
 import { TNullable } from '../core/types/nullable.type';
 import { keywords } from '../core/consts/keywords.const';
@@ -62,6 +63,48 @@ export class Lexer {
 
   /**
    * @description
+   * Tokenizes a number
+   */
+  private tokenizeNumber(): void {
+    let number = '';
+
+    while (this.at() && CherHelper.isNumber(this.at())) {
+      number += this.eat();
+    }
+
+    this.addToken(TokenType.Number, number);
+  }
+
+  /**
+   * @description
+   * Tokenizes an identifier
+   */
+  private tokenizeIdentifier(): void {
+    let identifier = '';
+
+    while (this.at() && CherHelper.isAlpha(this.at())) {
+      identifier += this.eat();
+    }
+
+    const keys = Object.keys(keywords);
+    const key = keys.find(e => e.startsWith(identifier)) as string;
+    const keyword = keywords[key];
+
+    if (keyword) {
+      while (this.at() && (!CherHelper.isSkippable(this.at()) || this.at() === Char.Space)) {
+        if (identifier === key) {
+          break;
+        }
+
+        identifier += this.eat();
+      }
+    }
+
+    this.addToken(keyword ?? TokenType.Identifier, identifier.trim());
+  }
+
+  /**
+   * @description
    * Creates a token object
    *
    * @param type The type of the token
@@ -120,68 +163,42 @@ export class Lexer {
 
     while (this.at()) {
       switch (this.at()) {
-        case '.': {
+        case Char.Dot: {
           this.addToken(TokenType.Dot, this.eat());
           break;
         }
 
-        case '(': {
+        case Char.OpenP: {
           this.addToken(TokenType.OpenP, this.eat());
           break;
         }
 
-        case ')': {
+        case Char.CloseP: {
           this.addToken(TokenType.CloseP, this.eat());
           break;
         }
 
-        case '=': {
+        case Char.Equals: {
           this.addToken(TokenType.Equals, this.eat());
           break;
         }
 
-        case '+':
-        case '-':
-        case '*':
-        case '/':
-        case '%': {
+        case Char.Plus:
+        case Char.Minus:
+        case Char.Star:
+        case Char.Slash:
+        case Char.Percentage: {
           this.addToken(TokenType.BinaryOp, this.eat());
           break;
         }
 
         default: {
           if (CherHelper.isNumber(this.at())) {
-            let num = '';
-
-            while (this.code.length > 0 && CherHelper.isNumber(this.at())) {
-              num += this.eat();
-            }
-
-            this.addToken(TokenType.Number, num);
+            this.tokenizeNumber();
           } else if (CherHelper.isAlpha(this.at())) {
-            let ident = '';
-
-            while (this.code.length > 0 && CherHelper.isAlpha(this.at())) {
-              ident += this.eat();
-            }
-
-            const keys = Object.keys(keywords);
-            const key = keys.find(e => e.startsWith(ident)) as string;
-            const keyword = keywords[key];
-
-            if (keyword) {
-              while (this.code.length > 0 && (CherHelper.isAlpha(this.at()) || CherHelper.isNumber(this.at()) || this.at() === ' ')) {
-                if (ident === key) {
-                  break;
-                }
-
-                ident += this.eat();
-              }
-            }
-
-            this.addToken(keyword ?? TokenType.Identifier, ident.trim());
+            this.tokenizeIdentifier();
           } else if (CherHelper.isSkippable(this.at())) {
-            if (this.at() === '\n') {
+            if (this.at() === Char.NewLine) {
               this.row++;
               this.col = 0;
             }
