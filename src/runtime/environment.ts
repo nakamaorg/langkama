@@ -60,7 +60,7 @@ export class Environment {
     }
 
     if (!this.parent) {
-      throw `Cannot resolve variable ${name} as it does not exist`;
+      throw `Cannot resolve variable "${name}" as it does not exist`;
     }
 
     return this.parent.resolve(name);

@@ -9,6 +9,7 @@ const code = `
   a sa7 hear me out birthyear is 1998.
   hear me out curryear is 2024.
   hear me out age is curryear - birthyear.
+  a sa7 her me out name13 is 15.
 
   age
 `;
@@ -21,6 +22,7 @@ try {
   console.log('Compiling LangKama script...');
 
   const tokens = lexer.tokenize(code);
+  console.log(tokens);
   const program = parser.parse(tokens);
   const result = evaluate(program, env);
 

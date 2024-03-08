@@ -82,25 +82,34 @@ export class Lexer {
   private tokenizeIdentifier(): void {
     let identifier = '';
 
-    while (this.at() && CherHelper.isAlpha(this.at())) {
+    while (this.at() && (CherHelper.isAlpha(this.at()) || CherHelper.isNumber(this.at()))) {
       identifier += this.eat();
     }
 
+    const baseIndex = this.index;
+    const baseIdentifier = identifier;
     const keys = Object.keys(keywords);
-    const key = keys.find(e => e.startsWith(identifier)) as string;
-    const keyword = keywords[key];
 
-    if (keyword) {
-      while (this.at() && (!CherHelper.isSkippable(this.at()) || this.at() === Char.Space)) {
-        if (identifier === key) {
-          break;
-        }
+    let key: string = '';
 
-        identifier += this.eat();
+    while (this.at() && (!CherHelper.isSkippable(this.at()) || this.at() === Char.Space)) {
+      key = keys.find(e => e.startsWith(identifier)) as string;
+
+      if (identifier === key) {
+        break;
       }
+
+      if (!key) {
+        this.index = baseIndex;
+        identifier = baseIdentifier;
+
+        break;
+      }
+
+      identifier += this.eat();
     }
 
-    this.addToken(keyword ?? TokenType.Identifier, identifier.trim());
+    this.addToken(keywords[key] ?? TokenType.Identifier, identifier.trim());
   }
 
   /**
