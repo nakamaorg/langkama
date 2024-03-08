@@ -1,4 +1,5 @@
 import { fileURLToPath } from 'url';
+import { createInterface } from 'node:readline';
 import { extname, resolve, basename } from 'path';
 import { existsSync, readFileSync, statSync } from 'fs';
 
@@ -84,7 +85,28 @@ class Cmd {
    * LangKama REPL
   */
   static #repl() {
-    console.log('repl');
+    const lexer = new LangKama.Lexer();
+    const parser = new LangKama.Parser();
+    const env = new LangKama.Environment();
+
+    const rl = createInterface({ input: process.stdin, output: process.stdout });
+    const prompt = () => {
+      rl.question('> ', input => {
+        if (input.toLowerCase() === 'exit') {
+          rl.close();
+        } else {
+          const tokens = lexer.tokenize(input);
+          const program = parser.parse(tokens);
+          const result = LangKama.evaluate(program, env);
+
+          this.#info(result.value);
+          prompt();
+        }
+      });
+    }
+
+    this.#info('--- LangKama v0.0.1 ---');
+    prompt();
   }
 
   static main() {

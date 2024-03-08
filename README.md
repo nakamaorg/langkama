@@ -37,6 +37,29 @@ npm start
 pnpm start
 ```
 
+LangKama _CLI_ offers flexible execution modes to cater to different development needs. You can either execute a LangKama script from a file by passing the file path as an argument or enter an interactive mode with a Read-Eval-Print Loop (_REPL_) by not providing any arguments. Below are the details on how to use both modes.
+
+#### Interpreting a Script File
+To run a LangKama script stored in a file, simply pass the path to the file as an argument when launching your application. The syntax for running a script is as follows:
+
+```bash
+npm start scripts/math.nkm
+# or, using pnpm
+pnpm start scripts/math.nkm
+```
+
+Replace `scripts/math.nkm` with the actual path to your LangKama script file. Upon execution, the application will interpret the script within the file..
+
+#### Launching the REPL
+
+If you prefer to work interactively or wish to test LangKama expressions on the fly, you can launch the application without any arguments to enter the _REPL_ mode. In this mode, you can input LangKama commands directly and see the results immediately. To enter _REPL_ mode.
+
+```bash
+npm start
+# or, using pnpm
+pnpm start
+```
+
 ### LangKama API
 
 For those looking to incorporate LangKama's functionality into their projects, the _API_ is accessible after a successful project build. You can find it at `dist/langkama.cjs`.
