@@ -17,6 +17,7 @@
     "url": "https://github.com/nakamaorg/langkama/issues"
   },
   "scripts": {
+    "postinstall": "pnpm build",
     "build": "tsc && vite build",
     "test": "node ./test/main.js",
     "start": "node ./bin/langkama.js"
