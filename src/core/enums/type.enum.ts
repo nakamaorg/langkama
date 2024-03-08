@@ -1,5 +1,5 @@
 export enum Type {
-  null = 'null',
-  number = 'number',
-  boolean = 'boolean'
+  Null,
+  Number,
+  Boolean
 }

@@ -6,7 +6,7 @@ import { Environment } from './runtime/environment';
 
 
 const code = `
-  a sa7 hear me out birthyear is 1998. |
+  a sa7 hear me out birthyear is 1998.
   hear me out curryear is 2024.
   hear me out age is curryear - birthyear.
 

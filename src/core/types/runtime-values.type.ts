@@ -7,28 +7,28 @@ export interface IRuntimeVal {
 }
 
 export interface INullVal extends IRuntimeVal {
-  type: Type.null;
+  type: Type.Null;
   value: null;
 }
 
 export interface INumberVal extends IRuntimeVal {
-  type: Type.number;
+  type: Type.Number;
   value: number;
 }
 
 export interface IBoolVal extends IRuntimeVal {
-  type: Type.boolean;
+  type: Type.Boolean;
   value: boolean;
 }
 
 export function MK_NULL(): INullVal {
-  return { type: Type.null, value: null };
+  return { type: Type.Null, value: null };
 }
 
-export function MK_NUMBER(num: number): INumberVal {
-  return { type: Type.number, value: num };
+export function MK_NUMBER(number: number): INumberVal {
+  return { type: Type.Number, value: number };
 }
 
-export function MK_BOOL(bool: boolean): IBoolVal {
-  return { type: Type.boolean, value: bool };
+export function MK_BOOL(boolean: boolean): IBoolVal {
+  return { type: Type.Boolean, value: boolean };
 }

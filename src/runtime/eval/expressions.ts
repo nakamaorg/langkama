@@ -3,7 +3,7 @@ import { Environment } from '../environment';
 import { Type } from '../../core/enums/type.enum';
 import { NodeType } from '../../core/enums/node-type.enum';
 import { IAssignmentNode, IBinaryExpression, IIdentifierNode } from '../../core/types/ast.type';
-import { INumberVal, IRuntimeVal, MK_NULL } from '../../core/types/runtime-values.type';
+import { INumberVal, IRuntimeVal, MK_NULL, MK_NUMBER } from '../../core/types/runtime-values.type';
 
 
 
@@ -11,7 +11,7 @@ export function evaluateBinaryExpression(binaryExpression: IBinaryExpression, en
   const lhs = evaluate(binaryExpression.left, env);
   const rhs = evaluate(binaryExpression.right, env);
 
-  if (lhs.type === Type.number && rhs.type === Type.number) {
+  if (lhs.type === Type.Number && rhs.type === Type.Number) {
     return evaluateNumericBinaryExpression(lhs as INumberVal, rhs as INumberVal, binaryExpression.operator);
   }
 
@@ -51,7 +51,7 @@ export function evaluateNumericBinaryExpression(lhs: INumberVal, rhs: INumberVal
     }
   }
 
-  return { value: result, type: Type.number };
+  return MK_NUMBER(result);
 }
 
 export function evaluateIdentifier(identifier: IIdentifierNode, env: Environment): IRuntimeVal {
