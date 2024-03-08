@@ -6,7 +6,7 @@ import { Char } from '../enums/char.enum';
  * @description
  * Helps with single character operations and checks
  */
-export class CherHelper {
+export class CharHelper {
 
   /**
    * @description

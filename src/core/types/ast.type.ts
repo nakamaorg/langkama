@@ -42,3 +42,8 @@ export interface INumberNode extends IExpressionNode {
   kind: NodeType.Number;
   value: number;
 }
+
+export interface IStringNode extends IExpressionNode {
+  kind: NodeType.String;
+  value: string;
+}

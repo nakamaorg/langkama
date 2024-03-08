@@ -3,7 +3,7 @@ import { Environment } from '../environment';
 import { Type } from '../../core/enums/type.enum';
 import { NodeType } from '../../core/enums/node-type.enum';
 import { IAssignmentNode, IBinaryExpression, IIdentifierNode } from '../../core/types/ast.type';
-import { INumberVal, IRuntimeVal, MK_NULL, MK_NUMBER } from '../../core/types/runtime-values.type';
+import { INumberVal, IRuntimeVal, IStringVal, MK_NULL, MK_NUMBER, MK_STRING } from '../../core/types/runtime-values.type';
 
 
 
@@ -11,18 +11,31 @@ export function evaluateBinaryExpression(binaryExpression: IBinaryExpression, en
   const lhs = evaluate(binaryExpression.left, env);
   const rhs = evaluate(binaryExpression.right, env);
 
-  if (lhs.type === Type.Number && rhs.type === Type.Number) {
-    return evaluateNumericBinaryExpression(lhs as INumberVal, rhs as INumberVal, binaryExpression.operator);
+  if (lhs.type !== rhs.type) {
+    throw `Can't perform binary operations on different types`;
   }
 
-  return MK_NULL();
+  switch (lhs.type) {
+    case Type.Number: {
+      return evaluateNumericBinaryExpression(lhs as INumberVal, rhs as INumberVal, binaryExpression.operator);
+    }
+
+    case Type.String: {
+      if (binaryExpression.operator === '+') {
+        return MK_STRING((lhs as IStringVal).value + (rhs as IStringVal).value);
+      } else {
+        throw `Invalid operation on string "${binaryExpression.operator}"`;
+      }
+    }
+
+    default: {
+      return MK_NULL();
+    }
+  }
 }
 
 export function evaluateNumericBinaryExpression(lhs: INumberVal, rhs: INumberVal, operator: string): INumberVal {
   let result = 0;
-
-  if (operator === '+') {
-  }
 
   switch (operator) {
     case '+': {

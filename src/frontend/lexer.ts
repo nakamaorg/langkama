@@ -2,9 +2,11 @@ import { Char } from '../core/enums/char.enum';
 import { TToken } from '../core/types/token.type';
 import { TNullable } from '../core/types/nullable.type';
 import { keywords } from '../core/consts/keywords.const';
-import { CherHelper } from '../core/helpers/char.helper';
+import { CharHelper } from '../core/helpers/char.helper';
 import { TokenType } from '../core/enums/token-type.enum';
+import { LangKamaError } from '../core/errors/langkama.error';
 import { UnrecognizedTokenError } from '../core/errors/unrecognized-token.error';
+import { UnclosedStringError } from '../core/errors/unclosed-string.error';
 
 
 
@@ -63,12 +65,28 @@ export class Lexer {
 
   /**
    * @description
+   * Advances while checking if the next character matches with an input character
+   *
+   * @param char The character to check
+   */
+  private expect(char: Char, error: LangKamaError): Char {
+    const token = this.eat();
+
+    if (!token || token !== char) {
+      throw error;
+    }
+
+    return token;
+  }
+
+  /**
+   * @description
    * Tokenizes a number
    */
   private tokenizeNumber(): void {
     let number = '';
 
-    while (this.at() && CherHelper.isNumber(this.at())) {
+    while (this.at() && CharHelper.isNumber(this.at())) {
       number += this.eat();
     }
 
@@ -82,7 +100,7 @@ export class Lexer {
   private tokenizeIdentifier(): void {
     let identifier = '';
 
-    while (this.at() && (CherHelper.isAlpha(this.at()) || CherHelper.isNumber(this.at()))) {
+    while (this.at() && (CharHelper.isAlpha(this.at()) || CharHelper.isNumber(this.at()))) {
       identifier += this.eat();
     }
 
@@ -92,7 +110,7 @@ export class Lexer {
 
     let key: string = '';
 
-    while (this.at() && (!CherHelper.isSkippable(this.at()) || this.at() === Char.Space)) {
+    while (this.at() && (!CharHelper.isSkippable(this.at()) || this.at() === Char.Space)) {
       key = keys.find(e => e.startsWith(identifier)) as string;
 
       if (identifier === key) {
@@ -109,7 +127,7 @@ export class Lexer {
       identifier += this.eat();
     }
 
-    this.addToken(keywords[key] ?? TokenType.Identifier, identifier.trim());
+    this.addToken(keywords[key] ?? TokenType.Identifier, identifier);
   }
 
   /**
@@ -135,8 +153,11 @@ export class Lexer {
    * @param type The type of the token
    * @param value The value of the token
    */
-  private addToken(type: TokenType, value?: TNullable<string>): void {
-    this.tokens.push(this.createToken(type, value));
+  private addToken(type: TokenType, value?: TNullable<string>): TToken {
+    const token = this.createToken(type, value);
+    this.tokens.push(token);
+
+    return token;
   }
 
   /**
@@ -187,6 +208,20 @@ export class Lexer {
           break;
         }
 
+        case Char.DoubleQuotes: {
+          let string: string = '';
+          this.eat();
+
+          while (this.at() && this.at() !== Char.DoubleQuotes && this.at() !== Char.NewLine) {
+            string += this.eat();
+          }
+
+          const token = this.addToken(TokenType.String, string);
+          this.expect(Char.DoubleQuotes, new UnclosedStringError(token.row, token.col));
+
+          break;
+        }
+
         case Char.Equals: {
           this.addToken(TokenType.Equals, this.eat());
           break;
@@ -202,11 +237,11 @@ export class Lexer {
         }
 
         default: {
-          if (CherHelper.isNumber(this.at())) {
+          if (CharHelper.isNumber(this.at())) {
             this.tokenizeNumber();
-          } else if (CherHelper.isAlpha(this.at())) {
+          } else if (CharHelper.isAlpha(this.at())) {
             this.tokenizeIdentifier();
-          } else if (CherHelper.isSkippable(this.at())) {
+          } else if (CharHelper.isSkippable(this.at())) {
             if (this.at() === Char.NewLine) {
               this.row++;
               this.col = 0;
@@ -214,7 +249,7 @@ export class Lexer {
 
             this.eat();
           } else {
-            throw new UnrecognizedTokenError(this.row, this.col, this.at());
+            throw new UnrecognizedTokenError(this.row, this.col);
           }
         }
       }

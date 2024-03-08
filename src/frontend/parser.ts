@@ -1,7 +1,7 @@
 import { TToken } from '../core/types/token.type';
 import { NodeType } from '../core/enums/node-type.enum';
 import { TokenType } from '../core/enums/token-type.enum';
-import { IAssignmentNode, IBinaryExpression, IExpressionNode, IIdentifierNode, INumberNode, IProgramNode, IStatementNode, IVariableDeclarationNode } from '../core/types/ast.type';
+import { IAssignmentNode, IBinaryExpression, IExpressionNode, IIdentifierNode, INumberNode, IProgramNode, IStatementNode, IStringNode, IVariableDeclarationNode } from '../core/types/ast.type';
 
 
 
@@ -117,6 +117,13 @@ export class Parser {
           kind: NodeType.Number,
           value: parseFloat(this.eat().value as string)
         } as INumberNode;
+      }
+
+      case TokenType.String: {
+        return {
+          kind: NodeType.String,
+          value: this.eat().value
+        } as IStringNode;
       }
 
       case TokenType.OpenP: {

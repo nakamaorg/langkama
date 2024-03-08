@@ -3,6 +3,7 @@ export enum Char {
   OpenP = '(',
   CloseP = ')',
   Equals = '=',
+  DoubleQuotes = '"',
 
   // Operators
   Plus = '+',

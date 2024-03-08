@@ -1,9 +1,9 @@
 import { Environment } from './environment';
 import { NodeType } from '../core/enums/node-type.enum';
-import { IRuntimeVal, MK_NUMBER } from '../core/types/runtime-values.type';
+import { IRuntimeVal, MK_NUMBER, MK_STRING } from '../core/types/runtime-values.type';
 import { evaluateProgram, evaluateVariableDeclaration } from './eval/statements';
 import { evaluateAssignment, evaluateBinaryExpression, evaluateIdentifier } from './eval/expressions';
-import { IAssignmentNode, IBinaryExpression, IIdentifierNode, INumberNode, IProgramNode, IStatementNode, IVariableDeclarationNode } from '../core/types/ast.type';
+import { IAssignmentNode, IBinaryExpression, IIdentifierNode, INumberNode, IProgramNode, IStatementNode, IStringNode, IVariableDeclarationNode } from '../core/types/ast.type';
 
 
 
@@ -11,6 +11,10 @@ export function evaluate(node: IStatementNode, env: Environment): IRuntimeVal {
   switch (node.kind) {
     case NodeType.Number: {
       return MK_NUMBER((node as INumberNode).value);
+    }
+    
+    case NodeType.String: {
+      return MK_STRING((node as IStringNode).value);
     }
 
     case NodeType.Identifier: {

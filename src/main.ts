@@ -8,10 +8,11 @@ import { Environment } from './runtime/environment';
 const code = `
   a sa7 hear me out birthyear is 1998.
   hear me out curryear is 2024.
-  hear me out age is curryear - birthyear.
-  a sa7 her me out name13 is 15.
+  hear me out age is curryear   - birthyear.
+  a sa7 hear me out firstName1 is "oussama".
+  a sa7 hear me out lastName is "essamadi".
 
-  age
+  "Hello, my name is " + firstName1 + " " + lastName + " and I'm " + "48" + " years old!"
 `;
 
 try {
@@ -22,7 +23,6 @@ try {
   console.log('Compiling LangKama script...');
 
   const tokens = lexer.tokenize(code);
-  console.log(tokens);
   const program = parser.parse(tokens);
   const result = evaluate(program, env);
 

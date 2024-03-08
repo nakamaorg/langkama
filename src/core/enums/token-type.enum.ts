@@ -5,6 +5,7 @@ export enum TokenType {
   Const = 'Const',
   OpenP = 'OpenP',
   Number = 'Number',
+  String = 'String',
   CloseP = 'CloseP',
   Equals = 'Equals',
   BinaryOp = 'BinaryOp',

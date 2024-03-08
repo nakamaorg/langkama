@@ -16,6 +16,11 @@ export interface INumberVal extends IRuntimeVal {
   value: number;
 }
 
+export interface IStringVal extends IRuntimeVal {
+  type: Type.String;
+  value: string;
+}
+
 export interface IBoolVal extends IRuntimeVal {
   type: Type.Boolean;
   value: boolean;
@@ -27,6 +32,10 @@ export function MK_NULL(): INullVal {
 
 export function MK_NUMBER(number: number): INumberVal {
   return { type: Type.Number, value: number };
+}
+
+export function MK_STRING(string: string): IStringVal {
+  return { type: Type.String, value: string };
 }
 
 export function MK_BOOL(boolean: boolean): IBoolVal {
