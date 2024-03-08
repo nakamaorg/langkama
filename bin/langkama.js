@@ -3,6 +3,7 @@ import { createInterface } from 'node:readline';
 import { extname, resolve, basename } from 'path';
 import { existsSync, readFileSync, statSync } from 'fs';
 
+import chalk from 'chalk';
 import LangKama from './../dist/langkama.cjs';
 
 
@@ -30,7 +31,8 @@ class Cmd {
    * @param {LangKamaError} error The error to log
    */
   static #error(error) {
-    process.stderr.write(`${error.toString()}\n`);
+    process.stderr.write(chalk.bgRed(' LangKama Error \n'));
+    process.stderr.write(chalk.red(`${error.toString()}\n`));
     process.exit(error.errno);
   }
 
@@ -95,17 +97,22 @@ class Cmd {
         if (input.toLowerCase() === 'exit') {
           rl.close();
         } else {
-          const tokens = lexer.tokenize(input);
-          const program = parser.parse(tokens);
-          const result = LangKama.evaluate(program, env);
-
-          this.#info(result.value);
-          prompt();
+          try {
+            const tokens = lexer.tokenize(input);
+            const program = parser.parse(tokens);
+            const result = LangKama.evaluate(program, env);
+  
+            this.#info(chalk.green(result.value));
+          } catch(err) {
+            this.#error(err);
+          } finally {
+            prompt();
+          }
         }
       });
     }
 
-    this.#info('--- LangKama v0.0.1 ---');
+    this.#info(`--- ${chalk.bgWhite(' LangKama v0.0.1 ')} ---`);
     prompt();
   }
 

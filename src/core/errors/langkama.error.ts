@@ -22,8 +22,8 @@ export class LangKamaError extends Error {
     const loc = (this.row || this.col) ? `${[this.row, this.col].join(':')}` : null;
 
     return [
-      `\t[${this.name}] - ${this.message}.`,
-      loc ? `\t${loc} - show line here` : ''
+      `  [${this.name}] - ${this.message}.`,
+      loc ? `  ${loc} - show line here` : ''
     ].join('\n');
   }
 }
