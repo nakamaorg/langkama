@@ -39,7 +39,7 @@ class Cmd {
    *
    * @param {string} filePath  The path to the LangKama source file
    */
-  static #compile(filePath) {
+  static interpret(filePath) {
     try {
       const fullPath = resolve(filePath);
 
@@ -89,7 +89,7 @@ class Cmd {
 
   static main() {
     if (process.argv.length > 2) {
-      this.#compile(process.argv[2]);
+      this.interpret(process.argv[2]);
     } else {
       this.#repl();
     }
