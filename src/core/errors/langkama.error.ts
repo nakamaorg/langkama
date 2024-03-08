@@ -8,9 +8,14 @@ export class LangKamaError extends Error {
 
     this.row = row;
     this.col = col;
+
+    this.name = 'LangKamaError';
   }
 
   public toString(): string {
-    return `[${this.row}:${this.col}] ${this.name} - ${this.message}.`;
+    return [
+      `\t[${this.name}] - ${this.message}.`,
+      `\t[${this.row}:${this.col}] - show line here`
+    ].join('\n');
   }
 }
