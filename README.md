@@ -1,4 +1,10 @@
-# LangKama
+<h1 align="center">LangKama</h1>
+
+<p align="center">
+  <img src="https://github.com/nakamaorg/langkama/actions/workflows/test.yml/badge.svg" />
+  <img src="https://img.shields.io/github/v/tag/nakamaorg/langkama" />
+  <img src="https://img.shields.io/github/license/nakamaorg/langkama" />
+</p>
 
 LangKama is a ~~turing~~retard-complete programming language designed for shits and giggles. Below you'll find detailed instructions on how to set up, build, and use LangKama, as well as run tests to ensure everything is working as expected.
 
