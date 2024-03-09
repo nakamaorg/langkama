@@ -1,35 +1,69 @@
-import { TToken } from '../core/types/token.type';
 import { NodeType } from '../core/enums/node-type.enum';
 import { TokenType } from '../core/enums/token-type.enum';
+
+import { LangKamaError, MissingEqualsError, MissingIdentifierError, MissingDotError, UnclosedParenthesisError, UninitializedConstantError, UnrecognizedTokenError } from '../core';
+
+import { TToken } from '../core/types/token.type';
 import { IAssignmentNode, IBinaryExpression, IExpressionNode, IIdentifierNode, INumberNode, IProgramNode, IStatementNode, IStringNode, IVariableDeclarationNode } from '../core/types/ast.type';
 
 
 
+/**
+ * @description
+ * Helps with parsing the tokens into an AST
+ */
 export class Parser {
+
+  /**
+   * @description
+   * The collection of tokens
+   */
   private tokens: Array<TToken>;
 
+  /**
+   * @description
+   * Instantiates a parser instance
+   */
   constructor() {
     this.tokens = [];
   }
 
+  /**
+   * @description
+   * Get the current token
+   */
   private at(): TToken {
     return this.tokens[0];
   }
 
+  /**
+   * @description
+   * Get the current token and advance
+   */
   private eat(): TToken {
     return this.tokens.shift() as TToken;
   }
 
-  private expect(tokenType: TokenType, error: string): TToken {
+  /**
+   * @description
+   * Advances while checking if the next token matches with the input token
+   *
+   * @param char The character to check
+   */
+  private expect(type: TokenType, error: LangKamaError): TToken {
     const token = this.eat();
 
-    if (!token || token.type !== tokenType) {
-      throw `Parser - ${error}, Expected ${tokenType}`;
+    if (!token || token.type !== type) {
+      throw error;
     }
 
     return token;
   }
 
+  /**
+   * @description
+   * Checks if the end of the file has not been reached yet
+   */
   private notEof(): boolean {
     return this.tokens[0].type !== TokenType.EOF;
   }
@@ -57,7 +91,7 @@ export class Parser {
     if (this.at().type === TokenType.Equals) {
       this.eat();
       const right = this.parseAssignmentExpression();
-      this.expect(TokenType.Dot, 'Assignment must end with a dot');
+      this.expect(TokenType.Dot, new MissingDotError(this.at().row, this.at().col));
 
       return { kind: NodeType.AssignmentExpression, assigne: left, value: right } as IAssignmentNode;
     }
@@ -129,32 +163,32 @@ export class Parser {
       case TokenType.OpenP: {
         this.eat();
         const value = this.parseExpression();
-        this.expect(TokenType.CloseP, 'Unclosed parenthesis');
+        this.expect(TokenType.CloseP, new UnclosedParenthesisError(this.at().row, this.at().col));
 
         return value;
       }
 
       default: {
-        throw `Parser - Unexpected token ${JSON.stringify(this.at())}}`;
+        throw new UnrecognizedTokenError(this.at().row, this.at().col);
       }
     }
   }
 
   private parseVariableDeclaration(): IExpressionNode {
     const isConstant = this.eat().type === TokenType.Const;
-    const identifier = this.expect(TokenType.Identifier, 'Expected identifier name').value;
+    const identifier = this.expect(TokenType.Identifier, new MissingIdentifierError(this.at().row, this.at().col)).value;
 
     if (this.at().type === TokenType.Dot) {
       this.eat();
 
       if (isConstant) {
-        throw 'No value provided';
+        throw new UninitializedConstantError(this.at().row, this.at().col);
       }
 
       return { kind: NodeType.VariableDeclaration, identifier, constant: false } as IVariableDeclarationNode;
     }
 
-    this.expect(TokenType.Equals, 'Expected equals token following the identifier in variable declaration');
+    this.expect(TokenType.Equals, new MissingEqualsError(this.at().row, this.at().col));
 
     const declaration = {
       identifier,
@@ -163,7 +197,7 @@ export class Parser {
       kind: NodeType.VariableDeclaration
     } as IVariableDeclarationNode;
 
-    this.expect(TokenType.Dot, 'Variable declaration must end with a dot');
+    this.expect(TokenType.Dot, new MissingDotError(this.at().row, this.at().col));
 
     return declaration;
   }

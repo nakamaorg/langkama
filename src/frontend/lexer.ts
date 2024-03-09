@@ -1,12 +1,13 @@
 import { Char } from '../core/enums/char.enum';
+import { TokenType } from '../core/enums/token-type.enum';
+
 import { TToken } from '../core/types/token.type';
 import { TNullable } from '../core/types/nullable.type';
+
 import { keywords } from '../core/consts/keywords.const';
 import { CharHelper } from '../core/helpers/char.helper';
-import { TokenType } from '../core/enums/token-type.enum';
-import { LangKamaError } from '../core/errors/langkama.error';
-import { UnrecognizedTokenError } from '../core/errors/unrecognized-token.error';
-import { UnclosedStringError } from '../core/errors/unclosed-string.error';
+
+import { LangKamaError, UnclosedStringError, UnrecognizedTokenError } from '../core';
 
 
 
@@ -68,15 +69,16 @@ export class Lexer {
    * Advances while checking if the next character matches with an input character
    *
    * @param char The character to check
+   * @param error The error to throw
    */
   private expect(char: Char, error: LangKamaError): Char {
-    const token = this.eat();
+    const currentChar = this.eat();
 
-    if (!token || token !== char) {
+    if (!currentChar || currentChar !== char) {
       throw error;
     }
 
-    return token;
+    return currentChar;
   }
 
   /**
