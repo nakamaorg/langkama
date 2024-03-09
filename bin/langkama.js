@@ -23,12 +23,27 @@ class Cmd {
 
   /**
    * @description
+   * Execution time
+   */
+  static startTime = process.hrtime();
+
+  /**
+   * @description
    * Logs text to stdout stream
    *
    * @param {string} text The text to log
+   * @param {boolean} time Whether to include the execution time or not
    */
-  static #info(text) {
-    process.stdout.write(`${text}\n`);
+  static #info(text, time = true) {
+    if (time) {
+      const elapsed = process.hrtime(this.startTime);
+      const elapsedSeconds = elapsed[0] + elapsed[1] / 1e9;
+      const elapsedSecondslabel = chalk.yellow(`[${elapsedSeconds.toFixed(5)}s]`);
+  
+      process.stdout.write(`${elapsedSecondslabel} ${text}\n`);
+    } else {
+      process.stdout.write(`${text}\n`);
+    }
   }
 
   /**
@@ -38,7 +53,10 @@ class Cmd {
    * @param {LangKamaError} error The error to log
    */
   static #error(error) {
-    process.stderr.write(chalk.bgRed(' LangKama Error \n'));
+    const elapsed = process.hrtime(this.startTime);
+    const elapsedSeconds = elapsed[0] + elapsed[1] / 1e9;
+
+    process.stderr.write(chalk.bgRed(`[${chalk.yellow(elapsedSeconds.toFixed(5))}s] LangKama Error \n`));
     process.stderr.write(chalk.red(`${error.toString()}\n`));
     process.exit(error.errno);
   }
@@ -51,6 +69,9 @@ class Cmd {
    */
   static interpret(filePath) {
     try {
+      this.startTime = process.hrtime();
+      this.#info(`--- ${chalk.bgWhite(' LangKama v0.0.1 Interpreter ')} ---`, false);
+
       const fullPath = resolve(filePath);
 
       if (!existsSync(fullPath)) {
@@ -119,7 +140,7 @@ class Cmd {
       });
     }
 
-    this.#info(`--- ${chalk.bgWhite(' LangKama v0.0.1 ')} ---`);
+    this.#info(`--- ${chalk.bgWhite(' LangKama v0.0.1 REPL ')} ---`);
     prompt();
   }
 
