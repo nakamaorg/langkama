@@ -1,13 +1,15 @@
 import { resolve } from 'path';
+import dts from 'vite-plugin-dts';
 import { defineConfig } from 'vite';
 
 
 
 export default defineConfig({
+  plugins: [dts({ copyDtsFiles: true })],
   build: {
     lib: {
       name: 'Langkama',
-      formats: ['umd'],
+      // formats: ['umd'],
       fileName: 'langkama',
       entry: resolve(__dirname, 'src/main.ts')
     },
@@ -15,7 +17,7 @@ export default defineConfig({
     emptyOutDir: true,
     rollupOptions: {
       output: {
-        entryFileNames: () => `langkama.cjs`
+        // entryFileNames: () => `langkama.cjs`
       }
     }
   }

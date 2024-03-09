@@ -1,4 +1,4 @@
-const LangKama = require('../dist/langkama.cjs');
+const LangKama = require('../dist/langkama.umd.cjs');
 
 
 

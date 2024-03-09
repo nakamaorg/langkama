@@ -4,8 +4,15 @@ import { extname, resolve, basename } from 'path';
 import { existsSync, readFileSync, statSync } from 'fs';
 
 import chalk from 'chalk';
-import LangKama from './../dist/langkama.cjs';
 
+import {
+  InvalidFileError,
+  UnknownFileError,
+  Lexer,
+  Parser,
+  Environment,
+  evaluate
+} from './../dist/langkama.js';
 
 
 /**
@@ -47,14 +54,14 @@ class Cmd {
       const fullPath = resolve(filePath);
 
       if (!existsSync(fullPath)) {
-        throw new LangKama.UnknownFileError(fullPath);
+        throw new UnknownFileError(fullPath);
       }
 
       const fileName = basename(fullPath);
       const fileStats = statSync(fullPath);
 
       if (extname(fullPath) !== '.nkm' || fileStats.isDirectory()) {
-        throw new LangKama.InvalidFileError(fileName);
+        throw new InvalidFileError(fileName);
       }
 
       this.#info(`Loading "${fileName}" script...`);
@@ -62,16 +69,16 @@ class Cmd {
       const code = bytes.toString();
 
       this.#info(`Tokenizing "${fileName}" script...`);
-      const lexer = new LangKama.Lexer();
+      const lexer = new Lexer();
       const tokens = lexer.tokenize(code);
 
       this.#info(`Parsing "${fileName}" script...`);
-      const parser = new LangKama.Parser();
+      const parser = new Parser();
       const program = parser.parse(tokens);
 
       this.#info(`Interpreting "${fileName}" script...`);
-      const env = new LangKama.Environment();
-      const result = LangKama.evaluate(program, env);
+      const env = new Environment();
+      const result = evaluate(program, env);
 
       this.#info('LangKama script compiled!\n');
       this.#info(result.value);
@@ -87,9 +94,9 @@ class Cmd {
    * LangKama REPL
   */
   static #repl() {
-    const lexer = new LangKama.Lexer();
-    const parser = new LangKama.Parser();
-    const env = new LangKama.Environment();
+    const lexer = new Lexer();
+    const parser = new Parser();
+    const env = new Environment();
 
     const rl = createInterface({ input: process.stdin, output: process.stdout });
     const prompt = () => {
@@ -100,10 +107,10 @@ class Cmd {
           try {
             const tokens = lexer.tokenize(input);
             const program = parser.parse(tokens);
-            const result = LangKama.evaluate(program, env);
-  
+            const result = evaluate(program, env);
+
             this.#info(chalk.green(result.value));
-          } catch(err) {
+          } catch (err) {
             this.#error(err);
           } finally {
             prompt();
