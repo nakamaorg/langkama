@@ -1,7 +1,8 @@
+import { Char } from '../core/enums/char.enum';
 import { NodeType } from '../core/enums/node-type.enum';
 import { TokenType } from '../core/enums/token-type.enum';
 
-import { LangKamaError, MissingEqualsError, MissingIdentifierError, MissingDotError, UnclosedParenthesisError, UninitializedConstantError, UnrecognizedTokenError } from '../core';
+import { LangKamaError, MissingEqualsError, MissingIdentifierError, MissingDotError, UnclosedParenthesisError, UninitializedConstantError, UnrecognizedTokenError, IncompleteExpressionError } from '../core';
 
 import { TToken } from '../core/types/token.type';
 import { IAssignmentNode, IBinaryExpression, IExpressionNode, IIdentifierNode, INumberNode, IProgramNode, IStatementNode, IStringNode, IVariableDeclarationNode } from '../core/types/ast.type';
@@ -68,6 +69,10 @@ export class Parser {
     return this.tokens[0].type !== TokenType.EOF;
   }
 
+  /**
+   * @description
+   * Parses a statement
+   */
   private parseStatement(): IStatementNode {
     switch (this.at().type) {
       case TokenType.Let:
@@ -101,7 +106,6 @@ export class Parser {
 
   private parseAdditiveExpression(): IExpressionNode {
     let left = this.parseMultiplicativeExpression();
-
     while (this.at().value === '+' || this.at().value === '-') {
       const operator = this.eat().value;
       const right = this.parseMultiplicativeExpression();
@@ -111,7 +115,7 @@ export class Parser {
         right,
         operator,
         kind: NodeType.BinaryExpression,
-      } as IBinaryExpression
+      } as IBinaryExpression;
     }
 
     return left;
@@ -120,7 +124,7 @@ export class Parser {
   private parseMultiplicativeExpression(): IExpressionNode {
     let left = this.parsePrimaryExpression();
 
-    while (this.at().value === '*' || this.at().value === '/' || this.at().value === '%') {
+    while (this.at().value === Char.Star || this.at().value === Char.Slash || this.at().value === Char.Percentage) {
       const operator = this.eat().value;
       const right = this.parsePrimaryExpression();
 
@@ -129,7 +133,7 @@ export class Parser {
         right,
         operator,
         kind: NodeType.BinaryExpression,
-      } as IBinaryExpression
+      } as IBinaryExpression;
     }
 
     return left;
@@ -168,8 +172,12 @@ export class Parser {
         return value;
       }
 
+      case TokenType.EOF: {
+        throw new IncompleteExpressionError(this.at().row, this.at().col);
+      }
+
       default: {
-        throw new UnrecognizedTokenError(this.at().row, this.at().col); // TODO: switch to a more appropriate error
+        throw new UnrecognizedTokenError(this.at().row, this.at().col);
       }
     }
   }
@@ -202,6 +210,12 @@ export class Parser {
     return declaration;
   }
 
+  /**
+   * @description
+   * Parses a list of tokens into an AST
+   *
+   * @param tokens The tokens to parse
+   */
   public parse(tokens: Array<TToken>): IProgramNode {
     this.tokens = [...tokens];
 

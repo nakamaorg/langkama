@@ -154,7 +154,7 @@ describe('Maths and arithmetics errors', () => {
 
   test('Incomplete operation', () => {
     const code = `1 +`;
-    expect(() => compile(code)).toThrow(LangKama.UnrecognizedToken); // TODO: switch to a more appropriate error
+    expect(() => compile(code)).toThrow(LangKama.IncompleteExpressionError);
   });
 
   test('Arithmetics on different data types', () => {

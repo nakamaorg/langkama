@@ -56,7 +56,7 @@ describe('Strings errors', () => {
 
   test('Incomplete operation', () => {
     const code = `"John" +`;
-    expect(() => compile(code)).toThrow(LangKama.UnrecognizedTokenError); // TODO: switch to a more appropriate error
+    expect(() => compile(code)).toThrow(LangKama.IncompleteOperationError);
   });
 
   test('String concatenation with non string type', () => {

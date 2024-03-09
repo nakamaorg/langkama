@@ -7,4 +7,5 @@ export * from './missing-equals.error';
 export * from './missing-identifier.error';
 export * from './unrecognized-token.error';
 export * from './unclosed-parenthesis.error';
+export * from './incomplete-expression.error';
 export * from './uninitialized-constant.error';

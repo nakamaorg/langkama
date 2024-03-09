@@ -8,5 +8,6 @@ export enum Errno {
   MissingIdentifierError,
   UnrecognizedTokenError,
   UnclosedParenthesisError,
+  IncompleteExpressionError,
   UninitializedConstantError
 }
