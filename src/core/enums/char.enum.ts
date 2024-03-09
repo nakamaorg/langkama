@@ -2,7 +2,6 @@ export enum Char {
   Dot = '.',
   OpenP = '(',
   CloseP = ')',
-  Equals = '=',
   DoubleQuotes = '"',
 
   // Operators

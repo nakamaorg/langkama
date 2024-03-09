@@ -222,11 +222,6 @@ export class Lexer {
           break;
         }
 
-        case Char.Equals: {
-          this.addToken(TokenType.Equals, this.eat());
-          break;
-        }
-
         case Char.Plus:
         case Char.Minus:
         case Char.Star:

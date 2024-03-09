@@ -60,8 +60,8 @@ describe('Constants errors', () => {
 
   test('Constant duplication', () => {
     const code = `
-      a sa7 hear me out zero = 0.
-      a sa7 hear me out zero = 0.
+      a sa7 hear me out zero is 0.
+      a sa7 hear me out zero is 0.
     `;
     expect(() => compile(code)).toThrow('Cannot declare variable zero as it\'s already defined');
   });

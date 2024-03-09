@@ -93,8 +93,8 @@ describe('Variables errors', () => {
 
   test('Variable duplication', () => {
     const code = `
-      hear me out myVar = 1.
-      hear me out myVar = 2.
+      hear me out myVar is 1.
+      hear me out myVar is 2.
     `;
     expect(() => compile(code)).toThrow('Cannot declare variable myVar as it\'s already defined');
   });
