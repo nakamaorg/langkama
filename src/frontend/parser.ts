@@ -169,7 +169,7 @@ export class Parser {
       }
 
       default: {
-        throw new UnrecognizedTokenError(this.at().row, this.at().col);
+        throw new UnrecognizedTokenError(this.at().row, this.at().col); // TODO: switch to a more appropriate error
       }
     }
   }

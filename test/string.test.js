@@ -56,7 +56,7 @@ describe('Strings errors', () => {
 
   test('Incomplete operation', () => {
     const code = `"John" +`;
-    expect(() => compile(code)).toThrow('Parser - Unexpected token {"type":"EOF","row":1,"value":null,"col":8}}');
+    expect(() => compile(code)).toThrow(LangKama.UnrecognizedTokenError); // TODO: switch to a more appropriate error
   });
 
   test('String concatenation with non string type', () => {

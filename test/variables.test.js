@@ -70,17 +70,17 @@ describe('Variables errors', () => {
 
   test('Variable declaration without an identifier', () => {
     const code = `hear me out`;
-    expect(() => compile(code)).toThrow('Parser - Expected identifier name, Expected Identifier');
+    expect(() => compile(code)).toThrow(LangKama.MissingIdentifierError);
   });
 
   test('Variable declaration without a dot at the end', () => {
     const code = `hear me out var`;
-    expect(() => compile(code)).toThrow('Parser - Expected equals token following the identifier in variable declaration, Expected Equals');
+    expect(() => compile(code)).toThrow(LangKama.MissingEqualsError);
   });
 
   test('Variable declaration without a valid value after the equals keyword', () => {
     const code = `hear me out var is`;
-    expect(() => compile(code)).toThrow('Parser - Expected equals token following the identifier in variable declaration, Expected Equals');
+    expect(() => compile(code)).toThrow(LangKama.MissingEqualsError);
   });
 
   test('Variable reassignment without a valid value after the equals keyword', () => {

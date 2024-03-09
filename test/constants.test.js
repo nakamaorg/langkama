@@ -55,7 +55,7 @@ describe('Constants errors', () => {
 
   test('Constant declaration without a value', () => {
     const code = `a sa7 hear me out zero.`;
-    expect(() => compile(code)).toThrow('No value provided');
+    expect(() => compile(code)).toThrow(LangKama.UninitializedConstantError);
   });
 
   test('Constant duplication', () => {
