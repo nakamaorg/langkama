@@ -1,7 +1,12 @@
 export enum Errno {
   LangKamaError,
+  MissingDotError,
   InvalidFileError,
   UnknownFileError,
+  MissingEqualsError,
   UnclosedStringError,
-  UnrecognizedTokenError
+  MissingIdentifierError,
+  UnrecognizedTokenError,
+  UnclosedParenthesisError,
+  UninitializedConstantError
 }
