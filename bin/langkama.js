@@ -11,7 +11,8 @@ import {
   Lexer,
   Parser,
   Environment,
-  evaluate
+  evaluate,
+  version
 } from './../dist/langkama.js';
 
 
@@ -39,7 +40,7 @@ class Cmd {
       const elapsed = process.hrtime(this.startTime);
       const elapsedSeconds = elapsed[0] + elapsed[1] / 1e9;
       const elapsedSecondslabel = chalk.yellow(`[${elapsedSeconds.toFixed(5)}s]`);
-  
+
       process.stdout.write(`${elapsedSecondslabel} ${text}\n`);
     } else {
       process.stdout.write(`${text}\n`);
@@ -70,7 +71,7 @@ class Cmd {
   static interpret(filePath) {
     try {
       this.startTime = process.hrtime();
-      this.#info(`--- ${chalk.bgWhite(' LangKama v0.0.1 Interpreter ')} ---`, false);
+      this.#info(`--- ${chalk.bgWhite(` LangKama v${version} Interpreter `)} ---`, false);
 
       const fullPath = resolve(filePath);
 
@@ -122,6 +123,8 @@ class Cmd {
     const rl = createInterface({ input: process.stdin, output: process.stdout });
     const prompt = () => {
       rl.question('> ', input => {
+        this.startTime = process.hrtime();
+
         if (input.toLowerCase() === 'exit') {
           rl.close();
         } else {
@@ -140,7 +143,7 @@ class Cmd {
       });
     }
 
-    this.#info(`--- ${chalk.bgWhite(' LangKama v0.0.1 REPL ')} ---`);
+    this.#info(`--- ${chalk.bgWhite(` LangKama v${version} REPL `)} ---`, false);
     prompt();
   }
 

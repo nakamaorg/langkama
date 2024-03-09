@@ -1,24 +1,25 @@
 import { resolve } from 'path';
-import dts from 'vite-plugin-dts';
 import { defineConfig } from 'vite';
+
+import pkg from './package.json';
+import dts from 'vite-plugin-dts';
 
 
 
 export default defineConfig({
   plugins: [dts({ copyDtsFiles: true })],
+  define: {
+    __CONFIG__: {
+      version: pkg.version
+    }
+  },
   build: {
     lib: {
       name: 'Langkama',
-      // formats: ['umd'],
-      fileName: 'langkama',
+      fileName: pkg.name,
       entry: resolve(__dirname, 'src/main.ts')
     },
     minify: true,
-    emptyOutDir: true,
-    rollupOptions: {
-      output: {
-        // entryFileNames: () => `langkama.cjs`
-      }
-    }
+    emptyOutDir: true
   }
 });
