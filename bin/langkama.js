@@ -52,14 +52,18 @@ class Cmd {
    * Logs error to stderr stream
    *
    * @param {LangKamaError} error The error to log
+   * @param {boolean} exit Whether to exit the process or not
    */
-  static #error(error) {
+  static #error(error, exit = true) {
     const elapsed = process.hrtime(this.startTime);
     const elapsedSeconds = elapsed[0] + elapsed[1] / 1e9;
 
     process.stderr.write(chalk.bgRed(`[${chalk.yellow(elapsedSeconds.toFixed(5))}s] LangKama Error \n`));
     process.stderr.write(chalk.red(`${error.toString()}\n`));
-    process.exit(error.errno);
+
+    if (exit) {
+      process.exit(error.errno);
+    }
   }
 
   /**
@@ -135,7 +139,7 @@ class Cmd {
 
             this.#info(chalk.green(result.value));
           } catch (err) {
-            this.#error(err);
+            this.#error(err, false);
           } finally {
             prompt();
           }
