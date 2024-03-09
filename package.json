@@ -17,14 +17,16 @@
     "url": "https://github.com/nakamaorg/langkama/issues"
   },
   "scripts": {
-    "postinstall": "pnpm build",
+    "postinstall": "pnpm prod",
     "build": "tsc && vite build",
-    "test": "node ./test/main.js",
-    "start": "node ./bin/langkama.js"
+    "test": "npx jest --verbose",
+    "start": "node ./bin/langkama.js",
+    "prod": "pnpm build && pnpm test"
   },
   "devDependencies": {
     "@types/node": "^20.11.25",
     "chalk": "^5.3.0",
+    "jest": "^29.7.0",
     "typescript": "^5.2.2",
     "vite": "^5.1.4"
   }
