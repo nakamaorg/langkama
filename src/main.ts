@@ -36,20 +36,26 @@ export class LangKama {
    *
    * @param code The Langkama source code to interpret
    */
-  static interpret(code: string, onLifecycle?: LifecycleCallbackFn): IRuntimeVal {
-    const lexer = new Lexer();
-    const parser = new Parser();
-    const env = new Environment();
+  static interpret(code: string, onLifecycle?: LifecycleCallbackFn): Promise<IRuntimeVal> {
+    return new Promise((resolve, reject) => {
+      try {
+        const lexer = new Lexer();
+        const parser = new Parser();
+        const env = new Environment();
 
-    this.callLifecycleCallback(Lifecycle.Lexing, onLifecycle);
-    const tokens = lexer.tokenize(code);
+        this.callLifecycleCallback(Lifecycle.Lexing, onLifecycle);
+        const tokens = lexer.tokenize(code);
 
-    this.callLifecycleCallback(Lifecycle.Parsing, onLifecycle);
-    const program = parser.parse(tokens);
+        this.callLifecycleCallback(Lifecycle.Parsing, onLifecycle);
+        const program = parser.parse(tokens);
 
-    this.callLifecycleCallback(Lifecycle.Interpreting, onLifecycle);
-    const result = evaluate(program, env);
+        this.callLifecycleCallback(Lifecycle.Interpreting, onLifecycle);
+        const result = evaluate(program, env);
 
-    return result;
+        resolve(result);
+      } catch (err) {
+        reject(err);
+      }
+    });
   }
 }

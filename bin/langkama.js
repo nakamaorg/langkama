@@ -70,7 +70,7 @@ class Cmd {
    *
    * @param {string} filePath  The path to the LangKama source file
    */
-  static interpret(filePath) {
+  static async interpret(filePath) {
     try {
       this.startTime = process.hrtime();
       this.#info(`--- ${chalk.bgWhite(` LangKama v${version} Interpreter `)} ---`, false);
@@ -92,7 +92,7 @@ class Cmd {
       const bytes = readFileSync(fullPath);
       const code = bytes.toString();
 
-      const result = LangKama.interpret(code, lifecycle => {
+      const onLifecycle = lifecycle => {
         switch (lifecycle) {
           case Lifecycle.Lexing: {
             this.#info(`Tokenizing "${fileName}" script...`);
@@ -109,7 +109,9 @@ class Cmd {
             break;
           }
         }
-      });
+      }
+
+      const result = await LangKama.interpret(code, onLifecycle);
 
       this.#info('LangKama script compiled!\n');
       this.#info(chalk.green(result.value));
@@ -127,14 +129,14 @@ class Cmd {
   static #repl() {
     const rl = createInterface({ input: process.stdin, output: process.stdout });
     const prompt = () => {
-      rl.question('> ', input => {
+      rl.question('> ', async input => {
         this.startTime = process.hrtime();
 
         if (input.toLowerCase() === 'exit') {
           rl.close();
         } else {
           try {
-            const result = LangKama.interpret(input);
+            const result = await LangKama.interpret(input);
             this.#info(chalk.green(result.value));
           } catch (err) {
             this.#error(err, false);
