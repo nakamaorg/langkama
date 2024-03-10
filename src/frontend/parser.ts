@@ -1,3 +1,5 @@
+import { ErrorManager } from './error-manager';
+
 import { Char } from '../core/enums/char.enum';
 import { NodeType } from '../core/enums/node-type.enum';
 import { TokenType } from '../core/enums/token-type.enum';
@@ -5,7 +7,7 @@ import { TokenType } from '../core/enums/token-type.enum';
 import { LangKamaError, MissingEqualsError, MissingIdentifierError, MissingDotError, UnclosedParenthesisError, UninitializedConstantError, UnrecognizedTokenError, IncompleteExpressionError } from '../core';
 
 import { TToken } from '../core/types/token.type';
-import { IAssignmentNode, IBinaryExpression, IExpressionNode, IIdentifierNode, INumberNode, IProgramNode, IStatementNode, IStringNode, IVariableDeclarationNode } from '../core/types/ast.type';
+import { IAssignmentNode, IBinaryExpression, IExpressionNode, IIdentifierNode, INumberNode, IProgramNode, ISkipNode, IStatementNode, IStringNode, IVariableDeclarationNode } from '../core/types/ast.type';
 
 
 
@@ -23,10 +25,29 @@ export class Parser {
 
   /**
    * @description
-   * Instantiates a parser instance
+   * The error manager
    */
-  constructor() {
-    this.tokens = [];
+  private errorManager: ErrorManager;
+
+  /**
+   * @description
+   * Raises an error
+   *
+   * @param error The error to raise
+   */
+  private raise(error: LangKamaError, node?: TToken): void | ISkipNode {
+    let value;
+
+    if (node) {
+      value = { kind: NodeType.Skip, start: node.location, end: node.location } as ISkipNode;
+    }
+
+    this.errorManager.raise(error);
+    this.eat();
+
+    if (node) {
+      return value;
+    }
   }
 
   /**
@@ -55,10 +76,21 @@ export class Parser {
     const token = this.eat();
 
     if (!token || token.type !== type) {
-      throw error;
+      this.raise(error);
     }
 
     return token;
+  }
+
+  /**
+   * @description
+   * Instantiates a lexer instance
+   *
+   * @param errorManager The error manager to handle the lexer's errors
+   */
+  constructor(errorManager: ErrorManager) {
+    this.tokens = [];
+    this.errorManager = errorManager;
   }
 
   /**
@@ -218,11 +250,11 @@ export class Parser {
       }
 
       case TokenType.EOF: {
-        throw new IncompleteExpressionError(this.at().location);
+        return this.raise(new IncompleteExpressionError(this.at().location), token) as ISkipNode;
       }
 
       default: {
-        throw new UnrecognizedTokenError(this.at().location);
+        return this.raise(new UnrecognizedTokenError(this.at().location), token) as ISkipNode;
       }
     }
   }
@@ -239,7 +271,8 @@ export class Parser {
       this.eat();
 
       if (isConstant) {
-        throw new UninitializedConstantError(this.at().location);
+        this.errorManager.raise(new UninitializedConstantError(this.at().location));
+        this.eat();
       }
 
       return {

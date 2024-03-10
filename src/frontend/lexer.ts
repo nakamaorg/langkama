@@ -8,6 +8,7 @@ import { TLocation } from '../core/types/location.type';
 import { keywords } from '../core/consts/keywords.const';
 import { CharHelper } from '../core/helpers/char.helper';
 
+import { ErrorManager } from './error-manager';
 import { LangKamaError, UnclosedStringError, UnrecognizedTokenError } from '../core';
 
 
@@ -42,6 +43,22 @@ export class Lexer {
    */
   private tokens!: Array<TToken>;
 
+  /**
+   * @description
+   * The error manager
+   */
+  private errorManager: ErrorManager;
+
+  /**
+   * @description
+   * Raises an error
+   *
+   * @param error The error to raise
+   */
+  private raise(error: LangKamaError): void {
+    this.errorManager.raise(error);
+    this.eat();
+  }
 
   /**
    * @description
@@ -71,10 +88,10 @@ export class Lexer {
     const currentChar = this.eat();
 
     if (!currentChar || currentChar !== char) {
-      throw error;
+      this.raise(error);
     }
 
-    return currentChar;
+    return currentChar as Char;
   }
 
   /**
@@ -170,14 +187,18 @@ export class Lexer {
     this.index = 0;
     this.code = code;
     this.tokens = [];
+    this.errorManager.init();
     this.location = { row: 0, col: 0 };
   }
 
   /**
    * @description
    * Instantiates a lexer instance
+   *
+   * @param errorManager The error manager to handle the lexer's errors
    */
-  constructor() {
+  constructor(errorManager: ErrorManager) {
+    this.errorManager = errorManager;
     this.init();
   }
 
@@ -243,7 +264,7 @@ export class Lexer {
 
             this.eat();
           } else {
-            throw new UnrecognizedTokenError(this.location);
+            this.raise(new UnrecognizedTokenError(this.location));
           }
         }
       }

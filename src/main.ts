@@ -4,10 +4,11 @@ import { evaluate } from './runtime/interpreter';
 import { Environment } from './runtime/environment';
 
 import { TUnsafe } from './core/types/unsafe.type';
+import { ErrorCallbackFn, LifecycleCallbackFn } from '.';
 import { IRuntimeVal } from './core/types/runtime-values.type';
-import { LifecycleCallbackFn } from './core/types/lifecycle-callback.type';
 
 import { Lifecycle } from './core/enums/lifecycle.enum';
+import { ErrorManager } from './frontend/error-manager';
 
 
 
@@ -36,20 +37,28 @@ export class LangKama {
    *
    * @param code The Langkama source code to interpret
    */
-  static interpret(code: string, onLifecycle?: LifecycleCallbackFn): IRuntimeVal {
-    const lexer = new Lexer();
-    const parser = new Parser();
-    const env = new Environment();
+  static interpret(code: string, onError?: ErrorCallbackFn, onLifecycle?: LifecycleCallbackFn): Promise<IRuntimeVal> {
+    return new Promise((resolve, reject) => {
+      const errorManager = new ErrorManager(code, onError);
 
-    this.callLifecycleCallback(Lifecycle.Lexing, onLifecycle);
-    const tokens = lexer.tokenize(code);
+      const env = new Environment();
+      const lexer = new Lexer(errorManager);
+      const parser = new Parser(errorManager);
 
-    this.callLifecycleCallback(Lifecycle.Parsing, onLifecycle);
-    const program = parser.parse(tokens);
+      this.callLifecycleCallback(Lifecycle.Lexing, onLifecycle);
+      const tokens = lexer.tokenize(code);
 
-    this.callLifecycleCallback(Lifecycle.Interpreting, onLifecycle);
-    const result = evaluate(program, env);
+      this.callLifecycleCallback(Lifecycle.Parsing, onLifecycle);
+      const program = parser.parse(tokens);
 
-    return result;
+      this.callLifecycleCallback(Lifecycle.Interpreting, onLifecycle);
+      const result = evaluate(program, env);
+
+      if (errorManager.hasErrors()) {
+        reject(errorManager.getErrors());
+      } else {
+        resolve(result);
+      }
+    });
   }
 }

@@ -23,6 +23,8 @@ export interface IVariableDeclarationNode extends IStatementNode {
 
 export interface IExpressionNode extends IStatementNode { }
 
+export interface ISkipNode extends IExpressionNode { }
+
 export interface IAssignmentNode extends IExpressionNode {
   kind: NodeType.AssignmentExpression;
   assigne: IExpressionNode;

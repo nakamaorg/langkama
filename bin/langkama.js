@@ -49,15 +49,16 @@ class Cmd {
    * @description
    * Logs error to stderr stream
    *
-   * @param {LangKamaError} error The error to log
+   * @param {LangKamaError|Array<LangKamaError>} error The error to log
    * @param {boolean} exit Whether to exit the process or not
    */
   static #error(error, exit = true) {
     const elapsed = process.hrtime(this.startTime);
     const elapsedSeconds = elapsed[0] + elapsed[1] / 1e9;
+    const errors = Array.isArray(error) ? error : [error];
 
     process.stderr.write(chalk.bgRed(`[${chalk.yellow(elapsedSeconds.toFixed(5))}s] LangKama Error \n`));
-    process.stderr.write(chalk.red(`${error.toString()}\n`));
+    errors.forEach(err => process.stderr.write(chalk.red(`${err.toString()}\n`)));
 
     if (exit) {
       process.exit(error.errno);
@@ -92,29 +93,42 @@ class Cmd {
       const bytes = readFileSync(fullPath);
       const code = bytes.toString();
 
-      const result = LangKama.interpret(code, lifecycle => {
+      const onLifecycle = lifecycle => {
         switch (lifecycle) {
           case Lifecycle.Lexing: {
             this.#info(`Tokenizing "${fileName}" script...`);
+            this.startTime = process.hrtime();
+
             break;
           }
 
           case Lifecycle.Parsing: {
             this.#info(`Parsing "${fileName}" script...`);
+            this.startTime = process.hrtime();
+
             break;
           }
 
           case Lifecycle.Interpreting: {
             this.#info(`Interpreting "${fileName}" script...`);
+            this.startTime = process.hrtime();
+
             break;
           }
         }
-      });
+      };
 
-      this.#info('LangKama script compiled!\n');
-      this.#info(chalk.green(result.value));
+      LangKama
+        .interpret(code, () => { }, onLifecycle)
+        .then(() => {
+          this.#info('LangKama script compiled!\n');
+          this.#info(chalk.green(result.value));
 
-      process.exit(0);
+          process.exit(0);
+        })
+        .catch(error => {
+          this.#error(error);
+        });
     } catch (err) {
       this.#error(err);
     }
@@ -127,17 +141,18 @@ class Cmd {
   static #repl() {
     const rl = createInterface({ input: process.stdin, output: process.stdout });
     const prompt = () => {
-      rl.question('> ', input => {
+      rl.question('> ', async input => {
         this.startTime = process.hrtime();
 
         if (input.toLowerCase() === 'exit') {
           rl.close();
         } else {
           try {
-            const result = LangKama.interpret(input);
+            const result = await LangKama.interpret(input);
             this.#info(chalk.green(result.value));
-          } catch (err) {
-            this.#error(err, false);
+          } catch (error) {
+            console.log({ error });
+            this.#error(error, false);
           } finally {
             prompt();
           }

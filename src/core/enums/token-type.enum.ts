@@ -2,6 +2,7 @@ export enum TokenType {
   EOF = 'EOF',
   Dot = 'Dot',
   Let = 'Let',
+  Skip = 'Skip',
   Const = 'Const',
   OpenP = 'OpenP',
   Number = 'Number',
