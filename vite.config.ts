@@ -17,7 +17,7 @@ export default defineConfig({
     lib: {
       name: 'Langkama',
       fileName: pkg.name,
-      entry: resolve(__dirname, 'src/main.ts')
+      entry: resolve(__dirname, 'src/index.ts')
     },
     minify: true,
     emptyOutDir: true

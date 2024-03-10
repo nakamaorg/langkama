@@ -1,32 +1,19 @@
-const LangKama = require('../dist/langkama.umd.cjs');
+const Type = require('../dist/langkama.umd.cjs').Type;
+const LangKama = require('../dist/langkama.umd.cjs').LangKama;
 
 
 
 describe('Variables', () => {
-  const compile = (() => {
-    const lexer = new LangKama.Lexer();
-    const parser = new LangKama.Parser();
-
-    return (code) => {
-      const tokens = lexer.tokenize(code);
-      const program = parser.parse(tokens);
-      const env = new LangKama.Environment();
-      const result = LangKama.evaluate(program, env);
-
-      return result;
-    }
-  })();
-
   test('Variable declaration without value', () => {
     const code = `hear me out var.`;
-    const result = compile(code);
+    const result = LangKama.interpret(code);
 
-    expect(result.type).toBe(LangKama.Type.Null);
+    expect(result.type).toBe(Type.Null);
   });
 
   test('Variable declaration with value', () => {
     const code = `hear me out var is 123.`;
-    const result = compile(code);
+    const result = LangKama.interpret(code);
 
     expect(result.value).toBe(123);
   });
@@ -38,7 +25,7 @@ describe('Variables', () => {
       hear me out fullName is firstName + " " + lastName.
     `;
 
-    const result = compile(code);
+    const result = LangKama.interpret(code);
     expect(result.value).toBe('John Doe');
   });
 
@@ -48,39 +35,25 @@ describe('Variables', () => {
       name is "Kama".
     `;
 
-    const result = compile(code);
+    const result = LangKama.interpret(code);
     expect(result.value).toBe('Kama');
   });
 });
 
 describe('Variables errors', () => {
-  const compile = (() => {
-    const lexer = new LangKama.Lexer();
-    const parser = new LangKama.Parser();
-
-    return (code) => {
-      const tokens = lexer.tokenize(code);
-      const program = parser.parse(tokens);
-      const env = new LangKama.Environment();
-      const result = LangKama.evaluate(program, env);
-
-      return result;
-    }
-  })();
-
   test('Variable declaration without an identifier', () => {
     const code = `hear me out`;
-    expect(() => compile(code)).toThrow(LangKama.MissingIdentifierError);
+    expect(() => LangKama.interpret(code)).toThrow(LangKama.MissingIdentifierError);
   });
 
   test('Variable declaration without a dot at the end', () => {
     const code = `hear me out var`;
-    expect(() => compile(code)).toThrow(LangKama.MissingEqualsError);
+    expect(() => LangKama.interpret(code)).toThrow(LangKama.MissingEqualsError);
   });
 
   test('Variable declaration without a valid value after the equals keyword', () => {
     const code = `hear me out var is`;
-    expect(() => compile(code)).toThrow(LangKama.MissingEqualsError);
+    expect(() => LangKama.interpret(code)).toThrow(LangKama.MissingEqualsError);
   });
 
   test('Variable reassignment without a valid value after the equals keyword', () => {
@@ -88,7 +61,7 @@ describe('Variables errors', () => {
       hear me out x is 1.
       x is
     `;
-    expect(() => compile(code)).toThrow('Cannot resolve variable "is" as it does not exist');
+    expect(() => LangKama.interpret(code)).toThrow('Cannot resolve variable "is" as it does not exist');
   });
 
   test('Variable duplication', () => {
@@ -96,11 +69,11 @@ describe('Variables errors', () => {
       hear me out myVar is 1.
       hear me out myVar is 2.
     `;
-    expect(() => compile(code)).toThrow('Cannot declare variable myVar as it\'s already defined');
+    expect(() => LangKama.interpret(code)).toThrow('Cannot declare variable myVar as it\'s already defined');
   });
 
   test('Undeclared variable', () => {
     const code = `myVar`;
-    expect(() => compile(code)).toThrow('Cannot resolve variable "myVar" as it does not exist');
+    expect(() => LangKama.interpret(code)).toThrow('Cannot resolve variable "myVar" as it does not exist');
   });
 });

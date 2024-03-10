@@ -6,13 +6,10 @@ import { existsSync, readFileSync, statSync } from 'fs';
 import chalk from 'chalk';
 
 import {
+  version,
+  LangKama,
   InvalidFileError,
-  UnknownFileError,
-  Lexer,
-  Parser,
-  Environment,
-  evaluate,
-  version
+  UnknownFileError
 } from './../dist/langkama.js';
 
 
@@ -95,16 +92,10 @@ class Cmd {
       const code = bytes.toString();
 
       this.#info(`Tokenizing "${fileName}" script...`);
-      const lexer = new Lexer();
-      const tokens = lexer.tokenize(code);
-
       this.#info(`Parsing "${fileName}" script...`);
-      const parser = new Parser();
-      const program = parser.parse(tokens);
-
       this.#info(`Interpreting "${fileName}" script...`);
-      const env = new Environment();
-      const result = evaluate(program, env);
+
+      const result = LangKama.interpret(code);
 
       this.#info('LangKama script compiled!\n');
       this.#info(chalk.green(result.value));
@@ -120,10 +111,6 @@ class Cmd {
    * LangKama REPL
   */
   static #repl() {
-    const lexer = new Lexer();
-    const parser = new Parser();
-    const env = new Environment();
-
     const rl = createInterface({ input: process.stdin, output: process.stdout });
     const prompt = () => {
       rl.question('> ', input => {
@@ -133,10 +120,7 @@ class Cmd {
           rl.close();
         } else {
           try {
-            const tokens = lexer.tokenize(input);
-            const program = parser.parse(tokens);
-            const result = evaluate(program, env);
-
+            const result = LangKama.interpret(input);
             this.#info(chalk.green(result.value));
           } catch (err) {
             this.#error(err, false);
