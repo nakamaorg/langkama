@@ -3,6 +3,7 @@ import { TokenType } from '../core/enums/token-type.enum';
 
 import { TToken } from '../core/types/token.type';
 import { TNullable } from '../core/types/nullable.type';
+import { TLocation } from '../core/types/location.type';
 
 import { keywords } from '../core/consts/keywords.const';
 import { CharHelper } from '../core/helpers/char.helper';
@@ -31,21 +32,16 @@ export class Lexer {
 
   /**
    * @description
-   * The number of the current line
+   * The current location
    */
-  private row!: number;
-
-  /**
-   * @description
-   * The number of the current character on the current line
-   */
-  private col!: number;
+  private location!: TLocation;
 
   /**
    * @description
    * The array of tokens
    */
   private tokens!: Array<TToken>;
+
 
   /**
    * @description
@@ -60,7 +56,7 @@ export class Lexer {
    * Get the current character and advance
    */
   private eat(): TNullable<string> {
-    this.col++;
+    this.location.col++;
     return this.code[this.index++] ?? null;
   }
 
@@ -142,9 +138,11 @@ export class Lexer {
   private createToken(type: TokenType, value?: TNullable<string>): TToken {
     return {
       type,
-      row: this.row,
       value: value ?? null,
-      col: Math.abs((value?.length ?? 0) - this.col)
+      location: {
+        row: this.location.row,
+        col: Math.abs((value?.length ?? 0) - this.location.col)
+      }
     };
   }
 
@@ -169,11 +167,10 @@ export class Lexer {
    * @param code The source code to process next
    */
   private init(code: string = ''): void {
-    this.row = 1;
-    this.col = 0;
     this.index = 0;
     this.code = code;
     this.tokens = [];
+    this.location = { row: 0, col: 0 };
   }
 
   /**
@@ -219,7 +216,7 @@ export class Lexer {
           }
 
           const token = this.addToken(TokenType.String, string);
-          this.expect(Char.DoubleQuotes, new UnclosedStringError(token.row, token.col));
+          this.expect(Char.DoubleQuotes, new UnclosedStringError(token.location));
 
           break;
         }
@@ -240,13 +237,13 @@ export class Lexer {
             this.tokenizeIdentifier();
           } else if (CharHelper.isSkippable(this.at())) {
             if (this.at() === Char.NewLine) {
-              this.row++;
-              this.col = 0;
+              this.location.row++;
+              this.location.col = 0;
             }
 
             this.eat();
           } else {
-            throw new UnrecognizedTokenError(this.row, this.col);
+            throw new UnrecognizedTokenError(this.location);
           }
         }
       }

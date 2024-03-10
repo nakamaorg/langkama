@@ -107,7 +107,7 @@ class Cmd {
       const result = evaluate(program, env);
 
       this.#info('LangKama script compiled!\n');
-      this.#info(result.value);
+      this.#info(chalk.green(result.value));
 
       process.exit(0);
     } catch (err) {

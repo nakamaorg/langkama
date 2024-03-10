@@ -1,25 +1,23 @@
 import { Errno } from '../enums/errno.enum';
+import { TLocation } from '../types/location.type';
 
 
 
 export class LangKamaError extends Error {
 
   public errno: Errno;
-  private row?: number;
-  private col?: number;
+  private location?: TLocation;
 
-  constructor(message: string, row?: number, col?: number) {
+  constructor(message: string, location?: TLocation) {
     super(message);
 
-    this.row = row;
-    this.col = col;
-
+    this.location = location;
     this.name = 'LangKamaError';
     this.errno = Errno.LangKamaError;
   }
 
   public toString(): string {
-    const loc = (this.row || this.col) ? `${[this.row, this.col].join(':')}` : null;
+    const loc = (this.location?.row || this.location?.col) ? `${[this.location?.row, this.location?.col].join(':')}` : null;
 
     return [
       `  [${this.name}] - ${this.message}.`,

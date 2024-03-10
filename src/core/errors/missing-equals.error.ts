@@ -1,11 +1,12 @@
 import { Errno } from '../enums/errno.enum';
 import { LangKamaError } from './langkama.error';
+import { TLocation } from '../types/location.type';
 
 
 
 export class MissingEqualsError extends LangKamaError {
-  constructor(row: number, col: number) {
-    super('missing assignment operation', row, col);
+  constructor(location: TLocation) {
+    super('missing assignment operation', location);
 
     this.name = 'MissingEqualsError';
     this.errno = Errno.MissingEqualsError;

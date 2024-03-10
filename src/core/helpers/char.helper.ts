@@ -15,7 +15,7 @@ export class CharHelper {
    * @param char The character to check
    */
   public static isSkippable(char: string): boolean {
-    return char === Char.Space || char === Char.Tabulation || char === Char.NewLine || char === Char.CarriageReturn;
+    return [Char.Space, Char.Tabulation, Char.NewLine, Char.CarriageReturn].includes(char as Char);
   }
 
   /**

@@ -1,9 +1,12 @@
+import { TLocation } from './location.type';
 import { NodeType } from '../enums/node-type.enum';
 
 
 
 export interface IStatementNode {
   kind: NodeType;
+  end: TLocation;
+  start: TLocation;
 }
 
 export interface IProgramNode extends IStatementNode {

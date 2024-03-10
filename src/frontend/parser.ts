@@ -86,24 +86,42 @@ export class Parser {
     }
   }
 
+  /**
+   * @description
+   * Parses an expression
+   */
   private parseExpression(): IExpressionNode {
     return this.parseAssignmentExpression();
   }
 
+  /**
+   * @description
+   * parses an assignment
+   */
   private parseAssignmentExpression(): IExpressionNode {
     const left = this.parseAdditiveExpression();
 
     if (this.at().type === TokenType.Equals) {
       this.eat();
       const right = this.parseAssignmentExpression();
-      this.expect(TokenType.Dot, new MissingDotError(this.at().row, this.at().col));
+      this.expect(TokenType.Dot, new MissingDotError(this.at().location));
 
-      return { kind: NodeType.AssignmentExpression, assigne: left, value: right } as IAssignmentNode;
+      return {
+        value: right,
+        assigne: left,
+        kind: NodeType.AssignmentExpression,
+        end: { row: right.end.row, col: right.end.col },
+        start: { row: left.start.row, col: left.start.col }
+      } as IAssignmentNode;
     }
 
     return left;
   }
 
+  /**
+   * @description
+   * Parses an additive expression
+   */
   private parseAdditiveExpression(): IExpressionNode {
     let left = this.parseMultiplicativeExpression();
     while (this.at().value === '+' || this.at().value === '-') {
@@ -115,16 +133,22 @@ export class Parser {
         right,
         operator,
         kind: NodeType.BinaryExpression,
+        end: { row: right.end.row, col: right.end.col },
+        start: { row: left.start.row, col: left.start.col }
       } as IBinaryExpression;
     }
 
     return left;
   }
 
+  /**
+   * @description
+   * Parses a multiplicative expression
+   */
   private parseMultiplicativeExpression(): IExpressionNode {
     let left = this.parsePrimaryExpression();
 
-    while (this.at().value === Char.Star || this.at().value === Char.Slash || this.at().value === Char.Percentage) {
+    while ([Char.Star, Char.Slash, Char.Percentage].includes(this.at().value as Char)) {
       const operator = this.eat().value;
       const right = this.parsePrimaryExpression();
 
@@ -133,79 +157,113 @@ export class Parser {
         right,
         operator,
         kind: NodeType.BinaryExpression,
+        end: { row: right.end.row, col: right.end.col },
+        start: { row: left.start.row, col: left.start.col }
       } as IBinaryExpression;
     }
 
     return left;
   }
 
+  /**
+   * @description
+   * Parses a primary expression
+   */
   private parsePrimaryExpression(): IExpressionNode {
-    const tk = this.at().type;
+    const token = this.at();
 
-    switch (tk) {
+    switch (token.type) {
       case TokenType.Identifier: {
-        return {
+        const node = {
+          symbol: token.value,
           kind: NodeType.Identifier,
-          symbol: this.eat().value
+          start: { row: token.location.row, col: token.location.col },
+          end: { row: token.location.row, col: token.location.col + (token.value?.length ?? 0) }
         } as IIdentifierNode;
+
+        this.eat();
+        return node;
       }
 
       case TokenType.Number: {
-        return {
+        const node = {
           kind: NodeType.Number,
-          value: parseFloat(this.eat().value as string)
+          value: parseFloat(token.value as string),
+          start: { row: token.location.row, col: token.location.col },
+          end: { row: token.location.row, col: token.location.col + (token.value?.length ?? 0) }
         } as INumberNode;
+
+        this.eat();
+        return node;
       }
 
       case TokenType.String: {
-        return {
+        const node = {
           kind: NodeType.String,
-          value: this.eat().value
+          value: token.value,
+          start: { row: token.location.row, col: token.location.col },
+          end: { row: token.location.row, col: token.location.col + (token.value?.length ?? 0) }
         } as IStringNode;
+
+        this.eat();
+        return node;
       }
 
       case TokenType.OpenP: {
         this.eat();
         const value = this.parseExpression();
-        this.expect(TokenType.CloseP, new UnclosedParenthesisError(this.at().row, this.at().col));
+        this.expect(TokenType.CloseP, new UnclosedParenthesisError(this.at().location));
 
         return value;
       }
 
       case TokenType.EOF: {
-        throw new IncompleteExpressionError(this.at().row, this.at().col);
+        throw new IncompleteExpressionError(this.at().location);
       }
 
       default: {
-        throw new UnrecognizedTokenError(this.at().row, this.at().col);
+        throw new UnrecognizedTokenError(this.at().location);
       }
     }
   }
 
+  /**
+   * @description
+   * Parses a variable declaration
+   */
   private parseVariableDeclaration(): IExpressionNode {
     const isConstant = this.eat().type === TokenType.Const;
-    const identifier = this.expect(TokenType.Identifier, new MissingIdentifierError(this.at().row, this.at().col)).value;
+    const token = this.expect(TokenType.Identifier, new MissingIdentifierError(this.at().location));
 
     if (this.at().type === TokenType.Dot) {
       this.eat();
 
       if (isConstant) {
-        throw new UninitializedConstantError(this.at().row, this.at().col);
+        throw new UninitializedConstantError(this.at().location);
       }
 
-      return { kind: NodeType.VariableDeclaration, identifier, constant: false } as IVariableDeclarationNode;
+      return {
+        constant: false,
+        identifier: token.value,
+        kind: NodeType.VariableDeclaration,
+        start: { row: token.location.row, col: token.location.col },
+        end: { row: token.location.row, col: token.location.col + (token.value?.length ?? 0) }
+      } as IVariableDeclarationNode;
     }
 
-    this.expect(TokenType.Equals, new MissingEqualsError(this.at().row, this.at().col));
+    this.expect(TokenType.Equals, new MissingEqualsError(this.at().location));
 
+    const valueExpression = this.parseExpression();
     const declaration = {
-      identifier,
       constant: isConstant,
-      value: this.parseExpression(),
-      kind: NodeType.VariableDeclaration
+      value: valueExpression,
+      identifier: token.value,
+      kind: NodeType.VariableDeclaration,
+      start: { row: token.location.row, col: token.location.col },
+      end: { row: token.location.row, col: token.location.col + (token.value?.length ?? 0) + (valueExpression?.end?.col ?? 0) }
     } as IVariableDeclarationNode;
 
-    this.expect(TokenType.Dot, new MissingDotError(this.at().row, this.at().col));
+    this.expect(TokenType.Dot, new MissingDotError(this.at().location));
 
     return declaration;
   }
@@ -220,14 +278,16 @@ export class Parser {
     this.tokens = [...tokens];
 
     const program: IProgramNode = {
+      body: [],
       kind: NodeType.Program,
-      body: []
+      end: { row: 0, col: 0 },
+      start: { row: 0, col: 0 }
     }
 
     while (this.notEof()) {
       program.body.push(this.parseStatement());
     }
 
-    return program;
+    return { ...program, end: this.at().location };
   }
 }

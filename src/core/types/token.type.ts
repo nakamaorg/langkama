@@ -1,11 +1,11 @@
 import { TNullable } from './nullable.type';
 import { TokenType } from '../enums/token-type.enum';
+import { TLocation } from './location.type';
 
 
 
 export type TToken = {
-  row: number
-  col: number
   type: TokenType
+  location: TLocation
   value: TNullable<string>
 }
