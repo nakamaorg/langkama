@@ -8,6 +8,7 @@ import chalk from 'chalk';
 import {
   version,
   LangKama,
+  Lifecycle,
   InvalidFileError,
   UnknownFileError
 } from './../dist/langkama.js';
@@ -91,11 +92,24 @@ class Cmd {
       const bytes = readFileSync(fullPath);
       const code = bytes.toString();
 
-      this.#info(`Tokenizing "${fileName}" script...`);
-      this.#info(`Parsing "${fileName}" script...`);
-      this.#info(`Interpreting "${fileName}" script...`);
+      const result = LangKama.interpret(code, lifecycle => {
+        switch (lifecycle) {
+          case Lifecycle.Lexing: {
+            this.#info(`Tokenizing "${fileName}" script...`);
+            break;
+          }
 
-      const result = LangKama.interpret(code);
+          case Lifecycle.Parsing: {
+            this.#info(`Parsing "${fileName}" script...`);
+            break;
+          }
+
+          case Lifecycle.Interpreting: {
+            this.#info(`Interpreting "${fileName}" script...`);
+            break;
+          }
+        }
+      });
 
       this.#info('LangKama script compiled!\n');
       this.#info(chalk.green(result.value));
