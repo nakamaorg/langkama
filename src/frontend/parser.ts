@@ -232,11 +232,12 @@ export class Parser {
    * Parses a variable declaration
    */
   private parseVariableDeclaration(): IExpressionNode {
-    const isConstant = this.eat().type === TokenType.Const;
+    const constToken = this.eat();
+    const isConstant = constToken.type === TokenType.Const;
     const token = this.expect(TokenType.Identifier, new MissingIdentifierError(this.at().location));
 
     if (this.at().type === TokenType.Dot) {
-      this.eat();
+      const dotToken = this.eat();
 
       if (isConstant) {
         throw new UninitializedConstantError(this.at().location);
@@ -244,10 +245,10 @@ export class Parser {
 
       return {
         constant: false,
+        end: dotToken.location,
         identifier: token.value,
-        kind: NodeType.VariableDeclaration,
-        start: { row: token.location.row, col: token.location.col },
-        end: { row: token.location.row, col: token.location.col + (token.value?.length ?? 0) }
+        start: constToken.location,
+        kind: NodeType.VariableDeclaration
       } as IVariableDeclarationNode;
     }
 
@@ -258,9 +259,9 @@ export class Parser {
       constant: isConstant,
       value: valueExpression,
       identifier: token.value,
-      kind: NodeType.VariableDeclaration,
-      start: { row: token.location.row, col: token.location.col },
-      end: { row: token.location.row, col: token.location.col + (token.value?.length ?? 0) + (valueExpression?.end?.col ?? 0) }
+      end: valueExpression.end,
+      start: constToken.location,
+      kind: NodeType.VariableDeclaration
     } as IVariableDeclarationNode;
 
     this.expect(TokenType.Dot, new MissingDotError(this.at().location));
