@@ -112,7 +112,7 @@ class Cmd {
         }
       }
 
-      const result = await LangKama.interpret(code, onLifecycle);
+      const result = await LangKama.interpret(code, null, onLifecycle);
 
       this.#info('LangKama script compiled!\n');
       this.#info(chalk.green(result.value));

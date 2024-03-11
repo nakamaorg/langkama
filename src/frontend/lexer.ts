@@ -32,15 +32,32 @@ export class Lexer {
 
   /**
    * @description
-   * The current location
+   * The number of the line the lexer is currently processing
    */
-  private location!: TLocation;
+  private line!: number;
+
+  /**
+   * @description
+   * The index number of the start of the current line
+   */
+  private lineOffset!: number;
 
   /**
    * @description
    * The array of tokens
    */
   private tokens!: Array<TToken>;
+
+  /**
+   * @description
+   * The location of the character the lexer is currently processing
+   */
+  private get location(): TLocation {
+    return {
+      row: this.line,
+      col: this.index - this.lineOffset
+    };
+  }
 
 
   /**
@@ -56,7 +73,6 @@ export class Lexer {
    * Get the current character and advance
    */
   private eat(): TNullable<string> {
-    this.location.col++;
     return this.code[this.index++] ?? null;
   }
 
@@ -140,8 +156,8 @@ export class Lexer {
       type,
       value: value ?? null,
       location: {
-        row: this.location.row,
-        col: Math.abs((value?.length ?? 0) - this.location.col)
+        row: this.line,
+        col: this.index - this.lineOffset - (value?.length ?? 0)
       }
     };
   }
@@ -167,10 +183,11 @@ export class Lexer {
    * @param code The source code to process next
    */
   private init(code: string = ''): void {
+    this.line = 0;
     this.index = 0;
     this.code = code;
     this.tokens = [];
-    this.location = { row: 0, col: 0 };
+    this.lineOffset = 0;
   }
 
   /**
@@ -237,8 +254,8 @@ export class Lexer {
             this.tokenizeIdentifier();
           } else if (CharHelper.isSkippable(this.at())) {
             if (this.at() === Char.NewLine) {
-              this.location.row++;
-              this.location.col = 0;
+              this.line++;
+              this.lineOffset = this.index + 1;
             }
 
             this.eat();
@@ -250,7 +267,6 @@ export class Lexer {
     }
 
     this.addToken(TokenType.EOF);
-
     return this.tokens;
   }
 }
