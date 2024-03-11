@@ -9,6 +9,7 @@ import {
   version,
   LangKama,
   Lifecycle,
+  Environment,
   InvalidFileError,
   UnknownFileError
 } from './../dist/langkama.js';
@@ -128,6 +129,8 @@ class Cmd {
   */
   static #repl() {
     const rl = createInterface({ input: process.stdin, output: process.stdout });
+    const env = new Environment();
+
     const prompt = () => {
       rl.question('> ', async input => {
         this.startTime = process.hrtime();
@@ -136,7 +139,7 @@ class Cmd {
           rl.close();
         } else {
           try {
-            const result = await LangKama.interpret(input);
+            const result = await LangKama.interpret(input, env);
             this.#info(chalk.green(result.value));
           } catch (err) {
             this.#error(err, false);

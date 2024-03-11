@@ -35,13 +35,15 @@ export class LangKama {
    * Interprets LangKama source code
    *
    * @param code The Langkama source code to interpret
+   * @param environment The envrionment to read from
+   * @param onLifecycle The lifecycle callback
    */
-  static interpret(code: string, onLifecycle?: LifecycleCallbackFn): Promise<IRuntimeVal> {
+  static interpret(code: string, environment?: Environment, onLifecycle?: LifecycleCallbackFn): Promise<IRuntimeVal> {
     return new Promise((resolve, reject) => {
       try {
         const lexer = new Lexer();
         const parser = new Parser();
-        const env = new Environment();
+        const env = environment ?? new Environment();
 
         this.callLifecycleCallback(Lifecycle.Lexing, onLifecycle);
         const tokens = lexer.tokenize(code);
