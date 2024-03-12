@@ -16,6 +16,16 @@ export class Base<T> {
    */
   private index!: number;
 
+ /**
+   * @description
+   * Instntiates a base frontend instance
+   *
+   * @param content The content to reset to
+   */
+	constructor(content: T) {
+    this.init(content);
+  }
+
   /**
    * @description
    * Instntiates a base frontend instance
