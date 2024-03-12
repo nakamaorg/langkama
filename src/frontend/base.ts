@@ -8,12 +8,14 @@ export class Base<T> {
    * @description
    * Content to traverse 
   */
+  // @ts-ignore
   private content!: T;
 
   /**
    * @description
    * The index where the traversal is currently on 
    */
+  // @ts-ignore
   private index!: number;
 
  /**
