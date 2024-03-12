@@ -59,7 +59,6 @@ export class Lexer {
     };
   }
 
-
   /**
    * @description
    * Get the current character
