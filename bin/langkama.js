@@ -8,8 +8,8 @@ import chalk from 'chalk';
 import {
   version,
   LangKama,
-  Lifecycle,
   Environment,
+  LangKamaEvent,
   InvalidFileError,
   UnknownFileError
 } from './../dist/langkama.js';
@@ -90,34 +90,23 @@ class Cmd {
       }
 
       this.#info(`Loading "${fileName}" script...`);
+
       const bytes = readFileSync(fullPath);
       const code = bytes.toString();
+      const compiler = new LangKama();
 
-      const onLifecycle = lifecycle => {
-        switch (lifecycle) {
-          case Lifecycle.Lexing: {
-            this.#info(`Tokenizing "${fileName}" script...`);
-            break;
-          }
+      compiler
+        .on(LangKamaEvent.Success, result => {
+          this.#info('LangKama script compiled!\n');
+          this.#info(chalk.green(result.value));
 
-          case Lifecycle.Parsing: {
-            this.#info(`Parsing "${fileName}" script...`);
-            break;
-          }
-
-          case Lifecycle.Interpreting: {
-            this.#info(`Interpreting "${fileName}" script...`);
-            break;
-          }
-        }
-      }
-
-      const result = await LangKama.interpret(code, null, onLifecycle);
-
-      this.#info('LangKama script compiled!\n');
-      this.#info(chalk.green(result.value));
-
-      process.exit(0);
+          process.exit(0);
+        })
+        .on(LangKamaEvent.Error, error => { throw error })
+        .on(LangKamaEvent.Lexer, () => this.#info(`Tokenizing "${fileName}" script...`))
+        .on(LangKamaEvent.Parser, tokens => this.#info(`Parsing "${tokens.length}" tokens...`))
+        .on(LangKamaEvent.Interpreter, () => this.#info(`Interpreting "${fileName}" script...`))
+        .interpret(code);
     } catch (err) {
       this.#error(err);
     }
@@ -130,6 +119,7 @@ class Cmd {
   static #repl() {
     const rl = createInterface({ input: process.stdin, output: process.stdout });
     const env = new Environment();
+    const compiler = new LangKama();
 
     const prompt = () => {
       rl.question('> ', async input => {
@@ -138,14 +128,16 @@ class Cmd {
         if (input.toLowerCase() === 'exit') {
           rl.close();
         } else {
-          try {
-            const result = await LangKama.interpret(input, env);
-            this.#info(chalk.green(result.value));
-          } catch (err) {
-            this.#error(err, false);
-          } finally {
-            prompt();
-          }
+          compiler
+            .on(LangKamaEvent.Success, result => {
+              this.#info(chalk.green(result.value));
+              prompt();
+            })
+            .on(LangKamaEvent.Error, error => {
+              this.#error(error, false);
+              prompt();
+            })
+            .interpret(input, env);
         }
       });
     }

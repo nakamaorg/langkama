@@ -3,11 +3,11 @@ import { Parser } from './frontend/parser';
 import { evaluate } from './runtime/interpreter';
 import { Environment } from './runtime/environment';
 
-import { TUnsafe } from './core/types/unsafe.type';
-import { IRuntimeVal } from './core/types/runtime-values.type';
-import { LifecycleCallbackFn } from './core/types/lifecycle-callback.type';
+import { IRuntimeVal, LangKamaError } from '.';
+import { LangKamaEvent } from './core/enums/langkama-event.enum';
 
-import { Lifecycle } from './core/enums/lifecycle.enum';
+import { TToken } from './core/types/token.type';
+import { IProgramNode } from './core/types/ast.type';
 
 
 
@@ -17,17 +17,18 @@ import { Lifecycle } from './core/enums/lifecycle.enum';
  */
 export class LangKama {
 
-  /**
-   * @description
-   * Calls the life cycle callback if available
-   *
-   * @param lifecycle The life cycle to emit
-   * @param onLifecycle The life cycle callback function to call
-   */
-  private static callLifecycleCallback(lifecycle: Lifecycle, onLifecycle: TUnsafe<LifecycleCallbackFn>): void {
-    if (onLifecycle) {
-      onLifecycle(lifecycle);
-    }
+  private onLexerEvent: (code: string) => void;
+  private onSuccessEvent: (value: IRuntimeVal) => void;
+  private onErrorEvent: (error: LangKamaError) => void;
+  private onParserEvent: (tokens: Array<TToken>) => void;
+  private onInterpreterEvent: (program: IProgramNode) => void;
+
+  constructor() {
+    this.onErrorEvent = () => { };
+    this.onLexerEvent = () => { };
+    this.onParserEvent = () => { };
+    this.onSuccessEvent = () => { };
+    this.onInterpreterEvent = () => { };
   }
 
   /**
@@ -36,28 +37,65 @@ export class LangKama {
    *
    * @param code The Langkama source code to interpret
    * @param environment The envrionment to read from
-   * @param onLifecycle The lifecycle callback
    */
-  static interpret(code: string, environment?: Environment, onLifecycle?: LifecycleCallbackFn): Promise<IRuntimeVal> {
-    return new Promise((resolve, reject) => {
-      try {
-        const lexer = new Lexer();
-        const parser = new Parser();
-        const env = environment ?? new Environment();
+  public interpret(code: string, environment?: Environment): LangKama {
+    try {
+      const lexer = new Lexer();
+      const parser = new Parser();
+      const env = environment ?? new Environment();
 
-        this.callLifecycleCallback(Lifecycle.Lexing, onLifecycle);
-        const tokens = lexer.tokenize(code);
+      this.onLexerEvent(code);
+      const tokens = lexer.tokenize(code);
 
-        this.callLifecycleCallback(Lifecycle.Parsing, onLifecycle);
-        const program = parser.parse(tokens);
+      this.onParserEvent(tokens);
+      const program = parser.parse(tokens);
 
-        this.callLifecycleCallback(Lifecycle.Interpreting, onLifecycle);
-        const result = evaluate(program, env);
+      this.onInterpreterEvent(program);
+      const result = evaluate(program, env);
 
-        resolve(result);
-      } catch (err) {
-        reject(err);
+      this.onSuccessEvent(result);
+    } catch (error) {
+      this.onErrorEvent(new LangKamaError('err')); // TODO: implemete a proper error manager
+    } finally {
+      return this;
+    }
+  }
+
+  /**
+   * @description
+   * Listens to updates regarding a specific event
+   *
+   * @param event The event to subscribe to
+   * @param eventListener The event listener callback function
+   */
+  public on(event: LangKamaEvent, eventListener: () => void): LangKama {
+    switch (event) {
+      case LangKamaEvent.Error: {
+        this.onErrorEvent = eventListener;
+        break;
       }
-    });
+
+      case LangKamaEvent.Success: {
+        this.onSuccessEvent = eventListener;
+        break;
+      }
+
+      case LangKamaEvent.Lexer: {
+        this.onLexerEvent = eventListener;
+        break;
+      }
+
+      case LangKamaEvent.Parser: {
+        this.onParserEvent = eventListener;
+        break;
+      }
+
+      case LangKamaEvent.Interpreter: {
+        this.onInterpreterEvent = eventListener;
+        break;
+      }
+    }
+
+    return this;
   }
 }
