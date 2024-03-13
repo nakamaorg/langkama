@@ -2,10 +2,11 @@ import { Char } from '../core/enums/char.enum';
 import { NodeType } from '../core/enums/node-type.enum';
 import { TokenType } from '../core/enums/token-type.enum';
 
-import { LangKamaError, MissingEqualsError, MissingIdentifierError, MissingDotError, UnclosedParenthesisError, UninitializedConstantError, UnrecognizedTokenError, IncompleteExpressionError } from '../core';
+import { MissingEqualsError, MissingIdentifierError, MissingDotError, UnclosedParenthesisError, UninitializedConstantError, UnrecognizedTokenError, IncompleteExpressionError } from '../core';
 
 import { TToken } from '../core/types/token.type';
 import { IAssignmentNode, IBinaryExpression, IExpressionNode, IIdentifierNode, INumberNode, IProgramNode, IStatementNode, IStringNode, IVariableDeclarationNode } from '../core/types/ast.type';
+import { Consumer } from './consumer';
 
 
 
@@ -13,52 +14,14 @@ import { IAssignmentNode, IBinaryExpression, IExpressionNode, IIdentifierNode, I
  * @description
  * Helps with parsing the tokens into an AST
  */
-export class Parser {
-
-  /**
-   * @description
-   * The collection of tokens
-   */
-  private tokens: Array<TToken>;
+export class Parser extends Consumer<TToken> {
 
   /**
    * @description
    * Instantiates a parser instance
    */
   constructor() {
-    this.tokens = [];
-  }
-
-  /**
-   * @description
-   * Get the current token
-   */
-  private at(): TToken {
-    return this.tokens[0];
-  }
-
-  /**
-   * @description
-   * Get the current token and advance
-   */
-  private eat(): TToken {
-    return this.tokens.shift() as TToken;
-  }
-
-  /**
-   * @description
-   * Advances while checking if the next token matches with the input token
-   *
-   * @param char The character to check
-   */
-  private expect(type: TokenType, error: LangKamaError): TToken {
-    const token = this.eat();
-
-    if (!token || token.type !== type) {
-      throw error;
-    }
-
-    return token;
+    super([], (a: TokenType, b: TToken) => (a && a === b.type));
   }
 
   /**
@@ -66,7 +29,7 @@ export class Parser {
    * Checks if the end of the file has not been reached yet
    */
   private notEof(): boolean {
-    return this.tokens[0].type !== TokenType.EOF;
+    return this.at().type !== TokenType.EOF;
   }
 
   /**
@@ -125,7 +88,7 @@ export class Parser {
   private parseAdditiveExpression(): IExpressionNode {
     let left = this.parseMultiplicativeExpression();
     while (this.at().value === '+' || this.at().value === '-') {
-      const operator = this.eat().value;
+      const operator = (this.eat() as TToken).value;
       const right = this.parseMultiplicativeExpression();
 
       left = {
@@ -149,7 +112,7 @@ export class Parser {
     let left = this.parsePrimaryExpression();
 
     while ([Char.Star, Char.Slash, Char.Percentage].includes(this.at().value as Char)) {
-      const operator = this.eat().value;
+      const operator = (this.eat() as TToken).value;
       const right = this.parsePrimaryExpression();
 
       left = {
@@ -232,12 +195,12 @@ export class Parser {
    * Parses a variable declaration
    */
   private parseVariableDeclaration(): IExpressionNode {
-    const constToken = this.eat();
+    const constToken = this.eat() as TToken;
     const isConstant = constToken.type === TokenType.Const;
-    const token = this.expect(TokenType.Identifier, new MissingIdentifierError(this.at().location));
+    const token = this.expect<TokenType>(TokenType.Identifier, new MissingIdentifierError(this.at().location));
 
     if (this.at().type === TokenType.Dot) {
-      const dotToken = this.eat();
+      const dotToken = this.eat() as TToken;
 
       if (isConstant) {
         throw new UninitializedConstantError(this.at().location);
@@ -276,7 +239,7 @@ export class Parser {
    * @param tokens The tokens to parse
    */
   public parse(tokens: Array<TToken>): IProgramNode {
-    this.tokens = [...tokens];
+    this.content = [...tokens];
 
     const program: IProgramNode = {
       body: [],
@@ -285,9 +248,11 @@ export class Parser {
       start: { row: 0, col: 0 }
     }
 
+    console.log({ content: this.content });
     while (this.notEof()) {
       program.body.push(this.parseStatement());
     }
+    console.log({ program });
 
     return { ...program, end: this.at().location };
   }

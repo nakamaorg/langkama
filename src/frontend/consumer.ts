@@ -1,5 +1,7 @@
 import { LangKamaError, TLocation } from '..';
+
 import { TNullable } from '../core/types/nullable.type';
+import { TCompareFn } from '../core/types/compare-function.type';
 
 
 
@@ -7,14 +9,14 @@ import { TNullable } from '../core/types/nullable.type';
  * @description
  * Helps with token/character traversal
  */
-export class Base<T> {
+export class Consumer<T> {
 
   /**
    * @description
    * Content to traverse 
   */
   // @ts-ignore
-  private content!: Array<T>;
+  protected content!: Array<T>;
 
   /**
    * @description
@@ -37,6 +39,12 @@ export class Base<T> {
 
   /**
    * @description
+   * The custom compare function
+   */
+  private compareFn!: <U = any>(a: U, b: T) => boolean;
+
+  /**
+   * @description
    * The location of the character the lexer is currently processing
    */
   protected get location(): TLocation {
@@ -52,8 +60,8 @@ export class Base<T> {
     *
     * @param content The content to reset to
     */
-  constructor(content: Array<T>) {
-    this.initBase(content);
+  constructor(content: Array<T>, compareFn?: TCompareFn) {
+    this.initBase(content, compareFn);
   }
 
   /**
@@ -62,11 +70,12 @@ export class Base<T> {
    *
    * @param content The content to reset to
    */
-  protected initBase(content: Array<T>): void {
+  protected initBase(content: Array<T>, compareFn?: TCompareFn): void {
     this.line = 0;
     this.index = 0;
     this.lineOffset = 0;
     this.content = content;
+    this.compareFn = compareFn ?? ((a, b) => a && a == b);
   }
 
   /**
@@ -89,17 +98,17 @@ export class Base<T> {
    * @description
    * Advances while checking if the next character matches with an input character
    *
-   * @param char The character to check
+   * @param target The target to check
    * @param error The error to throw
    */
-  protected expect<U = any>(char: U, error: LangKamaError): U {
-    const currentChar = this.eat();
+  protected expect<U = any>(target: U, error: LangKamaError): T {
+    const currentCTarget = this.eat();
 
-    if (!currentChar || currentChar !== char) {
+    if (!this.compareFn<U>(target, currentCTarget as T)) {
       throw error;
     }
 
-    return currentChar as U;
+    return currentCTarget as T;
   }
 
   /**

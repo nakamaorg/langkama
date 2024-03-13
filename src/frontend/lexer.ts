@@ -7,7 +7,7 @@ import { TNullable } from '../core/types/nullable.type';
 import { keywords } from '../core/consts/keywords.const';
 import { CharHelper } from '../core/helpers/char.helper';
 
-import { Base } from './base';
+import { Consumer } from './consumer';
 import { UnclosedStringError, UnrecognizedTokenError } from '../core';
 
 
@@ -16,7 +16,7 @@ import { UnclosedStringError, UnrecognizedTokenError } from '../core';
  * @description
  * Tokenizes source code
  */
-export class Lexer extends Base<string> {
+export class Lexer extends Consumer<string> {
 
   /**
    * @description
