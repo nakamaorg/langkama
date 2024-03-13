@@ -3,12 +3,12 @@ import { TokenType } from '../core/enums/token-type.enum';
 
 import { TToken } from '../core/types/token.type';
 import { TNullable } from '../core/types/nullable.type';
-import { TLocation } from '../core/types/location.type';
 
 import { keywords } from '../core/consts/keywords.const';
 import { CharHelper } from '../core/helpers/char.helper';
 
-import { LangKamaError, UnclosedStringError, UnrecognizedTokenError } from '../core';
+import { Base } from './base';
+import { UnclosedStringError, UnrecognizedTokenError } from '../core';
 
 
 
@@ -16,81 +16,13 @@ import { LangKamaError, UnclosedStringError, UnrecognizedTokenError } from '../c
  * @description
  * Tokenizes source code
  */
-export class Lexer {
-
-  /**
-   * @description
-   * Source code to tokenize
-  */
-  private code!: string;
-
-  /**
-   * @description
-   * The index where the lexer is currently looking
-   */
-  private index!: number;
-
-  /**
-   * @description
-   * The number of the line the lexer is currently processing
-   */
-  private line!: number;
-
-  /**
-   * @description
-   * The index number of the start of the current line
-   */
-  private lineOffset!: number;
+export class Lexer extends Base<string> {
 
   /**
    * @description
    * The array of tokens
    */
   private tokens!: Array<TToken>;
-
-  /**
-   * @description
-   * The location of the character the lexer is currently processing
-   */
-  private get location(): TLocation {
-    return {
-      row: this.line,
-      col: this.index - this.lineOffset
-    };
-  }
-
-  /**
-   * @description
-   * Get the current character
-   */
-  private at(): string {
-    return this.code[this.index];
-  }
-
-  /**
-   * @description
-   * Get the current character and advance
-   */
-  private eat(): TNullable<string> {
-    return this.code[this.index++] ?? null;
-  }
-
-  /**
-   * @description
-   * Advances while checking if the next character matches with an input character
-   *
-   * @param char The character to check
-   * @param error The error to throw
-   */
-  private expect(char: Char, error: LangKamaError): Char {
-    const currentChar = this.eat();
-
-    if (!currentChar || currentChar !== char) {
-      throw error;
-    }
-
-    return currentChar;
-  }
 
   /**
    * @description
@@ -155,8 +87,8 @@ export class Lexer {
       type,
       value: value ?? null,
       location: {
-        row: this.line,
-        col: this.index - this.lineOffset - (value?.length ?? 0)
+        row: this.location.row,
+        col: this.location.col - (value?.length ?? 0)
       }
     };
   }
@@ -182,11 +114,8 @@ export class Lexer {
    * @param code The source code to process next
    */
   private init(code: string = ''): void {
-    this.line = 0;
-    this.index = 0;
-    this.code = code;
+    super.initBase(code.split(''));
     this.tokens = [];
-    this.lineOffset = 0;
   }
 
   /**
@@ -194,6 +123,7 @@ export class Lexer {
    * Instantiates a lexer instance
    */
   constructor() {
+    super([]);
     this.init();
   }
 
@@ -253,8 +183,7 @@ export class Lexer {
             this.tokenizeIdentifier();
           } else if (CharHelper.isSkippable(this.at())) {
             if (this.at() === Char.NewLine) {
-              this.line++;
-              this.lineOffset = this.index + 1;
+              this.jumpLine();
             }
 
             this.eat();
