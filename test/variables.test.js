@@ -1,22 +1,25 @@
 const Type = require('../dist/langkama.umd.cjs').Type;
 const Errno = require('../dist/langkama.umd.cjs').Errno;
 const LangKama = require('../dist/langkama.umd.cjs').LangKama;
+const LangKamaEvent = require('../dist/langkama.umd.cjs').LangKamaEvent;
 
 
 
 describe('Variables', () => {
+  let compiler;
+
+  beforeEach(() => {
+    compiler = new LangKama();
+  });
+
   test('Variable declaration without value', async () => {
     const code = `hear me out var.`;
-    const result = await LangKama.interpret(code);
-
-    expect(result.type).toBe(Type.Null);
+    compiler.on(LangKamaEvent.Success, result => expect(result.type).toBe(Type.Null)).interpret(code);
   });
 
   test('Variable declaration with value', async () => {
     const code = `hear me out var is 123.`;
-    const result = await LangKama.interpret(code);
-
-    expect(result.value).toBe(123);
+    compiler.on(LangKamaEvent.Success, result => expect(result.value).toBe(123)).interpret(code);
   });
 
   test('Multiple variable declarations with value', async () => {
@@ -26,8 +29,7 @@ describe('Variables', () => {
       hear me out fullName is firstName + " " + lastName.
     `;
 
-    const result = await LangKama.interpret(code);
-    expect(result.value).toBe('John Doe');
+    compiler.on(LangKamaEvent.Success, result => expect(result.value).toBe('John Doe')).interpret(code);
   });
 
   test('Variable reassignment', async () => {
@@ -36,25 +38,30 @@ describe('Variables', () => {
       name is "Kama".
     `;
 
-    const result = await LangKama.interpret(code);
-    expect(result.value).toBe('Kama');
+    compiler.on(LangKamaEvent.Success, result => expect(result.value).toBe('Kama')).interpret(code);
   });
 });
 
 describe('Variables errors', () => {
+  let compiler;
+
+  beforeEach(() => {
+    compiler = new LangKama();
+  });
+
   test('Variable declaration without an identifier', () => {
     const code = `hear me out`;
-    LangKama.interpret(code).catch(err => expect(err.errno).toBe(Errno.MissingIdentifierError));
+    compiler.on(LangKamaEvent.Error, error => expect(error.errno).toBe(Errno.MissingIdentifierError)).interpret(code);
   });
 
   test('Variable declaration without a dot at the end', () => {
     const code = `hear me out var`;
-    LangKama.interpret(code).catch(err => expect(err.errno).toBe(Errno.MissingEqualsError));
+    compiler.on(LangKamaEvent.Error, error => expect(error.errno).toBe(Errno.MissingEqualsError)).interpret(code);
   });
 
   test('Variable declaration without a valid value after the equals keyword', () => {
     const code = `hear me out var is`;
-    LangKama.interpret(code).catch(err => expect(err.errno).toBe(Errno.MissingEqualsError));
+    compiler.on(LangKamaEvent.Error, error => expect(error.errno).toBe(Errno.MissingEqualsError)).interpret(code);
   });
 
   test('Variable reassignment without a valid value after the equals keyword', () => {
@@ -62,7 +69,7 @@ describe('Variables errors', () => {
       hear me out x is 1.
       x is
     `;
-    LangKama.interpret(code).catch(err => expect(err).toBe('Cannot resolve variable "is" as it does not exist'));
+    compiler.on(LangKamaEvent.Error, error => expect(error).toBe('Cannot resolve variable "is" as it does not exist')).interpret(code);
   });
 
   test('Variable duplication', () => {
@@ -70,11 +77,11 @@ describe('Variables errors', () => {
       hear me out myVar is 1.
       hear me out myVar is 2.
     `;
-    LangKama.interpret(code).catch(err => expect(err).toBe('Cannot declare variable myVar as it\'s already defined'));
+    compiler.on(LangKamaEvent.Error, error => expect(error).toBe('Cannot declare variable myVar as it\'s already defined')).interpret(code);
   });
 
   test('Undeclared variable', () => {
     const code = `myVar`;
-    LangKama.interpret(code).catch(err => expect(err).toBe('Cannot resolve variable "myVar" as it does not exist'));
+    compiler.on(LangKamaEvent.Error, error => expect(error).toBe('Cannot resolve variable "myVar" as it does not exist')).interpret(code);
   });
 });
