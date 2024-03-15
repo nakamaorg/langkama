@@ -188,7 +188,7 @@ export class Lexer extends Consumer<string> {
 
             this.eat();
           } else {
-            throw new UnrecognizedTokenError(this.location);
+            this.errorManager.raise(new UnrecognizedTokenError(this.location));
           }
         }
       }

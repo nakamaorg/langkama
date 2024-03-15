@@ -1,6 +1,7 @@
 import { LangKamaError, TLocation } from '..';
 
 import { TNullable } from '../core/types/nullable.type';
+import { ErrorManager } from '../core/managers/error.manager';
 import { TCompareFn } from '../core/types/compare-function.type';
 
 
@@ -10,6 +11,12 @@ import { TCompareFn } from '../core/types/compare-function.type';
  * Helps with token/character traversal
  */
 export class Consumer<T> {
+
+  /**
+   * @description
+   * The error manager
+   */
+  protected errorManager!: ErrorManager;
 
   /**
    * @description
@@ -75,6 +82,7 @@ export class Consumer<T> {
     this.index = 0;
     this.lineOffset = 0;
     this.content = content;
+    this.errorManager = new ErrorManager();
     this.compareFn = compareFn ?? ((a, b) => a && a == b);
   }
 
@@ -105,7 +113,7 @@ export class Consumer<T> {
     const currentCTarget = this.eat();
 
     if (!this.compareFn<U>(target, currentCTarget as T)) {
-      throw error;
+      this.errorManager.raise(error);
     }
 
     return currentCTarget as T;
