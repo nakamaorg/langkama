@@ -248,11 +248,9 @@ export class Parser extends Consumer<TToken> {
       start: { row: 0, col: 0 }
     }
 
-    console.log({ content: this.content });
     while (this.notEof()) {
       program.body.push(this.parseStatement());
     }
-    console.log({ program });
 
     return { ...program, end: this.at().location };
   }
