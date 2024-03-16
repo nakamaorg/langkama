@@ -1,4 +1,5 @@
 import { LangKamaError } from '..';
+import { TOnErrorCallbackFn } from '../types/on-error-callback.type';
 
 
 
@@ -14,8 +15,28 @@ export class ErrorManager {
    */
   private errors!: Array<LangKamaError>;
 
-  constructor() {
+  /**
+   * @description
+   * The error callback
+   */
+  private onError!: TOnErrorCallbackFn;
+
+  constructor(onError?: TOnErrorCallbackFn) {
     this.init();
+
+    if (onError) {
+      this.onError = onError;
+    }
+  }
+
+  /**
+   * @description
+   * Sets the error callback function to call
+   *
+   * @param onError The error callback function
+   */
+  public setCallback(onError: TOnErrorCallbackFn): void {
+    this.onError = onError;
   }
 
   /**
@@ -42,6 +63,10 @@ export class ErrorManager {
    */
   public raise(error: LangKamaError): void {
     this.errors.push(error);
+
+    if (this.onError) {
+      this.onError(error);
+    }
   }
 
   /**
