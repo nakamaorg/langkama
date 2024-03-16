@@ -1,16 +1,27 @@
+import { ConstantReassignmentError, VariableDefinedError, VariableNotDefinedError } from '..';
+
+import { ErrorManager } from '../core/managers/error.manager';
+
+import { TNullable } from '../core/types/nullable.type';
+import { TOnErrorCallbackFn } from '../core/types/on-error-callback.type';
 import { IRuntimeVal, MK_BOOL, MK_NULL } from '../core/types/runtime-values.type';
 
 
 
 export class Environment {
-  private parent?: Environment;
-  private variables: Map<string, IRuntimeVal>;
   private constants: Set<string>;
+  public errorManager?: ErrorManager;
+  private parent: TNullable<Environment>;
+  private variables: Map<string, IRuntimeVal>;
 
-  constructor(parent?: Environment) {
+  constructor(parent: TNullable<Environment>, onError?: TOnErrorCallbackFn) {
     this.parent = parent;
     this.constants = new Set();
     this.variables = new Map();
+
+    if (onError) {
+      this.errorManager = new ErrorManager(onError);
+    }
 
     if (!parent) {
       this.declareVariable('bruh', MK_NULL(), true);
@@ -21,7 +32,7 @@ export class Environment {
 
   public declareVariable(name: string, value: IRuntimeVal, constant: boolean = false): IRuntimeVal {
     if (this.variables.has(name)) {
-      throw `Cannot declare variable ${name} as it's already defined`
+      this.errorManager?.raise(new VariableDefinedError(name));
     }
 
     this.variables.set(name, value);
@@ -35,13 +46,13 @@ export class Environment {
 
   public assignVariable(name: string, value: IRuntimeVal): IRuntimeVal {
     if (!this.variables.has(name)) {
-      throw `Variable ${name} is not defined`
+      this.errorManager?.raise(new VariableNotDefinedError(name));
     }
 
     const env = this.resolve(name);
 
     if (env.constants.has(name)) {
-      throw 'Constant can\'t be reassigned';
+      this.errorManager?.raise(new ConstantReassignmentError(name));
     }
 
     env.variables.set(name, value);
@@ -60,7 +71,8 @@ export class Environment {
     }
 
     if (!this.parent) {
-      throw `Cannot resolve variable "${name}" as it does not exist`;
+      this.errorManager?.raise(new VariableNotDefinedError(name));
+      return this;
     }
 
     return this.parent.resolve(name);

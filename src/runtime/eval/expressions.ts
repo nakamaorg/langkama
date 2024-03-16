@@ -2,6 +2,7 @@ import { evaluate } from '../interpreter';
 import { Environment } from '../environment';
 import { Type } from '../../core/enums/type.enum';
 import { NodeType } from '../../core/enums/node-type.enum';
+import { InvalidAssignmentError, InvalidOperationError, UnmatchingTypesError } from '../..';
 import { IAssignmentNode, IBinaryExpression, IIdentifierNode } from '../../core/types/ast.type';
 import { INumberVal, IRuntimeVal, IStringVal, MK_NULL, MK_NUMBER, MK_STRING } from '../../core/types/runtime-values.type';
 
@@ -12,7 +13,8 @@ export function evaluateBinaryExpression(binaryExpression: IBinaryExpression, en
   const rhs = evaluate(binaryExpression.right, env);
 
   if (lhs.type !== rhs.type) {
-    throw `Can't perform binary operations on different types`;
+    env.errorManager?.raise(new UnmatchingTypesError(binaryExpression.start));
+    return MK_NULL();
   }
 
   switch (lhs.type) {
@@ -24,7 +26,8 @@ export function evaluateBinaryExpression(binaryExpression: IBinaryExpression, en
       if (binaryExpression.operator === '+') {
         return MK_STRING((lhs as IStringVal).value + (rhs as IStringVal).value);
       } else {
-        throw `Invalid operation on string "${binaryExpression.operator}"`;
+        env.errorManager?.raise(new InvalidOperationError(binaryExpression.start));
+        return MK_NULL();
       }
     }
 
@@ -74,7 +77,8 @@ export function evaluateIdentifier(identifier: IIdentifierNode, env: Environment
 
 export function evaluateAssignment(node: IAssignmentNode, env: Environment): IRuntimeVal {
   if (node.assigne.kind !== NodeType.Identifier) {
-    throw 'Invalid LHS inside assignment expression';
+    env.errorManager?.raise(new InvalidAssignmentError(node.start));
+    return MK_NULL();
   }
 
   const name = (node.assigne as IIdentifierNode).symbol;
