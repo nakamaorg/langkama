@@ -71,30 +71,23 @@ pnpm start
 For those looking to incorporate LangKama's functionality into their projects, the _API_ is accessible after a successful project build. You can find it at `dist/langkama.cjs`.
 
 ```ts
-import { Parser } from './frontend/parser';
-import { evaluate } from './runtime/interpreter';
-import { Environment } from './runtime/environment';
+import { LangKama } from './main';
+
 
 
 const code = `(1 + 2) * 3`;
+const compiler = new LangKama();
 
-try {
-  const lexer = new Lexer();
-  const parser = new Parser();
-  const env = new Environment();
-
-  console.log('Compiling LangKama script...');
-
-  const tokens = lexer.tokenize(code);
-  const program = parser.parse(tokens);
-  const result = evaluate(program, env);
-
-  console.log('LangKama script compiled!\n');
-  console.log({ result });
-} catch (err) {
-  console.error('LangKama Error');
-  console.error(`\t${err}`);
-}
+compiler
+  .on(LangKamaEvent.Success, result => {
+    console.log('LangKama script compiled!');
+    console.log({ result });
+  })
+  .on(LangKamaEvent.Error, error => { console.error(error) })
+  .on(LangKamaEvent.Lexer, () => console.log(`Tokenizing...`))
+  .on(LangKamaEvent.Parser, tokens => console.log(`Parsing...`))
+  .on(LangKamaEvent.Interpreter, () => console.log(`Interpreting...`))
+  .interpret(code);
 ```
 
 ## Test
