@@ -9,6 +9,8 @@ import { LangKamaEvent } from './core/enums/langkama-event.enum';
 import { TToken } from './core/types/token.type';
 import { IProgramNode } from './core/types/ast.type';
 
+import { ErrorManager } from './core/managers/error.manager';
+
 
 
 /***
@@ -19,16 +21,22 @@ export class LangKama {
 
   private onLexerEvent: (code: string) => void;
   private onSuccessEvent: (value: IRuntimeVal) => void;
-  private onErrorEvent: (error: LangKamaError) => void;
   private onParserEvent: (tokens: Array<TToken>) => void;
   private onInterpreterEvent: (program: IProgramNode) => void;
 
+  /**
+   * @description
+   * The error manager
+   */
+  private errorManager: ErrorManager;
+
   constructor() {
-    this.onErrorEvent = () => { };
     this.onLexerEvent = () => { };
     this.onParserEvent = () => { };
     this.onSuccessEvent = () => { };
     this.onInterpreterEvent = () => { };
+
+    this.errorManager = new ErrorManager();
   }
 
   /**
@@ -40,8 +48,8 @@ export class LangKama {
    */
   public interpret(code: string, environment?: Environment): LangKama {
     try {
-      const lexer = new Lexer();
-      const parser = new Parser();
+      const lexer = new Lexer(this.errorManager.raise.bind(this.errorManager));
+      const parser = new Parser(this.errorManager.raise.bind(this.errorManager));
       const env = environment ?? new Environment();
 
       this.onLexerEvent(code);
@@ -55,7 +63,7 @@ export class LangKama {
 
       this.onSuccessEvent(result);
     } catch (error) {
-      this.onErrorEvent(new LangKamaError('err')); // TODO: implemete a proper error manager
+      this.errorManager.raise(error as LangKamaError);
     } finally {
       return this;
     }
@@ -71,7 +79,7 @@ export class LangKama {
   public on(event: LangKamaEvent, eventListener: () => void): LangKama {
     switch (event) {
       case LangKamaEvent.Error: {
-        this.onErrorEvent = eventListener;
+        this.errorManager.setCallback(eventListener);
         break;
       }
 

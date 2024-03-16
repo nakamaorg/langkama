@@ -102,7 +102,7 @@ class Cmd {
 
           process.exit(0);
         })
-        .on(LangKamaEvent.Error, error => { throw error })
+        .on(LangKamaEvent.Error, error => { this.#error(error) })
         .on(LangKamaEvent.Lexer, () => this.#info(`Tokenizing "${fileName}" script...`))
         .on(LangKamaEvent.Parser, tokens => this.#info(`Parsing "${tokens.length}" tokens...`))
         .on(LangKamaEvent.Interpreter, () => this.#info(`Interpreting "${fileName}" script...`))
