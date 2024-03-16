@@ -231,7 +231,7 @@ export class Parser extends Consumer<TToken> {
       kind: NodeType.VariableDeclaration
     } as IVariableDeclarationNode;
 
-    this.expect(TokenType.Dot, new MissingDotError(this.at().location));
+    this.expect(TokenType.Dot, new MissingDotError(declaration.end));
 
     return declaration;
   }

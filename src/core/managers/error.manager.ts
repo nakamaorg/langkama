@@ -11,6 +11,12 @@ export class ErrorManager {
 
   /**
    * @description
+   * The code source related to the error manager
+   */
+  private context!: string;
+
+  /**
+   * @description
    * The list of errors
    */
   private errors!: Array<LangKamaError>;
@@ -19,14 +25,18 @@ export class ErrorManager {
    * @description
    * The error callback
    */
-  private onError!: TOnErrorCallbackFn;
+  private onError: TOnErrorCallbackFn;
 
-  constructor(onError?: TOnErrorCallbackFn) {
-    this.init();
-
-    if (onError) {
-      this.onError = onError;
-    }
+  /**
+   * @description
+   * Instantiates the error manager
+   *
+   * @param onError The error callback function to call in case an error was raised
+   * @param context The code source to manage the errors for
+   */
+  constructor(onError: TOnErrorCallbackFn, context?: string) {
+    this.init(context);
+    this.onError = onError;
   }
 
   /**
@@ -62,18 +72,23 @@ export class ErrorManager {
    * @param error The error to raise
    */
   public raise(error: LangKamaError): void {
-    this.errors.push(error);
+    error.setContext(this.context);
 
-    if (this.onError) {
-      this.onError(error);
-    }
+    this.errors.push(error);
+    this.onError(error);
   }
 
   /**
    * @description
    * Initializes the manager
+   *
+   * @param context The code source to manage the errors for
    */
-  public init(): void {
+  public init(context?: string): void {
     this.errors = [];
+
+    if (context) {
+      this.context = context;
+    }
   }
 }

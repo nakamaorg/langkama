@@ -8,6 +8,7 @@ import { LangKamaEvent } from './core/enums/langkama-event.enum';
 
 import { TToken } from './core/types/token.type';
 import { IProgramNode } from './core/types/ast.type';
+import { TOnErrorCallbackFn } from './core/types/on-error-callback.type';
 
 import { ErrorManager } from './core/managers/error.manager';
 
@@ -19,24 +20,18 @@ import { ErrorManager } from './core/managers/error.manager';
  */
 export class LangKama {
 
+  private onErrorEvent: TOnErrorCallbackFn;
   private onLexerEvent: (code: string) => void;
   private onSuccessEvent: (value: IRuntimeVal) => void;
   private onParserEvent: (tokens: Array<TToken>) => void;
   private onInterpreterEvent: (program: IProgramNode) => void;
 
-  /**
-   * @description
-   * The error manager
-   */
-  private errorManager: ErrorManager;
-
   constructor() {
+    this.onErrorEvent = () => { };
     this.onLexerEvent = () => { };
     this.onParserEvent = () => { };
     this.onSuccessEvent = () => { };
     this.onInterpreterEvent = () => { };
-
-    this.errorManager = new ErrorManager();
   }
 
   /**
@@ -47,10 +42,12 @@ export class LangKama {
    * @param environment The envrionment to read from
    */
   public interpret(code: string, environment?: Environment): LangKama {
+    const env = environment ?? new Environment();
+    const errorManager = new ErrorManager(this.onErrorEvent, code);
+
     try {
-      const lexer = new Lexer(this.errorManager.raise.bind(this.errorManager));
-      const parser = new Parser(this.errorManager.raise.bind(this.errorManager));
-      const env = environment ?? new Environment();
+      const lexer = new Lexer(errorManager.raise.bind(errorManager));
+      const parser = new Parser(errorManager.raise.bind(errorManager));
 
       this.onLexerEvent(code);
       const tokens = lexer.tokenize(code);
@@ -63,7 +60,7 @@ export class LangKama {
 
       this.onSuccessEvent(result);
     } catch (error) {
-      this.errorManager.raise(error as LangKamaError);
+      errorManager.raise(error as LangKamaError);
     } finally {
       return this;
     }
@@ -79,7 +76,7 @@ export class LangKama {
   public on(event: LangKamaEvent, eventListener: () => void): LangKama {
     switch (event) {
       case LangKamaEvent.Error: {
-        this.errorManager.setCallback(eventListener);
+        this.onErrorEvent = eventListener;
         break;
       }
 
