@@ -5,9 +5,16 @@ export enum Errno {
   UnknownFileError,
   MissingEqualsError,
   UnclosedStringError,
+  UnmatchingTypesError,
+  VariableDefinedError,
+  InvalidOperationError,
+  InvalidAssignmentError,
   MissingIdentifierError,
   UnrecognizedTokenError,
+  VariableNotDefinedError,
   UnclosedParenthesisError,
+  ConstantReassignmentError,
   IncompleteExpressionError,
+  UnrecognizedStatementError,
   UninitializedConstantError
 }
