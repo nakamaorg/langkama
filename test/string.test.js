@@ -11,19 +11,31 @@ describe('Strings', () => {
     compiler = new LangKama();
   });
 
-  test('String value', async () => {
+  test('String value', done => {
     const code = `"John"`;
-    compiler.on(LangKamaEvent.Success, result => expect(result.value).toBe('John')).interpret(code);
+
+    compiler.on(LangKamaEvent.Success, result => {
+      expect(result.value).toBe('John');
+      done();
+    }).interpret(code);
   });
 
-  test('String with spaces', async () => {
+  test('String with spaces', done => {
     const code = `"John Doe"`;
-    compiler.on(LangKamaEvent.Success, result => expect(result.value).toBe('John Doe')).interpret(code);
+
+    compiler.on(LangKamaEvent.Success, result => {
+      expect(result.value).toBe('John Doe');
+      done();
+    }).interpret(code);
   });
 
-  test('String concatenation', async () => {
+  test('String concatenation', done => {
     const code = `"John" + " " + "Doe"`;
-    compiler.on(LangKamaEvent.Success, result => expect(result.value).toBe('John Doe')).interpret(code);
+
+    compiler.on(LangKamaEvent.Success, result => {
+      expect(result.value).toBe('John Doe');
+      done();
+    }).interpret(code);
   });
 });
 
@@ -34,13 +46,21 @@ describe('Strings errors', () => {
     compiler = new LangKama();
   });
 
-  test('Incomplete operation', () => {
+  test('Incomplete operation', done => {
     const code = `"John" +`;
-    compiler.on(LangKamaEvent.Error, error => expect(error.errno).toBe(Errno.IncompleteExpressionError)).interpret(code);
+
+    compiler.on(LangKamaEvent.Error, error => {
+      expect(error.errno).toBe(Errno.IncompleteExpressionError);
+      done();
+    }).interpret(code);
   });
 
-  test('String concatenation with non string type', () => {
+  test('String concatenation with non string type', done => {
     const code = `"John" + 1`;
-    compiler.on(LangKamaEvent.Error, error => expect(error).toBe('Can\'t perform binary operations on different types')).interpret(code);
+
+    compiler.on(LangKamaEvent.Error, error => {
+      expect(error.errno).toBe(Errno.UnmatchingTypesError);
+      done();
+    }).interpret(code);
   });
 });

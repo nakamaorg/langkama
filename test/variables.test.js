@@ -12,33 +12,47 @@ describe('Variables', () => {
     compiler = new LangKama();
   });
 
-  test('Variable declaration without value', async () => {
+  test('Variable declaration without value', done => {
     const code = `hear me out var.`;
-    compiler.on(LangKamaEvent.Success, result => expect(result.type).toBe(Type.Null)).interpret(code);
+
+    compiler.on(LangKamaEvent.Success, result => {
+      expect(result.type).toBe(Type.Null);
+      done();
+    }).interpret(code);
   });
 
-  test('Variable declaration with value', async () => {
+  test('Variable declaration with value', done => {
     const code = `hear me out var is 123.`;
-    compiler.on(LangKamaEvent.Success, result => expect(result.value).toBe(123)).interpret(code);
+
+    compiler.on(LangKamaEvent.Success, result => {
+      expect(result.value).toBe(123);
+      done();
+    }).interpret(code);
   });
 
-  test('Multiple variable declarations with value', async () => {
+  test('Multiple variable declarations with value', done => {
     const code = `
       hear me out firstName is "John".
       hear me out lastName is "Doe".
       hear me out fullName is firstName + " " + lastName.
     `;
 
-    compiler.on(LangKamaEvent.Success, result => expect(result.value).toBe('John Doe')).interpret(code);
+    compiler.on(LangKamaEvent.Success, result => {
+      expect(result.value).toBe('John Doe');
+      done();
+    }).interpret(code);
   });
 
-  test('Variable reassignment', async () => {
+  test('Variable reassignment', done => {
     const code = `
       hear me out name is "Lang".
       name is "Kama".
     `;
 
-    compiler.on(LangKamaEvent.Success, result => expect(result.value).toBe('Kama')).interpret(code);
+    compiler.on(LangKamaEvent.Success, result => {
+      expect(result.value).toBe('Kama');
+      done();
+    }).interpret(code);
   });
 });
 
@@ -49,39 +63,63 @@ describe('Variables errors', () => {
     compiler = new LangKama();
   });
 
-  test('Variable declaration without an identifier', () => {
+  test('Variable declaration without an identifier', done => {
     const code = `hear me out`;
-    compiler.on(LangKamaEvent.Error, error => expect(error.errno).toBe(Errno.MissingIdentifierError)).interpret(code);
+
+    compiler.on(LangKamaEvent.Error, error => {
+      expect(error.errno).toBe(Errno.MissingIdentifierError);
+      done();
+    }).interpret(code);
   });
 
-  test('Variable declaration without a dot at the end', () => {
+  test('Variable declaration without a dot at the end', done => {
     const code = `hear me out var`;
-    compiler.on(LangKamaEvent.Error, error => expect(error.errno).toBe(Errno.MissingEqualsError)).interpret(code);
+
+    compiler.on(LangKamaEvent.Error, error => {
+      expect(error.errno).toBe(Errno.MissingEqualsError);
+      done();
+    }).interpret(code);
   });
 
-  test('Variable declaration without a valid value after the equals keyword', () => {
+  test('Variable declaration without a valid value after the equals keyword', done => {
     const code = `hear me out var is`;
-    compiler.on(LangKamaEvent.Error, error => expect(error.errno).toBe(Errno.MissingEqualsError)).interpret(code);
+
+    compiler.on(LangKamaEvent.Error, error => {
+      expect(error.errno).toBe(Errno.MissingEqualsError);
+      done();
+    }).interpret(code);
   });
 
-  test('Variable reassignment without a valid value after the equals keyword', () => {
+  test('Variable reassignment without a valid value after the equals keyword', done => {
     const code = `
       hear me out x is 1.
       x is
     `;
-    compiler.on(LangKamaEvent.Error, error => expect(error).toBe('Cannot resolve variable "is" as it does not exist')).interpret(code);
+
+    compiler.on(LangKamaEvent.Error, error => {
+      expect(error.errno).toBe(Errno.VariableNotDefinedError);
+      done();
+    }).interpret(code);
   });
 
-  test('Variable duplication', () => {
+  test('Variable duplication', done => {
     const code = `
       hear me out myVar is 1.
       hear me out myVar is 2.
     `;
-    compiler.on(LangKamaEvent.Error, error => expect(error).toBe('Cannot declare variable myVar as it\'s already defined')).interpret(code);
+
+    compiler.on(LangKamaEvent.Error, error => {
+      expect(error.errno).toBe(Errno.VariableDefinedError);
+      done();
+    }).interpret(code);
   });
 
-  test('Undeclared variable', () => {
+  test('Undeclared variable', done => {
     const code = `myVar`;
-    compiler.on(LangKamaEvent.Error, error => expect(error).toBe('Cannot resolve variable "myVar" as it does not exist')).interpret(code);
+
+    compiler.on(LangKamaEvent.Error, error => {
+      expect(error.errno).toBe(Errno.VariableNotDefinedError);
+      done();
+    }).interpret(code);
   });
 });
