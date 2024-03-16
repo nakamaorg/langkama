@@ -5,7 +5,9 @@ import { TokenType } from '../core/enums/token-type.enum';
 import { MissingEqualsError, MissingIdentifierError, MissingDotError, UnclosedParenthesisError, UninitializedConstantError, UnrecognizedTokenError, IncompleteExpressionError } from '../core';
 
 import { TToken } from '../core/types/token.type';
+import { TOnErrorCallbackFn } from '../core/types/on-error-callback.type';
 import { IAssignmentNode, IBinaryExpression, IExpressionNode, IIdentifierNode, INumberNode, IProgramNode, IStatementNode, IStringNode, IVariableDeclarationNode } from '../core/types/ast.type';
+
 import { Consumer } from './consumer';
 
 
@@ -19,9 +21,11 @@ export class Parser extends Consumer<TToken> {
   /**
    * @description
    * Instantiates a parser instance
+   *
+   * @param onError Callback for catching errors
    */
-  constructor() {
-    super([], (a: TokenType, b: TToken) => (a && a === b.type));
+  constructor(onError: TOnErrorCallbackFn) {
+    super([], onError, (a: TokenType, b: TToken) => (a && a === b.type));
   }
 
   /**

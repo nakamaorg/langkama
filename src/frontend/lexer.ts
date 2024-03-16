@@ -3,6 +3,7 @@ import { TokenType } from '../core/enums/token-type.enum';
 
 import { TToken } from '../core/types/token.type';
 import { TNullable } from '../core/types/nullable.type';
+import { TOnErrorCallbackFn } from '../core/types/on-error-callback.type';
 
 import { keywords } from '../core/consts/keywords.const';
 import { CharHelper } from '../core/helpers/char.helper';
@@ -121,9 +122,11 @@ export class Lexer extends Consumer<string> {
   /**
    * @description
    * Instantiates a lexer instance
+   *
+   * @param onError Callback for catching errors
    */
-  constructor() {
-    super([]);
+  constructor(onError: TOnErrorCallbackFn) {
+    super([], onError);
     this.init();
   }
 

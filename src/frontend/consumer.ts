@@ -3,6 +3,7 @@ import { LangKamaError, TLocation } from '..';
 import { TNullable } from '../core/types/nullable.type';
 import { ErrorManager } from '../core/managers/error.manager';
 import { TCompareFn } from '../core/types/compare-function.type';
+import { TOnErrorCallbackFn } from '../core/types/on-error-callback.type';
 
 
 
@@ -66,9 +67,13 @@ export class Consumer<T> {
     * Instntiates a base frontend instance
     *
     * @param content The content to reset to
+    * @param onError The error callback function
+    * @param compareFn The function to use for comparasion
     */
-  constructor(content: Array<T>, compareFn?: TCompareFn) {
-    this.initBase(content, compareFn);
+  constructor(content: Array<T>, onError: TOnErrorCallbackFn, compareFn?: TCompareFn) {
+    this.initBase(content);
+    this.errorManager = new ErrorManager(onError);
+    this.compareFn = compareFn ?? ((a, b) => a && a == b);
   }
 
   /**
@@ -77,13 +82,11 @@ export class Consumer<T> {
    *
    * @param content The content to reset to
    */
-  protected initBase(content: Array<T>, compareFn?: TCompareFn): void {
+  protected initBase(content: Array<T>): void {
     this.line = 0;
     this.index = 0;
     this.lineOffset = 0;
     this.content = content;
-    this.errorManager = new ErrorManager();
-    this.compareFn = compareFn ?? ((a, b) => a && a == b);
   }
 
   /**
