@@ -23,7 +23,7 @@ export class LangKamaError extends Error {
   }
 
   private canShowLine(): boolean {
-    return typeof this.location?.row != undefined && typeof this.location?.col != undefined;
+    return typeof this.location?.row != 'undefined' && typeof this.location?.col != 'undefined';
   }
 
   private getMessage(): string {

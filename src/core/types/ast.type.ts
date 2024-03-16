@@ -9,6 +9,8 @@ export interface IStatementNode {
   start: TLocation;
 }
 
+export interface ISkipNode extends IStatementNode { }
+
 export interface IProgramNode extends IStatementNode {
   kind: NodeType.Program;
   body: Array<IStatementNode>;

@@ -42,12 +42,12 @@ export class LangKama {
    * @param environment The envrionment to read from
    */
   public interpret(code: string, environment?: Environment): LangKama {
-    const env = environment ?? new Environment();
     const errorManager = new ErrorManager(this.onErrorEvent, code);
 
     try {
       const lexer = new Lexer(errorManager.raise.bind(errorManager));
       const parser = new Parser(errorManager.raise.bind(errorManager));
+      const env = environment ?? new Environment(null, errorManager.raise.bind(errorManager));
 
       this.onLexerEvent(code);
       const tokens = lexer.tokenize(code);

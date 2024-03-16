@@ -6,7 +6,7 @@ import { MissingEqualsError, MissingIdentifierError, MissingDotError, UnclosedPa
 
 import { TToken } from '../core/types/token.type';
 import { TOnErrorCallbackFn } from '../core/types/on-error-callback.type';
-import { IAssignmentNode, IBinaryExpression, IExpressionNode, IIdentifierNode, INumberNode, IProgramNode, IStatementNode, IStringNode, IVariableDeclarationNode } from '../core/types/ast.type';
+import { IAssignmentNode, IBinaryExpression, IExpressionNode, IIdentifierNode, INumberNode, IProgramNode, ISkipNode, IStatementNode, IStringNode, IVariableDeclarationNode } from '../core/types/ast.type';
 
 import { Consumer } from './consumer';
 
@@ -185,11 +185,23 @@ export class Parser extends Consumer<TToken> {
       }
 
       case TokenType.EOF: {
-        throw new IncompleteExpressionError(this.at().location);
+        this.errorManager.raise(new IncompleteExpressionError(this.at().location));
+
+        return {
+          kind: NodeType.Skip,
+          end: this.at().location,
+          start: this.at().location
+        } as ISkipNode;
       }
 
       default: {
-        throw new UnrecognizedTokenError(this.at().location);
+        this.errorManager.raise(new UnrecognizedTokenError(this.at().location));
+
+        return {
+          kind: NodeType.Skip,
+          end: this.at().location,
+          start: this.at().location
+        } as ISkipNode;
       }
     }
   }
@@ -207,7 +219,13 @@ export class Parser extends Consumer<TToken> {
       const dotToken = this.eat() as TToken;
 
       if (isConstant) {
-        throw new UninitializedConstantError(this.at().location);
+        this.errorManager.raise(new UninitializedConstantError(this.at().location));
+
+        return {
+          kind: NodeType.Skip,
+          end: this.at().location,
+          start: this.at().location
+        } as ISkipNode;
       }
 
       return {
