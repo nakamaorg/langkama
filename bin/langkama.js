@@ -9,6 +9,7 @@ import {
   version,
   LangKama,
   Environment,
+  ErrorManager,
   LangKamaEvent,
   InvalidFileError,
   UnknownFileError
@@ -121,6 +122,11 @@ class Cmd {
     const env = new Environment();
     const compiler = new LangKama();
 
+    const onErrorCallback = error => {
+      this.#error(error, false);
+      prompt();
+    };
+
     const prompt = () => {
       rl.question('> ', async input => {
         this.startTime = process.hrtime();
@@ -128,15 +134,15 @@ class Cmd {
         if (input.toLowerCase() === 'exit') {
           rl.close();
         } else {
+          const errorManager = new ErrorManager(onErrorCallback, input);
+          env.setErrorCallback(errorManager.raise.bind(errorManager));
+
           compiler
             .on(LangKamaEvent.Success, result => {
               this.#info(chalk.green(result.value));
               prompt();
             })
-            .on(LangKamaEvent.Error, error => {
-              this.#error(error, false);
-              prompt();
-            })
+            .on(LangKamaEvent.Error, onErrorCallback)
             .interpret(input, env);
         }
       });

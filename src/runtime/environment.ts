@@ -30,6 +30,14 @@ export class Environment {
     }
   }
 
+  public setErrorCallback(onError: TOnErrorCallbackFn): void {
+    if (this.errorManager) {
+      this.errorManager?.setCallback(onError);
+    } else {
+      this.errorManager = new ErrorManager(onError);
+    }
+  }
+
   public declareVariable(name: string, value: IRuntimeVal, constant: boolean = false): IRuntimeVal {
     if (this.variables.has(name)) {
       this.errorManager?.raise(new VariableDefinedError(name));
