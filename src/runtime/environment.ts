@@ -1,11 +1,12 @@
 import { ConstantReassignmentError, VariableDefinedError, VariableNotDefinedError } from '..';
 
 import { ErrorManager } from '../core/managers/error.manager';
+import { RuntimeHelper } from '../core/helpers/runtime.helper';
 
 import { TNullable } from '../core/types/nullable.type';
 import { TVariable } from '../core/types/variable.type';
+import { IRuntimeVal } from '../core/types/runtime-values.type';
 import { TOnErrorCallbackFn } from '../core/types/on-error-callback.type';
-import { IRuntimeVal, MK_BOOL, MK_NULL } from '../core/types/runtime-values.type';
 
 
 
@@ -49,9 +50,9 @@ export class Environment {
     }
 
     if (!parent) {
-      this.declareVariable('bruh', MK_NULL(), true);
-      this.declareVariable('W', MK_BOOL(true), true);
-      this.declareVariable('L', MK_BOOL(false), true);
+      this.declareVariable('bruh', RuntimeHelper.createNull(), true);
+      this.declareVariable('W', RuntimeHelper.createBoolean(true), true);
+      this.declareVariable('L', RuntimeHelper.createBoolean(false), true);
     }
   }
 

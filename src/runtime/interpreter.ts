@@ -1,9 +1,10 @@
 import { NodeType } from '../core/enums/node-type.enum';
 
-import { INumberVal, IRuntimeVal, IStringVal, MK_NULL, MK_NUMBER, MK_STRING } from '../core/types/runtime-values.type';
+import { INumberVal, IRuntimeVal, IStringVal } from '../core/types/runtime-values.type';
 import { IAssignmentNode, IBinaryExpression, IIdentifierNode, INumberNode, IProgramNode, IStatementNode, IStringNode, IVariableDeclarationNode } from '../core/types/ast.type';
 
 import { Environment } from './environment';
+import { RuntimeHelper } from '../core/helpers/runtime.helper';
 import { InvalidAssignmentError, InvalidOperationError, Type, UnmatchingTypesError, UnrecognizedStatementError } from '..';
 
 
@@ -22,7 +23,7 @@ export class Evaluator {
    * @param env The scope of the evaluation
    */
   private evaluateProgram(program: IProgramNode, env: Environment): IRuntimeVal {
-    let lastEvaluated: IRuntimeVal = MK_NULL();
+    let lastEvaluated: IRuntimeVal = RuntimeHelper.createNull();
 
     for (const statement of program.body) {
       lastEvaluated = this.evaluate(statement, env);
@@ -41,7 +42,7 @@ export class Evaluator {
   private evaluateVariableDeclaration(declaration: IVariableDeclarationNode, env: Environment): IRuntimeVal {
     const value = declaration.value
       ? this.evaluate(declaration.value, env)
-      : MK_NULL();
+      : RuntimeHelper.createNull();
 
     return env.declareVariable(declaration.identifier, value, declaration.constant);
   }
@@ -59,7 +60,7 @@ export class Evaluator {
 
     if (lhs.type !== rhs.type) {
       env.errorManager?.raise(new UnmatchingTypesError(binaryExpression.start));
-      return MK_NULL();
+      return RuntimeHelper.createNull();
     }
 
     switch (lhs.type) {
@@ -69,15 +70,15 @@ export class Evaluator {
 
       case Type.String: {
         if (binaryExpression.operator === '+') {
-          return MK_STRING((lhs as IStringVal).value + (rhs as IStringVal).value);
+          return RuntimeHelper.createString((lhs as IStringVal).value + (rhs as IStringVal).value);
         } else {
           env.errorManager?.raise(new InvalidOperationError(binaryExpression.start));
-          return MK_NULL();
+          return RuntimeHelper.createNull();
         }
       }
 
       default: {
-        return MK_NULL();
+        return RuntimeHelper.createNull();
       }
     }
   }
@@ -120,7 +121,7 @@ export class Evaluator {
       }
     }
 
-    return MK_NUMBER(result);
+    return RuntimeHelper.createNumber(result);
   }
 
   /**
@@ -145,7 +146,7 @@ export class Evaluator {
   private evaluateAssignment(node: IAssignmentNode, env: Environment): IRuntimeVal {
     if (node.assigne.kind !== NodeType.Identifier) {
       env.errorManager?.raise(new InvalidAssignmentError(node.start));
-      return MK_NULL();
+      return RuntimeHelper.createNull();
     }
 
     const name = (node.assigne as IIdentifierNode).symbol;
@@ -162,11 +163,11 @@ export class Evaluator {
   public evaluate(node: IStatementNode, env: Environment): IRuntimeVal {
     switch (node.kind) {
       case NodeType.Number: {
-        return MK_NUMBER((node as INumberNode).value);
+        return RuntimeHelper.createNumber((node as INumberNode).value);
       }
 
       case NodeType.String: {
-        return MK_STRING((node as IStringNode).value);
+        return RuntimeHelper.createString((node as IStringNode).value);
       }
 
       case NodeType.Identifier: {
@@ -191,7 +192,7 @@ export class Evaluator {
 
       default: {
         env.errorManager?.raise(new UnrecognizedStatementError(node.start));
-        return MK_NULL();
+        return RuntimeHelper.createNull();
       }
     }
   }
