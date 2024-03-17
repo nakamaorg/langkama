@@ -63,3 +63,16 @@ export interface IObjectNode extends IExpressionNode {
   kind: NodeType.Object;
   properties: Array<IPropertyNode>;
 }
+
+export interface ICallNode extends IExpressionNode {
+  kind: NodeType.Call;
+  caller: IExpressionNode;
+  arguments: Array<IExpressionNode>;
+}
+
+export interface IMemberNode extends IExpressionNode {
+  computed: boolean;
+  kind: NodeType.Member;
+  object: IExpressionNode;
+  property: IExpressionNode;
+}

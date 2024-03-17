@@ -2,11 +2,11 @@ import { Char } from '../core/enums/char.enum';
 import { NodeType } from '../core/enums/node-type.enum';
 import { TokenType } from '../core/enums/token-type.enum';
 
-import { MissingEqualsError, MissingIdentifierError, MissingDotError, UnclosedParenthesisError, UninitializedConstantError, UnrecognizedTokenError, IncompleteExpressionError, UnclosedObjectError, ExpectedKeyError, MissingColonError, ExpectedCommaError } from '../core';
+import { MissingEqualsError, MissingIdentifierError, MissingDotError, UnclosedParenthesisError, UninitializedConstantError, UnrecognizedTokenError, IncompleteExpressionError, UnclosedObjectError, ExpectedKeyError, MissingColonError, ExpectedCommaError, ExpectedOpenParenError, InvalidKeyError, UnclosedBracketError } from '../core';
 
 import { TToken } from '../core/types/token.type';
 import { TOnErrorCallbackFn } from '../core/types/on-error-callback.type';
-import { IAssignmentNode, IBinaryExpression, IExpressionNode, IIdentifierNode, INumberNode, IObjectNode, IProgramNode, IPropertyNode, ISkipNode, IStatementNode, IStringNode, IVariableDeclarationNode } from '../core/types/ast.type';
+import { IAssignmentNode, IBinaryExpression, ICallNode, IExpressionNode, IIdentifierNode, IMemberNode, INumberNode, IObjectNode, IProgramNode, IPropertyNode, ISkipNode, IStatementNode, IStringNode, IVariableDeclarationNode } from '../core/types/ast.type';
 
 import { Consumer } from './consumer';
 
@@ -25,7 +25,7 @@ export class Parser extends Consumer<TToken> {
    * @param onError Callback for catching errors
    */
   constructor(onError: TOnErrorCallbackFn) {
-    super([], onError, (a: TokenType, b: TToken) => (a && a === b.type));
+    super([], onError, (a: TokenType, b: TToken) => (Boolean(a) && a === b.type));
   }
 
   /**
@@ -172,11 +172,11 @@ export class Parser extends Consumer<TToken> {
    * Parses a multiplicative expression
    */
   private parseMultiplicativeExpression(): IExpressionNode {
-    let left = this.parsePrimaryExpression();
+    let left = this.parseCallMemberExpression();
 
     while ([Char.Star, Char.Slash, Char.Percentage].includes(this.at().value as Char)) {
       const operator = (this.eat() as TToken).value;
-      const right = this.parsePrimaryExpression();
+      const right = this.parseCallMemberExpression();
 
       left = {
         left,
@@ -189,6 +189,92 @@ export class Parser extends Consumer<TToken> {
     }
 
     return left;
+  }
+
+  private parseCallMemberExpression(): IExpressionNode {
+    const member = this.parseMemberExpression();
+
+    if (this.at().type === TokenType.OpenParen) {
+      return this.parseCallExpression(member);
+    }
+
+    return member;
+  }
+
+  private parseCallExpression(caller: IExpressionNode): ICallNode {
+    const args = this.parseArguments();
+    const lastArg = args.slice(0).reverse()[0];
+
+    let call = {
+      caller,
+      arguments: args,
+      end: lastArg.end,
+      kind: NodeType.Call,
+      start: caller.start
+    } as ICallNode;
+
+    if (this.at().type === TokenType.OpenParen) {
+      call = this.parseCallExpression(call);
+    }
+
+    return call;
+  }
+
+  private parseArguments(): Array<IExpressionNode> {
+    this.expect(TokenType.OpenParen, new ExpectedOpenParenError(this.at().location));
+
+    const args = this.at().type === TokenType.CloseParen
+      ? []
+      : this.parseArgumentsList();
+
+    this.expect(TokenType.CloseParen, new UnclosedParenthesisError(this.at().location));
+    return args;
+  }
+
+  private parseArgumentsList(): Array<IExpressionNode> {
+    const args = [this.parseAssignmentExpression()];
+
+    while (this.at().type === TokenType.Comma && this.eat()) {
+      args.push(this.parseAssignmentExpression());
+    }
+
+    return args;
+  }
+
+  private parseMemberExpression(): IExpressionNode {
+    let obj = this.parsePrimaryExpression();
+
+    while (this.at().type == TokenType.Dot || this.at().type == TokenType.OpenBrack) {
+      const operator = this.eat();
+
+      let computed: boolean;
+      let property: IExpressionNode;
+
+      if (operator?.type === TokenType.Dot) {
+        computed = false;
+        property = this.parsePrimaryExpression();
+
+        if (property.kind !== NodeType.Identifier) {
+          this.errorManager.raise(new InvalidKeyError(this.at().location));
+        }
+      } else {
+        computed = true;
+        property = this.parseExpression();
+
+        this.expect(TokenType.CloseBrack, new UnclosedBracketError(this.at().location));
+      }
+
+      obj = {
+        object: obj,
+        computed,
+        property,
+        end: property.end,
+        start: property.start,
+        kind: NodeType.Member
+      } as IMemberNode;
+    }
+
+    return obj;
   }
 
   /**
@@ -265,11 +351,15 @@ export class Parser extends Consumer<TToken> {
       }
 
       default: {
+        console.log('err during parsing');
+        console.log(this.at());
+        process.exit(1);
         const node = {
           kind: NodeType.Skip,
           end: this.at().location,
           start: this.at().location
         } as ISkipNode;
+
         this.errorManager.raise(new UnrecognizedTokenError(this.at().location));
         this.eat();
 
