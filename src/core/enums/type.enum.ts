@@ -4,5 +4,6 @@ export enum Type {
   Number,
   String,
   Object,
-  Boolean
+  Boolean,
+  Function
 }

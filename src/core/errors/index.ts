@@ -12,6 +12,7 @@ export * from './unclosed-object.error';
 export * from './unmatching-types.error';
 export * from './unclosed-bracket.error';
 export * from './variable-defined.error';
+export * from './invalid-function.error';
 export * from './invalid-operation.error';
 export * from './invalid-assignment.error';
 export * from './missing-identifier.error';
