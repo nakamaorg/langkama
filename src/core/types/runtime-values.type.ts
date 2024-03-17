@@ -6,6 +6,10 @@ export interface IRuntimeVal {
   type: Type;
 }
 
+export interface ISkipVal extends IRuntimeVal {
+  type: Type.Skip;
+}
+
 export interface INullVal extends IRuntimeVal {
   type: Type.Null;
   value: null;

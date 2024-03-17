@@ -1,4 +1,4 @@
-import { IBoolVal, INullVal, INumberVal, IStringVal, Type } from '..';
+import { IBoolVal, INullVal, INumberVal, IStringVal, ISkipVal, Type } from '..';
 
 
 
@@ -7,6 +7,14 @@ import { IBoolVal, INullVal, INumberVal, IStringVal, Type } from '..';
  * Helps with runtime values
  */
 export class RuntimeHelper {
+
+  /**
+   * @description
+   * Creates a null value
+   */
+  public static createSkip(): ISkipVal {
+    return { type: Type.Skip };
+  }
 
   /**
    * @description
