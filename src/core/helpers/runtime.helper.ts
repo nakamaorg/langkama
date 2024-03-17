@@ -1,3 +1,4 @@
+import { IObjectVal } from '../types/runtime-values.type';
 import { IBoolVal, INullVal, INumberVal, IStringVal, ISkipVal, Type } from '..';
 
 
@@ -54,4 +55,11 @@ export class RuntimeHelper {
     return { type: Type.Boolean, value: boolean };
   }
 
+  /**
+   * @description
+   * Creates an object value
+   */
+  public static createObject(): IObjectVal {
+    return { type: Type.Object, value: {} };
+  }
 }

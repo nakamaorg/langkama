@@ -2,11 +2,11 @@ import { Char } from '../core/enums/char.enum';
 import { NodeType } from '../core/enums/node-type.enum';
 import { TokenType } from '../core/enums/token-type.enum';
 
-import { MissingEqualsError, MissingIdentifierError, MissingDotError, UnclosedParenthesisError, UninitializedConstantError, UnrecognizedTokenError, IncompleteExpressionError } from '../core';
+import { MissingEqualsError, MissingIdentifierError, MissingDotError, UnclosedParenthesisError, UninitializedConstantError, UnrecognizedTokenError, IncompleteExpressionError, UnclosedObjectError, ExpectedKeyError, MissingColonError, ExpectedCommaError } from '../core';
 
 import { TToken } from '../core/types/token.type';
 import { TOnErrorCallbackFn } from '../core/types/on-error-callback.type';
-import { IAssignmentNode, IBinaryExpression, IExpressionNode, IIdentifierNode, INumberNode, IProgramNode, ISkipNode, IStatementNode, IStringNode, IVariableDeclarationNode } from '../core/types/ast.type';
+import { IAssignmentNode, IBinaryExpression, IExpressionNode, IIdentifierNode, INumberNode, IObjectNode, IProgramNode, IPropertyNode, ISkipNode, IStatementNode, IStringNode, IVariableDeclarationNode } from '../core/types/ast.type';
 
 import { Consumer } from './consumer';
 
@@ -66,7 +66,7 @@ export class Parser extends Consumer<TToken> {
    * parses an assignment
    */
   private parseAssignmentExpression(): IExpressionNode {
-    const left = this.parseAdditiveExpression();
+    const left = this.parseObjectExpression();
 
     if (this.at().type === TokenType.Equals) {
       this.eat();
@@ -83,6 +83,65 @@ export class Parser extends Consumer<TToken> {
     }
 
     return left;
+  }
+
+  private parseObjectExpression(): IExpressionNode {
+    if (this.at().type !== TokenType.OpenBrace) {
+      return this.parseAdditiveExpression();
+    }
+
+    const openBToken = this.eat();
+    const properties: Array<IPropertyNode> = [];
+
+    while (this.notEof() && this.at().type !== TokenType.CloseBrace) {
+      const keyToken = this.expect(TokenType.Identifier, new ExpectedKeyError(this.at().location));
+
+      if (this.at().type === TokenType.Comma) {
+        this.eat();
+
+        properties.push({
+          key: keyToken.value,
+          kind: NodeType.Property,
+          start: keyToken.location,
+          end: { row: keyToken.location.row, col: keyToken.location.col + (keyToken.value?.length ?? 0) }
+        } as IPropertyNode);
+
+        continue;
+      } else if (this.at().type === TokenType.CloseBrace) {
+        properties.push({
+          key: keyToken.value,
+          kind: NodeType.Property,
+          start: keyToken.location,
+          end: { row: keyToken.location.row, col: keyToken.location.col + (keyToken.value?.length ?? 0) }
+        } as IPropertyNode);
+
+        continue;
+      }
+
+      this.expect(TokenType.Colon, new MissingColonError(this.at().location));
+      const valueToken = this.parseExpression();
+
+      properties.push({
+        value: valueToken,
+        key: keyToken.value,
+        end: valueToken.end,
+        kind: NodeType.Property,
+        start: keyToken.location
+      } as IPropertyNode);
+
+      if (this.at().type !== TokenType.CloseBrace) {
+        this.expect(TokenType.Comma, new ExpectedCommaError(this.at().location));
+      }
+    }
+
+    const closeBToken = this.expect(TokenType.CloseBrace, new UnclosedObjectError(this.at().location));
+
+    return {
+      properties,
+      kind: NodeType.Object,
+      end: closeBToken.location,
+      start: openBToken?.location
+    } as IObjectNode;
   }
 
   /**
@@ -187,10 +246,10 @@ export class Parser extends Consumer<TToken> {
         return node;
       }
 
-      case TokenType.OpenP: {
+      case TokenType.OpenParen: {
         this.eat();
         const value = this.parseExpression();
-        this.expect(TokenType.CloseP, new UnclosedParenthesisError(this.at().location));
+        this.expect(TokenType.CloseParen, new UnclosedParenthesisError(this.at().location));
 
         return value;
       }
@@ -211,7 +270,6 @@ export class Parser extends Consumer<TToken> {
           end: this.at().location,
           start: this.at().location
         } as ISkipNode;
-
         this.errorManager.raise(new UnrecognizedTokenError(this.at().location));
         this.eat();
 
