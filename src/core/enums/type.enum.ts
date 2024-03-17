@@ -3,5 +3,6 @@ export enum Type {
   Null,
   Number,
   String,
+  Object,
   Boolean
 }

@@ -1,0 +1,17 @@
+hear me out lastName is "Doe".
+hear me out c is 3 * 3.
+a sa7 hear me out obj is {
+  a: 1,
+  b: 2,
+  c,
+  d: L,
+  e: W,
+  f: bruh,
+  g: "str",
+  h: {
+    i: 1 + 2,
+    j: "John" + " " + lastName
+  }
+}.
+
+obj

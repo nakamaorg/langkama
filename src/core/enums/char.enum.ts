@@ -1,7 +1,13 @@
 export enum Char {
   Dot = '.',
-  OpenP = '(',
-  CloseP = ')',
+  Comma = ',',
+  Colon = ':',
+  OpenPren = '(',
+  ClosePren = ')',
+  OpenBrack = '[',
+  CloseBrack = ']',
+  OpenBrace = '{',
+  CloseBrace = '}',
   DoubleQuotes = '"',
 
   // Operators
