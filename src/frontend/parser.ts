@@ -140,6 +140,17 @@ export class Parser extends Consumer<TToken> {
     const token = this.at();
 
     switch (token.type) {
+      case TokenType.Dot: {
+        const node = {
+          kind: NodeType.Skip,
+          end: this.at().location,
+          start: this.at().location
+        } as ISkipNode;
+
+        this.eat();
+        return node;
+      }
+
       case TokenType.Identifier: {
         const node = {
           symbol: token.value,

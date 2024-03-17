@@ -26,7 +26,11 @@ export class Evaluator {
     let lastEvaluated: IRuntimeVal = RuntimeHelper.createNull();
 
     for (const statement of program.body) {
-      lastEvaluated = this.evaluate(statement, env);
+      const currVal = this.evaluate(statement, env);
+
+      if (currVal.type !== Type.Skip) {
+        lastEvaluated = currVal;
+      }
     }
 
     return lastEvaluated;
@@ -188,6 +192,10 @@ export class Evaluator {
 
       case NodeType.VariableDeclaration: {
         return this.evaluateVariableDeclaration(node as IVariableDeclarationNode, env);
+      }
+
+      case NodeType.Skip: {
+        return RuntimeHelper.createSkip();
       }
 
       default: {
