@@ -99,14 +99,14 @@ class Cmd {
       compiler
         .on(LangKamaEvent.Success, result => {
           this.#info('LangKama script compiled!\n');
-          this.#info(chalk.green(result.value));
+          this.#info(chalk.green(JSON.stringify(result.value, null, 2)));
 
           process.exit(0);
         })
         .on(LangKamaEvent.Error, error => { this.#error(error) })
         .on(LangKamaEvent.Lexer, () => this.#info(`Tokenizing "${fileName}" script...`))
         .on(LangKamaEvent.Parser, tokens => this.#info(`Parsing "${tokens.length}" tokens...`))
-        .on(LangKamaEvent.Interpreter, () => this.#info(`Interpreting "${fileName}" script...`))
+        .on(LangKamaEvent.Interpreter, ast => this.#info(`Interpreting "${fileName}" script...`))
         .interpret(code);
     } catch (err) {
       this.#error(err);

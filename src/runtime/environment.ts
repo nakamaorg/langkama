@@ -36,6 +36,16 @@ export class Environment {
 
   /**
    * @description
+   * Initializes the global scope
+   */
+  private setupScope(): void {
+    this.declareVariable('bruh', RuntimeHelper.createNull(), true);
+    this.declareVariable('W', RuntimeHelper.createBoolean(true), true);
+    this.declareVariable('L', RuntimeHelper.createBoolean(false), true);
+  }
+
+  /**
+   * @description
    * Instantiates a scope instance
    *
    * @param parent the parent scope
@@ -50,9 +60,7 @@ export class Environment {
     }
 
     if (!parent) {
-      this.declareVariable('bruh', RuntimeHelper.createNull(), true);
-      this.declareVariable('W', RuntimeHelper.createBoolean(true), true);
-      this.declareVariable('L', RuntimeHelper.createBoolean(false), true);
+      this.setupScope();
     }
   }
 

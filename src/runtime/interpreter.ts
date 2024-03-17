@@ -1,7 +1,7 @@
 import { NodeType } from '../core/enums/node-type.enum';
 
 import { INumberVal, IRuntimeVal, IStringVal } from '../core/types/runtime-values.type';
-import { IAssignmentNode, IBinaryExpression, IIdentifierNode, INumberNode, IProgramNode, IStatementNode, IStringNode, IVariableDeclarationNode } from '../core/types/ast.type';
+import { IAssignmentNode, IBinaryExpression, IIdentifierNode, INumberNode, IObjectNode, IProgramNode, IStatementNode, IStringNode, IVariableDeclarationNode } from '../core/types/ast.type';
 
 import { Environment } from './environment';
 import { RuntimeHelper } from '../core/helpers/runtime.helper';
@@ -142,6 +142,27 @@ export class Evaluator {
 
   /**
    * @description
+   * Evaluates an object
+   *
+   * @param object The object to evaluate
+   * @param env The scope of the evaluation
+   */
+  private evaluateObject(object: IObjectNode, env: Environment): IRuntimeVal {
+    const obj = RuntimeHelper.createObject();
+
+    for (const { key, value } of object.properties) {
+      const val = value
+        ? this.evaluate(value, env)
+        : env.getValue(key).value;
+
+      obj.value[key] = val;
+    }
+
+    return obj;
+  }
+
+  /**
+   * @description
    * Evaluates an assignment expression
    *
    * @param node The assignment node to evaluate
@@ -176,6 +197,10 @@ export class Evaluator {
 
       case NodeType.Identifier: {
         return this.evaluateIdentifier(node as IIdentifierNode, env);
+      }
+
+      case NodeType.Object: {
+        return this.evaluateObject(node as IObjectNode, env);
       }
 
       case NodeType.AssignmentExpression: {
