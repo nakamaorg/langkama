@@ -3,5 +3,5 @@ export enum LangKamaEvent {
   Success,
   Lexer,
   Parser,
-  Interpreter,
+  Interpreter
 }
