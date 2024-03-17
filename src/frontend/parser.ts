@@ -150,6 +150,7 @@ export class Parser extends Consumer<TToken> {
    */
   private parseAdditiveExpression(): IExpressionNode {
     let left = this.parseMultiplicativeExpression();
+
     while (this.at().value === '+' || this.at().value === '-') {
       const operator = (this.eat() as TToken).value;
       const right = this.parseMultiplicativeExpression();
@@ -244,13 +245,13 @@ export class Parser extends Consumer<TToken> {
   private parseMemberExpression(): IExpressionNode {
     let obj = this.parsePrimaryExpression();
 
-    while (this.at().type == TokenType.Dot || this.at().type == TokenType.OpenBrack) {
+    while (this.at().type === TokenType.Dollar || this.at().type === TokenType.OpenBrack) {
       const operator = this.eat();
 
       let computed: boolean;
       let property: IExpressionNode;
 
-      if (operator?.type === TokenType.Dot) {
+      if (operator?.type === TokenType.Dollar) {
         computed = false;
         property = this.parsePrimaryExpression();
 
@@ -273,7 +274,6 @@ export class Parser extends Consumer<TToken> {
         kind: NodeType.Member
       } as IMemberNode;
     }
-
     return obj;
   }
 
@@ -351,9 +351,6 @@ export class Parser extends Consumer<TToken> {
       }
 
       default: {
-        console.log('err during parsing');
-        console.log(this.at());
-        process.exit(1);
         const node = {
           kind: NodeType.Skip,
           end: this.at().location,

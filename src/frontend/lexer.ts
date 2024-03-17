@@ -155,6 +155,11 @@ export class Lexer extends Consumer<string> {
           this.addToken(TokenType.Colon, this.eat());
           break;
         }
+       
+        case Char.Dollar: {
+          this.addToken(TokenType.Dollar, this.eat());
+          break;
+        }
 
         case Char.OpenPren: {
           this.addToken(TokenType.OpenParen, this.eat());

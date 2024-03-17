@@ -14,7 +14,8 @@ a sa7 hear me out obj is {
   }
 }.
 
-hear me out fullname is obj.h.j.
+hear me out fullname is obj$h$j.
 hear me out key is "b".
 hear me out val is obj[b].
 obj[a] is 0.
+obj$g is "ing".
