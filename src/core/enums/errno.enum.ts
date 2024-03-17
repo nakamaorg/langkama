@@ -12,6 +12,7 @@ export enum Errno {
   UnclosedObjectError,
   UnmatchingTypesError,
   UnclosedBracketError,
+  InvalidFunctionError,
   VariableDefinedError,
   InvalidOperationError,
   InvalidAssignmentError,
