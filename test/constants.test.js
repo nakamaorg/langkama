@@ -12,7 +12,7 @@ describe('Constants', () => {
   });
 
   test('Constant declaration with value', done => {
-    const code = `a sa7 hear me out zero is 0.`;
+    const code = `a sa7 hear me out zero is 0;`;
 
     compiler.on(LangKamaEvent.Success, result => {
       expect(result.value).toBe(0);
@@ -22,9 +22,9 @@ describe('Constants', () => {
 
   test('Multiple constant declarations', done => {
     const code = `
-      a sa7 hear me out firstName is "John".
-      a sa7 hear me out lastName is "Doe".
-      a sa7 hear me out fullName is firstName + " " + lastName.
+      a sa7 hear me out firstName is "John";
+      a sa7 hear me out lastName is "Doe";
+      a sa7 hear me out fullName is firstName + " " + lastName;
     `;
 
     compiler.on(LangKamaEvent.Success, result => {
@@ -42,7 +42,7 @@ describe('Constants errors', () => {
   });
 
   test('Constant declaration without a value', done => {
-    const code = `a sa7 hear me out zero.`;
+    const code = `a sa7 hear me out zero;`;
     compiler.on(LangKamaEvent.Error, error => {
       expect(error.errno).toBe(Errno.UninitializedConstantError)
       done();
@@ -51,8 +51,8 @@ describe('Constants errors', () => {
 
   test('Constant duplication', done => {
     const code = `
-      a sa7 hear me out zero is 0.
-      a sa7 hear me out zero is 0.
+      a sa7 hear me out zero is 0;
+      a sa7 hear me out zero is 0;
     `;
 
     compiler.on(LangKamaEvent.Error, error => {
@@ -63,8 +63,8 @@ describe('Constants errors', () => {
 
   test('Constant reassignment', done => {
     const code = `
-    a sa7 hear me out one is 1.
-    one is 2.
+    a sa7 hear me out one is 1;
+    one is 2;
     `;
     compiler.on(LangKamaEvent.Error, error => {
       expect(error.errno).toBe(Errno.ConstantReassignmentError);
