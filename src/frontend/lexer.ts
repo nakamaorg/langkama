@@ -145,14 +145,44 @@ export class Lexer extends Consumer<string> {
           this.addToken(TokenType.Dot, this.eat());
           break;
         }
-
-        case Char.OpenP: {
-          this.addToken(TokenType.OpenP, this.eat());
+       
+        case Char.Comma: {
+          this.addToken(TokenType.Comma, this.eat());
+          break;
+        }
+       
+        case Char.Colon: {
+          this.addToken(TokenType.Colon, this.eat());
           break;
         }
 
-        case Char.CloseP: {
-          this.addToken(TokenType.CloseP, this.eat());
+        case Char.OpenPren: {
+          this.addToken(TokenType.OpenParen, this.eat());
+          break;
+        }
+
+        case Char.ClosePren: {
+          this.addToken(TokenType.CloseParen, this.eat());
+          break;
+        }
+
+        case Char.OpenBrace: {
+          this.addToken(TokenType.OpenBrace, this.eat());
+          break;
+        }
+
+        case Char.CloseBrace: {
+          this.addToken(TokenType.CloseBrace, this.eat());
+          break;
+        }
+
+        case Char.OpenBrack: {
+          this.addToken(TokenType.OpenBrack, this.eat());
+          break;
+        }
+
+        case Char.CloseBrack: {
+          this.addToken(TokenType.CloseBrack, this.eat());
           break;
         }
 

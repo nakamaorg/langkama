@@ -25,7 +25,12 @@ export interface IStringVal extends IRuntimeVal {
   value: string;
 }
 
-export interface IBoolVal extends IRuntimeVal {
+export interface IBooleanVal extends IRuntimeVal {
   type: Type.Boolean;
   value: boolean;
+}
+
+export interface IObjectVal extends IRuntimeVal {
+  type: Type.Object;
+  value: Record<string, IRuntimeVal>;
 }

@@ -52,3 +52,14 @@ export interface IStringNode extends IExpressionNode {
   kind: NodeType.String;
   value: string;
 }
+
+export interface IPropertyNode extends IExpressionNode {
+  kind: NodeType.Property;
+  key: string;
+  value?: IExpressionNode;
+}
+
+export interface IObjectNode extends IExpressionNode {
+  kind: NodeType.Object;
+  properties: Array<IPropertyNode>;
+}
