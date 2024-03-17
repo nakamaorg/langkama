@@ -1,6 +1,6 @@
-import type { Environment, IStatementNode } from '../..';
 import { Type } from '../enums/type.enum';
 import { TFunctionCall } from './function.type';
+import type { Environment, IStatementNode } from '../..';
 
 
 

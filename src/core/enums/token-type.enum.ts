@@ -5,6 +5,7 @@ export enum TokenType {
   Const = 'Const',
   Comma = 'Comma',
   Equals = 'Equals',
+  Return = 'Return',
   Number = 'Number',
   String = 'String',
   Function = 'Function',
