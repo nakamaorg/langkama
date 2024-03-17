@@ -156,8 +156,8 @@ export class Lexer extends Consumer<string> {
           break;
         }
        
-        case Char.Dollar: {
-          this.addToken(TokenType.Dollar, this.eat());
+        case Char.Semicolon: {
+          this.addToken(TokenType.Semicolon, this.eat());
           break;
         }
 

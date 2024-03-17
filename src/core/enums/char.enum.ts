@@ -2,7 +2,7 @@ export enum Char {
   Dot = '.',
   Comma = ',',
   Colon = ':',
-  Dollar = '$',
+  Semicolon = ';',
   OpenPren = '(',
   ClosePren = ')',
   OpenBrack = '[',

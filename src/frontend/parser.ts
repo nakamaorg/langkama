@@ -71,7 +71,7 @@ export class Parser extends Consumer<TToken> {
     if (this.at().type === TokenType.Equals) {
       this.eat();
       const right = this.parseAssignmentExpression();
-      this.expect(TokenType.Dot, new MissingDotError(this.at().location));
+      this.expect(TokenType.Semicolon, new MissingDotError(this.at().location));
 
       return {
         value: right,
@@ -245,13 +245,13 @@ export class Parser extends Consumer<TToken> {
   private parseMemberExpression(): IExpressionNode {
     let obj = this.parsePrimaryExpression();
 
-    while (this.at().type === TokenType.Dollar || this.at().type === TokenType.OpenBrack) {
+    while (this.at().type === TokenType.Dot || this.at().type === TokenType.OpenBrack) {
       const operator = this.eat();
 
       let computed: boolean;
       let property: IExpressionNode;
 
-      if (operator?.type === TokenType.Dollar) {
+      if (operator?.type === TokenType.Dot) {
         computed = false;
         property = this.parsePrimaryExpression();
 
@@ -285,7 +285,7 @@ export class Parser extends Consumer<TToken> {
     const token = this.at();
 
     switch (token.type) {
-      case TokenType.Dot: {
+      case TokenType.Semicolon: {
         const node = {
           kind: NodeType.Skip,
           end: this.at().location,
@@ -374,7 +374,7 @@ export class Parser extends Consumer<TToken> {
     const isConstant = constToken.type === TokenType.Const;
     const token = this.expect<TokenType>(TokenType.Identifier, new MissingIdentifierError(this.at().location));
 
-    if (this.at().type === TokenType.Dot) {
+    if (this.at().type === TokenType.Semicolon) {
       const dotToken = this.eat() as TToken;
 
       if (isConstant) {
@@ -408,7 +408,7 @@ export class Parser extends Consumer<TToken> {
       kind: NodeType.VariableDeclaration
     } as IVariableDeclarationNode;
 
-    this.expect(TokenType.Dot, new MissingDotError(declaration.end));
+    this.expect(TokenType.Semicolon, new MissingDotError(declaration.end));
 
     return declaration;
   }
