@@ -1,4 +1,5 @@
 import { Type } from '../enums/type.enum';
+import { TFunctionCall } from './function.type';
 
 
 
@@ -33,4 +34,9 @@ export interface IBooleanVal extends IRuntimeVal {
 export interface IObjectVal extends IRuntimeVal {
   type: Type.Object;
   value: Record<string, IRuntimeVal>;
+}
+
+export interface IFunctionVal extends IRuntimeVal {
+  type: Type.Function;
+  call: TFunctionCall;
 }

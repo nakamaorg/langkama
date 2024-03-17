@@ -5,7 +5,7 @@ import { RuntimeHelper } from '../core/helpers/runtime.helper';
 
 import { TNullable } from '../core/types/nullable.type';
 import { TVariable } from '../core/types/variable.type';
-import { IRuntimeVal } from '../core/types/runtime-values.type';
+import { IRuntimeVal, IStringVal } from '../core/types/runtime-values.type';
 import { TOnErrorCallbackFn } from '../core/types/on-error-callback.type';
 
 
@@ -42,6 +42,13 @@ export class Environment {
     this.declareVariable('bruh', RuntimeHelper.createNull(), true);
     this.declareVariable('W', RuntimeHelper.createBoolean(true), true);
     this.declareVariable('L', RuntimeHelper.createBoolean(false), true);
+
+    this.declareVariable('loncina', RuntimeHelper.createFunction(args => {
+      const values = args.filter(e => 'value' in e).map(e => (e as IStringVal).value);
+      console.log(...values);
+
+      return RuntimeHelper.createNull();
+    }), true);
   }
 
   /**

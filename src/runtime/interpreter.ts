@@ -1,11 +1,11 @@
 import { NodeType } from '../core/enums/node-type.enum';
 
-import { INumberVal, IRuntimeVal, IStringVal } from '../core/types/runtime-values.type';
-import { IAssignmentNode, IBinaryExpression, IIdentifierNode, INumberNode, IObjectNode, IProgramNode, IStatementNode, IStringNode, IVariableDeclarationNode } from '../core/types/ast.type';
+import { IFunctionVal, INumberVal, IRuntimeVal, IStringVal } from '../core/types/runtime-values.type';
+import { IAssignmentNode, IBinaryExpression, ICallNode, IIdentifierNode, INumberNode, IObjectNode, IProgramNode, IStatementNode, IStringNode, IVariableDeclarationNode } from '../core/types/ast.type';
 
 import { Environment } from './environment';
 import { RuntimeHelper } from '../core/helpers/runtime.helper';
-import { InvalidAssignmentError, InvalidOperationError, Type, UnmatchingTypesError, UnrecognizedStatementError } from '..';
+import { InvalidAssignmentError, InvalidFunctionError, InvalidOperationError, Type, UnmatchingTypesError, UnrecognizedStatementError } from '..';
 
 
 
@@ -163,6 +163,26 @@ export class Evaluator {
 
   /**
    * @description
+   * Evaluates a function
+   *
+   * @param call The function to evaluate
+   * @param env The scope of the evaluation
+   */
+  private evaluateFunction(call: ICallNode, env: Environment): IRuntimeVal {
+    const args = call.arguments.map(e => this.evaluate(e, env));
+    const fn = this.evaluate(call.caller, env);
+
+    if (fn.type !== Type.Function) {
+      env.errorManager?.raise(new InvalidFunctionError(call.start));
+      return RuntimeHelper.createNull();
+    }
+
+    const result = (fn as IFunctionVal).call(args, env);
+    return result;
+  }
+
+  /**
+   * @description
    * Evaluates an assignment expression
    *
    * @param node The assignment node to evaluate
@@ -201,6 +221,10 @@ export class Evaluator {
 
       case NodeType.Object: {
         return this.evaluateObject(node as IObjectNode, env);
+      }
+
+      case NodeType.Call: {
+        return this.evaluateFunction(node as ICallNode, env);
       }
 
       case NodeType.AssignmentExpression: {
