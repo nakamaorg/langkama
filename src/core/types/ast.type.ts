@@ -23,6 +23,13 @@ export interface IVariableDeclarationNode extends IStatementNode {
   value?: IExpressionNode;
 }
 
+export interface IFunctionDeclarationNode extends IStatementNode {
+  kind: NodeType.FunctionDeclaration;
+  parameters: Array<string>;
+  body: Array<IStatementNode>;
+  name: string;
+}
+
 export interface IExpressionNode extends IStatementNode { }
 
 export interface IAssignmentNode extends IExpressionNode {

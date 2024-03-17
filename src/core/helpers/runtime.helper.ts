@@ -1,4 +1,4 @@
-import { IFunctionVal, IObjectVal } from '../types/runtime-values.type';
+import { INativeFunctionVal, IObjectVal } from '../types/runtime-values.type';
 import { IBoolVal, INullVal, INumberVal, IStringVal, ISkipVal, Type } from '..';
 import { TFunctionCall } from '../types/function.type';
 
@@ -70,7 +70,7 @@ export class RuntimeHelper {
    *
    * @param call The function call
    */
-  public static createFunction(call: TFunctionCall): IFunctionVal {
-    return { type: Type.Function, call };
+  public static createFunction(call: TFunctionCall): INativeFunctionVal {
+    return { type: Type.NativeFunction, call };
   }
 }

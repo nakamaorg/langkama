@@ -1,7 +1,7 @@
 import { NodeType } from '../core/enums/node-type.enum';
 
-import { IFunctionVal, INumberVal, IRuntimeVal, IStringVal } from '../core/types/runtime-values.type';
-import { IAssignmentNode, IBinaryExpression, ICallNode, IIdentifierNode, INumberNode, IObjectNode, IProgramNode, IStatementNode, IStringNode, IVariableDeclarationNode } from '../core/types/ast.type';
+import { IFunctionVal, INativeFunctionVal, INumberVal, IRuntimeVal, IStringVal } from '../core/types/runtime-values.type';
+import { IAssignmentNode, IBinaryExpression, ICallNode, IFunctionDeclarationNode, IIdentifierNode, INumberNode, IObjectNode, IProgramNode, IStatementNode, IStringNode, IVariableDeclarationNode } from '../core/types/ast.type';
 
 import { Environment } from './environment';
 import { RuntimeHelper } from '../core/helpers/runtime.helper';
@@ -38,7 +38,7 @@ export class Evaluator {
 
   /**
    * @description
-   * Evaluates a declaration statement
+   * Evaluates a variable declaration statement
    *
    * @param declaration The declaration statement
    * @param env The scope of the evaluation
@@ -49,6 +49,25 @@ export class Evaluator {
       : RuntimeHelper.createNull();
 
     return env.declareVariable(declaration.identifier, value, declaration.constant);
+  }
+
+  /**
+   * @description
+   * Evaluates a function declaration statement
+   *
+   * @param declaration The declaration statement
+   * @param env The scope of the evaluation
+   */
+  private evaluateFunctionDeclaration(declaration: IFunctionDeclarationNode, env: Environment): IRuntimeVal {
+    const fn = {
+      env,
+      type: Type.Function,
+      body: declaration.body,
+      name: declaration.name,
+      parameters: declaration.parameters
+    } as IFunctionVal;
+
+    return env.declareVariable(declaration.name, fn, true);
   }
 
   /**
@@ -172,13 +191,33 @@ export class Evaluator {
     const args = call.arguments.map(e => this.evaluate(e, env));
     const fn = this.evaluate(call.caller, env);
 
-    if (fn.type !== Type.Function) {
-      env.errorManager?.raise(new InvalidFunctionError(call.start));
-      return RuntimeHelper.createNull();
+    if (fn.type === Type.NativeFunction) {
+      const result = (fn as INativeFunctionVal).call(args, env);
+      return result;
+    } else if (fn.type === Type.Function) {
+      const func = fn as IFunctionVal;
+      const scope = new Environment(func.env);
+
+      for (let i = 0; i < func.parameters.length; ++i) {
+        const varName = func.parameters[i];
+        const varValue = args[i];
+
+        scope.declareVariable(varName, varValue);
+      }
+
+      let result: IRuntimeVal = RuntimeHelper.createNull();
+
+      for (const statement of func.body) {
+        if (statement.kind !== NodeType.Skip) {
+          result = this.evaluate(statement, scope);
+        }
+      }
+
+      return result;
     }
 
-    const result = (fn as IFunctionVal).call(args, env);
-    return result;
+    env.errorManager?.raise(new InvalidFunctionError(call.start));
+    return RuntimeHelper.createNull();
   }
 
   /**
@@ -241,6 +280,10 @@ export class Evaluator {
 
       case NodeType.VariableDeclaration: {
         return this.evaluateVariableDeclaration(node as IVariableDeclarationNode, env);
+      }
+
+      case NodeType.FunctionDeclaration: {
+        return this.evaluateFunctionDeclaration(node as IFunctionDeclarationNode, env);
       }
 
       case NodeType.Skip: {

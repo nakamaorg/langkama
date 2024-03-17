@@ -1,3 +1,4 @@
+import type { Environment, IStatementNode } from '../..';
 import { Type } from '../enums/type.enum';
 import { TFunctionCall } from './function.type';
 
@@ -36,7 +37,15 @@ export interface IObjectVal extends IRuntimeVal {
   value: Record<string, IRuntimeVal>;
 }
 
-export interface IFunctionVal extends IRuntimeVal {
-  type: Type.Function;
+export interface INativeFunctionVal extends IRuntimeVal {
+  type: Type.NativeFunction;
   call: TFunctionCall;
+}
+
+export interface IFunctionVal extends IRuntimeVal {
+  name: string;
+  env: Environment;
+  type: Type.Function;
+  parameters: Array<string>;
+  body: Array<IStatementNode>;
 }

@@ -2,11 +2,11 @@ import { Char } from '../core/enums/char.enum';
 import { NodeType } from '../core/enums/node-type.enum';
 import { TokenType } from '../core/enums/token-type.enum';
 
-import { MissingEqualsError, MissingIdentifierError, MissingDotError, UnclosedParenthesisError, UninitializedConstantError, UnrecognizedTokenError, IncompleteExpressionError, UnclosedObjectError, ExpectedKeyError, MissingColonError, ExpectedCommaError, ExpectedOpenParenError, InvalidKeyError, UnclosedBracketError } from '../core';
+import { MissingEqualsError, MissingIdentifierError, MissingDotError, UnclosedParenthesisError, UninitializedConstantError, UnrecognizedTokenError, IncompleteExpressionError, UnclosedObjectError, ExpectedKeyError, MissingColonError, ExpectedCommaError, ExpectedOpenParenError, InvalidKeyError, UnclosedBracketError, ExpectedFunctionNameError, ExpectedIdentifierError, ExpectedOpenBraceError, ExpectedCloseBraceError } from '../core';
 
 import { TToken } from '../core/types/token.type';
 import { TOnErrorCallbackFn } from '../core/types/on-error-callback.type';
-import { IAssignmentNode, IBinaryExpression, ICallNode, IExpressionNode, IIdentifierNode, IMemberNode, INumberNode, IObjectNode, IProgramNode, IPropertyNode, ISkipNode, IStatementNode, IStringNode, IVariableDeclarationNode } from '../core/types/ast.type';
+import { IAssignmentNode, IBinaryExpression, ICallNode, IExpressionNode, IFunctionDeclarationNode, IIdentifierNode, IMemberNode, INumberNode, IObjectNode, IProgramNode, IPropertyNode, ISkipNode, IStatementNode, IStringNode, IVariableDeclarationNode } from '../core/types/ast.type';
 
 import { Consumer } from './consumer';
 
@@ -45,6 +45,10 @@ export class Parser extends Consumer<TToken> {
       case TokenType.Let:
       case TokenType.Const: {
         return this.parseVariableDeclaration();
+      }
+
+      case TokenType.Function: {
+        return this.parseFunctionDeclaration();
       }
 
       default: {
@@ -411,6 +415,47 @@ export class Parser extends Consumer<TToken> {
     this.expect(TokenType.Semicolon, new MissingDotError(declaration.end));
 
     return declaration;
+  }
+
+  /**
+   * @description
+   * Parses a function declaration
+   */
+  private parseFunctionDeclaration(): IStatementNode {
+    const fnDeclationToken = this.eat();
+
+    const name = this.expect(TokenType.Identifier, new ExpectedFunctionNameError(this.at().location)).value;
+    const args = this.parseArguments();
+    const params: Array<string> = [];
+
+    for (const arg of args) {
+      if (arg.kind !== NodeType.Identifier) {
+        this.errorManager.raise(new ExpectedIdentifierError(arg.start));
+      } else {
+        params.push((arg as IIdentifierNode).symbol);
+      }
+    }
+
+    this.expect(TokenType.OpenBrace, new ExpectedOpenBraceError(this.at().location));
+
+    const body: Array<IStatementNode> = [];
+
+    while (this.notEof() && this.at().type !== TokenType.CloseBrace) {
+      body.push(this.parseStatement());
+    }
+
+    const closeBraceToken = this.expect(TokenType.CloseBrace, new ExpectedCloseBraceError(this.at().location));
+
+    const fn = {
+      body,
+      name,
+      parameters: params,
+      end: closeBraceToken?.location,
+      start: fnDeclationToken?.location,
+      kind: NodeType.FunctionDeclaration,
+    } as IFunctionDeclarationNode;
+
+    return fn;
   }
 
   /**
