@@ -8,6 +8,7 @@ export enum TokenType {
   Equals,
   Number,
   String,
+  Function,
   BinaryOp,
   Semicolon,
   OpenBrack,

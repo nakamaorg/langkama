@@ -10,5 +10,6 @@ export enum NodeType {
   Identifier,
   BinaryExpression,
   VariableDeclaration,
+  FunctionDeclaration,
   AssignmentExpression
 }

@@ -5,5 +5,6 @@ export enum Type {
   String,
   Object,
   Boolean,
-  Function
+  Function,
+  NativeFunction
 }
