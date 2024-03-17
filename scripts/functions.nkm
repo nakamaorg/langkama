@@ -1,1 +1,9 @@
-loncina("test", "lmao");
+hear me out multiplicator is 5;
+
+let me cook multiply(x) {
+  multiplicator * x;
+}
+
+a sa7 hear me out result is multiply(2);
+
+loncina("result: ", 2, " * ", multiplicator, " = ", result);
