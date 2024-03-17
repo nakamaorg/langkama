@@ -32,11 +32,6 @@ export interface IBooleanVal extends IRuntimeVal {
   value: boolean;
 }
 
-export interface IObjectVal extends IRuntimeVal {
-  type: Type.Object;
-  value: Record<string, IRuntimeVal>;
-}
-
 export interface INativeFunctionVal extends IRuntimeVal {
   type: Type.NativeFunction;
   call: TFunctionCall;

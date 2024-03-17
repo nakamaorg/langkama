@@ -2,11 +2,11 @@ import { Char } from '../core/enums/char.enum';
 import { NodeType } from '../core/enums/node-type.enum';
 import { TokenType } from '../core/enums/token-type.enum';
 
-import { MissingEqualsError, MissingIdentifierError, MissingDotError, UnclosedParenthesisError, UninitializedConstantError, UnrecognizedTokenError, IncompleteExpressionError, UnclosedObjectError, ExpectedKeyError, MissingColonError, ExpectedCommaError, ExpectedOpenParenError, InvalidKeyError, UnclosedBracketError, ExpectedFunctionNameError, ExpectedIdentifierError, ExpectedOpenBraceError, ExpectedCloseBraceError } from '../core';
+import { MissingEqualsError, MissingIdentifierError, MissingDotError, UnclosedParenthesisError, UninitializedConstantError, UnrecognizedTokenError, IncompleteExpressionError, ExpectedOpenParenError, ExpectedFunctionNameError, ExpectedIdentifierError, ExpectedOpenBraceError, ExpectedCloseBraceError } from '../core';
 
 import { TToken } from '../core/types/token.type';
 import { TOnErrorCallbackFn } from '../core/types/on-error-callback.type';
-import { IAssignmentNode, IBinaryExpression, ICallNode, IExpressionNode, IFunctionDeclarationNode, IIdentifierNode, IMemberNode, INumberNode, IObjectNode, IProgramNode, IPropertyNode, ISkipNode, IStatementNode, IStringNode, IVariableDeclarationNode } from '../core/types/ast.type';
+import { IAssignmentNode, IBinaryExpression, ICallNode, IExpressionNode, IFunctionDeclarationNode, IIdentifierNode, INumberNode, IProgramNode, ISkipNode, IStatementNode, IStringNode, IVariableDeclarationNode } from '../core/types/ast.type';
 
 import { Consumer } from './consumer';
 
@@ -70,7 +70,7 @@ export class Parser extends Consumer<TToken> {
    * parses an assignment
    */
   private parseAssignmentExpression(): IExpressionNode {
-    const left = this.parseObjectExpression();
+    const left = this.parseAdditiveExpression();
 
     if (this.at().type === TokenType.Equals) {
       this.eat();
@@ -87,65 +87,6 @@ export class Parser extends Consumer<TToken> {
     }
 
     return left;
-  }
-
-  private parseObjectExpression(): IExpressionNode {
-    if (this.at().type !== TokenType.OpenBrace) {
-      return this.parseAdditiveExpression();
-    }
-
-    const openBToken = this.eat();
-    const properties: Array<IPropertyNode> = [];
-
-    while (this.notEof() && this.at().type !== TokenType.CloseBrace) {
-      const keyToken = this.expect(TokenType.Identifier, new ExpectedKeyError(this.at().location));
-
-      if (this.at().type === TokenType.Comma) {
-        this.eat();
-
-        properties.push({
-          key: keyToken.value,
-          kind: NodeType.Property,
-          start: keyToken.location,
-          end: { row: keyToken.location.row, col: keyToken.location.col + (keyToken.value?.length ?? 0) }
-        } as IPropertyNode);
-
-        continue;
-      } else if (this.at().type === TokenType.CloseBrace) {
-        properties.push({
-          key: keyToken.value,
-          kind: NodeType.Property,
-          start: keyToken.location,
-          end: { row: keyToken.location.row, col: keyToken.location.col + (keyToken.value?.length ?? 0) }
-        } as IPropertyNode);
-
-        continue;
-      }
-
-      this.expect(TokenType.Colon, new MissingColonError(this.at().location));
-      const valueToken = this.parseExpression();
-
-      properties.push({
-        value: valueToken,
-        key: keyToken.value,
-        end: valueToken.end,
-        kind: NodeType.Property,
-        start: keyToken.location
-      } as IPropertyNode);
-
-      if (this.at().type !== TokenType.CloseBrace) {
-        this.expect(TokenType.Comma, new ExpectedCommaError(this.at().location));
-      }
-    }
-
-    const closeBToken = this.expect(TokenType.CloseBrace, new UnclosedObjectError(this.at().location));
-
-    return {
-      properties,
-      kind: NodeType.Object,
-      end: closeBToken.location,
-      start: openBToken?.location
-    } as IObjectNode;
   }
 
   /**
@@ -197,7 +138,7 @@ export class Parser extends Consumer<TToken> {
   }
 
   private parseCallMemberExpression(): IExpressionNode {
-    const member = this.parseMemberExpression();
+    const member = this.parsePrimaryExpression();
 
     if (this.at().type === TokenType.OpenParen) {
       return this.parseCallExpression(member);
@@ -244,41 +185,6 @@ export class Parser extends Consumer<TToken> {
     }
 
     return args;
-  }
-
-  private parseMemberExpression(): IExpressionNode {
-    let obj = this.parsePrimaryExpression();
-
-    while (this.at().type === TokenType.Dot || this.at().type === TokenType.OpenBrack) {
-      const operator = this.eat();
-
-      let computed: boolean;
-      let property: IExpressionNode;
-
-      if (operator?.type === TokenType.Dot) {
-        computed = false;
-        property = this.parsePrimaryExpression();
-
-        if (property.kind !== NodeType.Identifier) {
-          this.errorManager.raise(new InvalidKeyError(this.at().location));
-        }
-      } else {
-        computed = true;
-        property = this.parseExpression();
-
-        this.expect(TokenType.CloseBrack, new UnclosedBracketError(this.at().location));
-      }
-
-      obj = {
-        object: obj,
-        computed,
-        property,
-        end: property.end,
-        start: property.start,
-        kind: NodeType.Member
-      } as IMemberNode;
-    }
-    return obj;
   }
 
   /**

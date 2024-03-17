@@ -1,6 +1,6 @@
-import { INativeFunctionVal, IObjectVal } from '../types/runtime-values.type';
-import { IBoolVal, INullVal, INumberVal, IStringVal, ISkipVal, Type } from '..';
 import { TFunctionCall } from '../types/function.type';
+import { INativeFunctionVal } from '../types/runtime-values.type';
+import { IBoolVal, INullVal, INumberVal, IStringVal, ISkipVal, Type } from '..';
 
 
 
@@ -54,14 +54,6 @@ export class RuntimeHelper {
    */
   public static createBoolean(boolean: boolean): IBoolVal {
     return { type: Type.Boolean, value: boolean };
-  }
-
-  /**
-   * @description
-   * Creates an object value
-   */
-  public static createObject(): IObjectVal {
-    return { type: Type.Object, value: {} };
   }
 
   /**

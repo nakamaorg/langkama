@@ -1,15 +1,14 @@
 export enum NodeType {
-  Skip,
-  Call,
-  Member,
-  Number,
-  String,
-  Object,
-  Program,
-  Property,
-  Identifier,
-  BinaryExpression,
-  VariableDeclaration,
-  FunctionDeclaration,
-  AssignmentExpression
+  Skip = 'Skip',
+  Call = 'Call',
+  Number = 'Number',
+  String = 'String',
+  Object = 'Object',
+  Program = 'Program',
+  Property = 'Property',
+  Identifier = 'Identifier',
+  BinaryExpression = 'BinaryExpression',
+  VariableDeclaration = 'VariableDeclaration',
+  FunctionDeclaration = 'FunctionDeclaration',
+  AssignmentExpression = 'AssignmentExpression'
 }

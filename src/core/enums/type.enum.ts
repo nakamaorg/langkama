@@ -3,7 +3,6 @@ export enum Type {
   Null,
   Number,
   String,
-  Object,
   Boolean,
   Function,
   NativeFunction

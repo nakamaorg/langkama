@@ -71,6 +71,7 @@ export class Lexer extends Consumer<string> {
       }
 
       identifier += this.eat();
+      identifier = identifier.split('').filter(e => (e === ' ' || CharHelper.isAlpha(e) || CharHelper.isNumber(e))).join('');
     }
 
     this.addToken(keywords[key] ?? TokenType.Identifier, identifier);
@@ -141,21 +142,11 @@ export class Lexer extends Consumer<string> {
 
     while (this.at()) {
       switch (this.at()) {
-        case Char.Dot: {
-          this.addToken(TokenType.Dot, this.eat());
-          break;
-        }
-       
         case Char.Comma: {
           this.addToken(TokenType.Comma, this.eat());
           break;
         }
-       
-        case Char.Colon: {
-          this.addToken(TokenType.Colon, this.eat());
-          break;
-        }
-       
+
         case Char.Semicolon: {
           this.addToken(TokenType.Semicolon, this.eat());
           break;
@@ -178,16 +169,6 @@ export class Lexer extends Consumer<string> {
 
         case Char.CloseBrace: {
           this.addToken(TokenType.CloseBrace, this.eat());
-          break;
-        }
-
-        case Char.OpenBrack: {
-          this.addToken(TokenType.OpenBrack, this.eat());
-          break;
-        }
-
-        case Char.CloseBrack: {
-          this.addToken(TokenType.CloseBrack, this.eat());
           break;
         }
 
