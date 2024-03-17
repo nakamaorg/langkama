@@ -9,4 +9,4 @@ let me cook print(message) {
 }
 
 a sa7 hear me out retResult is multiply(2);
-print("ret result: " + bait(2) + " * " + bait(multiplicator) + " = " + bait(retResult))
+print("ret result: " + bait(2) + " * " + bait(multiplicator) + " = " + bait(retResult));
