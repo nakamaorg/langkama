@@ -86,7 +86,9 @@ export class LangKama {
       this.onInterpreterEventListener(program);
       const result = evaluator.evaluate(program, env);
 
-      this.onSuccessEventListener(result);
+      if (!errorManager.hasErrors()) {
+        this.onSuccessEventListener(result);
+      }
     } catch (error) {
       errorManager.raise(error as LangKamaError);
     } finally {

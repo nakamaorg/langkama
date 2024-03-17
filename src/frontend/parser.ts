@@ -206,13 +206,16 @@ export class Parser extends Consumer<TToken> {
       }
 
       default: {
-        this.errorManager.raise(new UnrecognizedTokenError(this.at().location));
-
-        return {
+        const node = {
           kind: NodeType.Skip,
           end: this.at().location,
           start: this.at().location
         } as ISkipNode;
+
+        this.errorManager.raise(new UnrecognizedTokenError(this.at().location));
+        this.eat();
+
+        return node;
       }
     }
   }

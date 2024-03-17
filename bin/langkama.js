@@ -120,7 +120,6 @@ class Cmd {
   static #repl() {
     const rl = createInterface({ input: process.stdin, output: process.stdout });
     const env = new Environment();
-    const compiler = new LangKama();
 
     const onErrorCallback = error => {
       this.#error(error, false);
@@ -134,6 +133,7 @@ class Cmd {
         if (input.toLowerCase() === 'exit') {
           rl.close();
         } else {
+          const compiler = new LangKama();
           const errorManager = new ErrorManager(onErrorCallback, input);
           env.setErrorCallback(errorManager.raise.bind(errorManager));
 
