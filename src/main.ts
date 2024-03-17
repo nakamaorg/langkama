@@ -1,9 +1,8 @@
 import { Lexer } from './frontend/lexer';
 import { Parser } from './frontend/parser';
-import { evaluate } from './runtime/interpreter';
 import { Environment } from './runtime/environment';
 
-import { IRuntimeVal, LangKamaError } from '.';
+import { Evaluator, IRuntimeVal, LangKamaError } from '.';
 import { LangKamaEvent } from './core/enums/langkama-event.enum';
 
 import { TToken } from './core/types/token.type';
@@ -20,18 +19,46 @@ import { ErrorManager } from './core/managers/error.manager';
  */
 export class LangKama {
 
-  private onErrorEvent: TOnErrorCallbackFn;
-  private onLexerEvent: (code: string) => void;
-  private onSuccessEvent: (value: IRuntimeVal) => void;
-  private onParserEvent: (tokens: Array<TToken>) => void;
-  private onInterpreterEvent: (program: IProgramNode) => void;
+  /**
+   * @description
+   * The error callback function
+   */
+  private onErrorEventListener: TOnErrorCallbackFn;
 
+  /**
+   * @description
+   * The lexer callback function
+   */
+  private onLexerEventListener: (code: string) => void;
+
+  /**
+   * @description
+   * The success callback function
+   */
+  private onSuccessEventListener: (value: IRuntimeVal) => void;
+
+  /**
+   * @description
+   * The parser callback function
+   */
+  private onParserEventListener: (tokens: Array<TToken>) => void;
+
+  /**
+   * @description
+   * The interpreter callback function
+   */
+  private onInterpreterEventListener: (program: IProgramNode) => void;
+
+  /**
+   * @description
+   * Instantiates a compiler instance for LangKama
+   */
   constructor() {
-    this.onErrorEvent = () => { };
-    this.onLexerEvent = () => { };
-    this.onParserEvent = () => { };
-    this.onSuccessEvent = () => { };
-    this.onInterpreterEvent = () => { };
+    this.onErrorEventListener = () => { };
+    this.onLexerEventListener = () => { };
+    this.onParserEventListener = () => { };
+    this.onSuccessEventListener = () => { };
+    this.onInterpreterEventListener = () => { };
   }
 
   /**
@@ -42,23 +69,24 @@ export class LangKama {
    * @param environment The envrionment to read from
    */
   public interpret(code: string, environment?: Environment): LangKama {
-    const errorManager = new ErrorManager(this.onErrorEvent, code);
+    const errorManager = new ErrorManager(this.onErrorEventListener, code);
 
     try {
+      const evaluator = new Evaluator();
       const lexer = new Lexer(errorManager.raise.bind(errorManager));
       const parser = new Parser(errorManager.raise.bind(errorManager));
       const env = environment ?? new Environment(null, errorManager.raise.bind(errorManager));
 
-      this.onLexerEvent(code);
+      this.onLexerEventListener(code);
       const tokens = lexer.tokenize(code);
 
-      this.onParserEvent(tokens);
+      this.onParserEventListener(tokens);
       const program = parser.parse(tokens);
 
-      this.onInterpreterEvent(program);
-      const result = evaluate(program, env);
+      this.onInterpreterEventListener(program);
+      const result = evaluator.evaluate(program, env);
 
-      this.onSuccessEvent(result);
+      this.onSuccessEventListener(result);
     } catch (error) {
       errorManager.raise(error as LangKamaError);
     } finally {
@@ -76,27 +104,27 @@ export class LangKama {
   public on(event: LangKamaEvent, eventListener: () => void): LangKama {
     switch (event) {
       case LangKamaEvent.Error: {
-        this.onErrorEvent = eventListener;
+        this.onErrorEventListener = eventListener;
         break;
       }
 
       case LangKamaEvent.Success: {
-        this.onSuccessEvent = eventListener;
+        this.onSuccessEventListener = eventListener;
         break;
       }
 
       case LangKamaEvent.Lexer: {
-        this.onLexerEvent = eventListener;
+        this.onLexerEventListener = eventListener;
         break;
       }
 
       case LangKamaEvent.Parser: {
-        this.onParserEvent = eventListener;
+        this.onParserEventListener = eventListener;
         break;
       }
 
       case LangKamaEvent.Interpreter: {
-        this.onInterpreterEvent = eventListener;
+        this.onInterpreterEventListener = eventListener;
         break;
       }
     }
