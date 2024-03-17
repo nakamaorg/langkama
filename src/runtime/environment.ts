@@ -49,6 +49,11 @@ export class Environment {
 
       return RuntimeHelper.createNull();
     }), true);
+
+    this.declareVariable('bait', RuntimeHelper.createFunction(args => {
+      const value = (args[0] as IStringVal).value ?? 'bruh';
+      return RuntimeHelper.createString(value.toString());
+    }), true);
   }
 
   /**

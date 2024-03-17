@@ -1,9 +1,12 @@
 hear me out multiplicator is 5;
 
 let me cook multiply(x) {
-  multiplicator * x;
+  reda multiplicator * x;
 }
 
-a sa7 hear me out result is multiply(2);
+let me cook print(message) {
+  loncina(message);
+}
 
-loncina("result: ", 2, " * ", multiplicator, " = ", result);
+a sa7 hear me out retResult is multiply(2);
+print("ret result: " + bait(2) + " * " + bait(multiplicator) + " = " + bait(retResult))

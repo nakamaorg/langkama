@@ -1,6 +1,7 @@
+import { TPrimitive } from '../types/primitive.type';
 import { TFunctionCall } from '../types/function.type';
-import { INativeFunctionVal } from '../types/runtime-values.type';
-import { IBoolVal, INullVal, INumberVal, IStringVal, ISkipVal, Type } from '..';
+import { INativeFunctionVal, IRuntimeVal } from '../types/runtime-values.type';
+import { IBooleanVal, INullVal, INumberVal, IStringVal, ISkipVal, Type } from '..';
 
 
 
@@ -9,6 +10,33 @@ import { IBoolVal, INullVal, INumberVal, IStringVal, ISkipVal, Type } from '..';
  * Helps with runtime values
  */
 export class RuntimeHelper {
+
+  public static createValue(value: TPrimitive): IRuntimeVal {
+    let type: Type;
+
+    switch (typeof value) {
+      case 'number': {
+        type = Type.Number;
+        break;
+      }
+
+      case 'boolean': {
+        type = Type.Boolean;
+        break;
+      }
+
+      case 'string': {
+        type = Type.String;
+        break;
+      }
+
+      default: {
+        type = Type.Null;
+      }
+    }
+
+    return { type, value } as IRuntimeVal;
+  }
 
   /**
    * @description
@@ -52,7 +80,7 @@ export class RuntimeHelper {
    *
    * @param boolean The boolean value
    */
-  public static createBoolean(boolean: boolean): IBoolVal {
+  public static createBoolean(boolean: boolean): IBooleanVal {
     return { type: Type.Boolean, value: boolean };
   }
 

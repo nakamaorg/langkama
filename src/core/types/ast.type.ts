@@ -16,6 +16,11 @@ export interface IProgramNode extends IStatementNode {
   body: Array<IStatementNode>;
 }
 
+export interface IReturnNode extends IStatementNode {
+  kind: NodeType.Return;
+  value: IExpressionNode;
+}
+
 export interface IVariableDeclarationNode extends IStatementNode {
   kind: NodeType.VariableDeclaration;
   constant: boolean;

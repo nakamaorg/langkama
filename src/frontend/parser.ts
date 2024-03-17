@@ -6,7 +6,7 @@ import { MissingEqualsError, MissingIdentifierError, MissingDotError, UnclosedPa
 
 import { TToken } from '../core/types/token.type';
 import { TOnErrorCallbackFn } from '../core/types/on-error-callback.type';
-import { IAssignmentNode, IBinaryExpression, ICallNode, IExpressionNode, IFunctionDeclarationNode, IIdentifierNode, INumberNode, IProgramNode, ISkipNode, IStatementNode, IStringNode, IVariableDeclarationNode } from '../core/types/ast.type';
+import { IAssignmentNode, IBinaryExpression, ICallNode, IExpressionNode, IFunctionDeclarationNode, IIdentifierNode, INumberNode, IProgramNode, IReturnNode, ISkipNode, IStatementNode, IStringNode, IVariableDeclarationNode } from '../core/types/ast.type';
 
 import { Consumer } from './consumer';
 
@@ -42,6 +42,10 @@ export class Parser extends Consumer<TToken> {
    */
   private parseStatement(): IStatementNode {
     switch (this.at().type) {
+      case TokenType.Return: {
+        return this.parseReturn();
+      }
+
       case TokenType.Let:
       case TokenType.Const: {
         return this.parseVariableDeclaration();
@@ -362,6 +366,24 @@ export class Parser extends Consumer<TToken> {
     } as IFunctionDeclarationNode;
 
     return fn;
+  }
+
+  /**
+   * @description
+   * Parses the return statement
+   */
+  private parseReturn(): IStatementNode {
+    const returnToken = this.eat();
+    const valueExpression = this.parseExpression();
+
+    this.expect(TokenType.Semicolon, new MissingDotError(valueExpression.end));
+
+    return {
+      kind: NodeType.Return,
+      value: valueExpression,
+      end: valueExpression.end,
+      start: returnToken?.location
+    } as IReturnNode;
   }
 
   /**

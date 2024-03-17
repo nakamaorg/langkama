@@ -1,7 +1,7 @@
 import { NodeType } from '../core/enums/node-type.enum';
 
 import { IFunctionVal, INativeFunctionVal, INumberVal, IRuntimeVal, IStringVal } from '../core/types/runtime-values.type';
-import { IAssignmentNode, IBinaryExpression, ICallNode, IFunctionDeclarationNode, IIdentifierNode, INumberNode, IProgramNode, IStatementNode, IStringNode, IVariableDeclarationNode } from '../core/types/ast.type';
+import { IAssignmentNode, IBinaryExpression, ICallNode, IFunctionDeclarationNode, IIdentifierNode, INumberNode, IProgramNode, IReturnNode, IStatementNode, IStringNode, IVariableDeclarationNode } from '../core/types/ast.type';
 
 import { Environment } from './environment';
 import { RuntimeHelper } from '../core/helpers/runtime.helper';
@@ -184,15 +184,22 @@ export class Evaluator {
         scope.declareVariable(varName, varValue);
       }
 
+      // @ts-ignore
+      let hasReturn: boolean = false;
       let result: IRuntimeVal = RuntimeHelper.createNull();
 
       for (const statement of func.body) {
         if (statement.kind !== NodeType.Skip) {
           result = this.evaluate(statement, scope);
+
+          if (statement.kind === NodeType.Return) {
+            hasReturn = true;
+            break;
+          }
         }
       }
 
-      return result;
+      return hasReturn ? result : RuntimeHelper.createNull();
     }
 
     env.errorManager?.raise(new InvalidFunctionError(call.start));
@@ -214,6 +221,18 @@ export class Evaluator {
 
     const name = (node.assigne as IIdentifierNode).symbol;
     return env.assignVariable(name, this.evaluate(node.value, env));
+  }
+
+  /**
+   * @description
+   * Evaluates a return statement
+   *
+   * @param node The return statement
+   * @param env The scope of evaluation
+   */
+  private evaluateReturn(node: IReturnNode, env: Environment): IRuntimeVal {
+    const val = this.evaluate(node.value, env) as IStringVal;
+    return RuntimeHelper.createValue(val.value);
   }
 
   /**
@@ -263,6 +282,10 @@ export class Evaluator {
 
       case NodeType.Skip: {
         return RuntimeHelper.createSkip();
+      }
+
+      case NodeType.Return: {
+        return this.evaluateReturn(node as IReturnNode, env);
       }
 
       default: {
