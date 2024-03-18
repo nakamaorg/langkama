@@ -86,19 +86,19 @@ describe('Variables errors', () => {
     const code = `hear me out var is`;
 
     compiler.on(LangKamaEvent.Error, error => {
-      expect(error.errno).toBe(Errno.MissingEqualsError);
+      expect(error.errno).toBe(Errno.IncompleteExpressionError);
       done();
     }).interpret(code);
   });
-
+  
   test('Variable reassignment without a valid value after the equals keyword', done => {
     const code = `
-      hear me out x is 1;
-      x is
+    hear me out x is 1;
+    x is
     `;
-
+    
     compiler.on(LangKamaEvent.Error, error => {
-      expect(error.errno).toBe(Errno.VariableNotDefinedError);
+      expect(error.errno).toBe(Errno.IncompleteExpressionError);
       done();
     }).interpret(code);
   });

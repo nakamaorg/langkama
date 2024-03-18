@@ -20,10 +20,14 @@ describe('Functions', () => {
       add(1, 2);
     `;
 
-    compiler.on(LangKamaEvent.Success, result => {
-        expect(result.value).toBe(3);
-        done();
-      })
+    compiler
+    .on(LangKamaEvent.Error, error => {
+      console.log(error.toString());
+    })
+    .on(LangKamaEvent.Success, result => {
+      expect(result.value).toBe(3);
+      done();
+    })
       .interpret(code);
   });
 });
