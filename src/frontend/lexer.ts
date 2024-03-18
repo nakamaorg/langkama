@@ -74,6 +74,14 @@ export class Lexer extends Consumer<string> {
       identifier = identifier.split('').filter(e => (e === ' ' || CharHelper.isAlpha(e) || CharHelper.isNumber(e))).join('');
     }
 
+    key = keys.find(e => e === identifier) as string;
+
+    if (keywords[key] === TokenType.Comment) {
+      while (this.at() && this.at() !== Char.NewLine) {
+        identifier += this.eat();
+      }
+    }
+
     this.addToken(keywords[key] ?? TokenType.Identifier, identifier);
   }
 

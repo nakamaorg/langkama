@@ -46,6 +46,17 @@ export class Parser extends Consumer<TToken> {
         return this.parseReturn();
       }
 
+      case TokenType.Comment: {
+        const node = {
+          kind: NodeType.Skip,
+          end: this.at().location,
+          start: this.at().location
+        } as ISkipNode;
+
+        this.eat();
+        return node;
+      }
+
       case TokenType.Let:
       case TokenType.Const: {
         return this.parseVariableDeclaration();
@@ -393,8 +404,6 @@ export class Parser extends Consumer<TToken> {
   private parseReturn(): IStatementNode {
     const returnToken = this.eat();
     const valueExpression = this.parseExpression();
-
-    this.expect(TokenType.Semicolon, new MissingDotError(valueExpression.end));
 
     return {
       kind: NodeType.Return,
