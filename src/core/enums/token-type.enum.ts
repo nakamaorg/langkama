@@ -8,6 +8,7 @@ export enum TokenType {
   Return = 'Return',
   Number = 'Number',
   String = 'String',
+  Comment = 'Comment',
   Function = 'Function',
   BinaryOp = 'BinaryOp',
   Semicolon = 'Semicolon',
