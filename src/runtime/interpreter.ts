@@ -184,7 +184,6 @@ export class Evaluator {
         scope.declareVariable(varName, varValue);
       }
 
-      // @ts-ignore
       let hasReturn: boolean = false;
       let result: IRuntimeVal = RuntimeHelper.createNull();
 

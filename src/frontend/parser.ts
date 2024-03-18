@@ -122,11 +122,11 @@ export class Parser extends Consumer<TToken> {
    * Parses a multiplicative expression
    */
   private parseMultiplicativeExpression(): IExpressionNode {
-    let left = this.parseCallMemberExpression();
+    let left = this.parseCallPrimaryExpression();
 
     while ([Char.Star, Char.Slash, Char.Percentage].includes(this.at().value as Char)) {
       const operator = (this.eat() as TToken).value;
-      const right = this.parseCallMemberExpression();
+      const right = this.parseCallPrimaryExpression();
 
       left = {
         left,
@@ -141,7 +141,11 @@ export class Parser extends Consumer<TToken> {
     return left;
   }
 
-  private parseCallMemberExpression(): IExpressionNode {
+  /**
+   * @description
+   * Parses function call and primary expressions
+   */
+  private parseCallPrimaryExpression(): IExpressionNode {
     const member = this.parsePrimaryExpression();
 
     if (this.at().type === TokenType.OpenParen) {
@@ -151,6 +155,12 @@ export class Parser extends Consumer<TToken> {
     return member;
   }
 
+  /**
+   * @description
+   * Parses a function call
+   *
+   * @param caller The caller function
+   */
   private parseCallExpression(caller: IExpressionNode): ICallNode {
     const args = this.parseArguments();
     const lastArg = args.slice(0).reverse()[0];
@@ -170,6 +180,10 @@ export class Parser extends Consumer<TToken> {
     return call;
   }
 
+  /**
+   * @description
+   * Parses function arguments
+   */
   private parseArguments(): Array<IExpressionNode> {
     this.expect(TokenType.OpenParen, new ExpectedOpenParenError(this.at().location));
 
@@ -181,6 +195,10 @@ export class Parser extends Consumer<TToken> {
     return args;
   }
 
+  /**
+   * @description
+   * Parses the list of arguments
+   */
   private parseArgumentsList(): Array<IExpressionNode> {
     const args = [this.parseAssignmentExpression()];
 
