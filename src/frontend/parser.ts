@@ -6,7 +6,7 @@ import { MissingEqualsError, MissingIdentifierError, MissingDotError, UnclosedPa
 
 import { TToken } from '../core/types/token.type';
 import { TOnErrorCallbackFn } from '../core/types/on-error-callback.type';
-import { IAssignmentNode, IBinaryExpression, ICallNode, IExpressionNode, IFunctionDeclarationNode, IIdentifierNode, INumberNode, IProgramNode, IReturnNode, ISkipNode, IStatementNode, IStringNode, IVariableDeclarationNode } from '../core/types/ast.type';
+import { IAssignmentNode, IBinaryExpression, ICallNode, IExpressionNode, IFunctionDeclarationNode, IIdentifierNode, ILoneExpression, INumberNode, IProgramNode, IReturnNode, ISkipNode, IStatementNode, IStringNode, IVariableDeclarationNode } from '../core/types/ast.type';
 
 import { Consumer } from './consumer';
 
@@ -106,12 +106,31 @@ export class Parser extends Consumer<TToken> {
 
   /**
    * @description
+   * Parses lone expressions
+   */
+  private parseLoneExpression(): IExpressionNode {
+    const operator = this.eat();
+    const expression = this.parseAdditiveExpression();
+
+    const node = {
+      expression,
+      end: expression.end,
+      start: operator?.location,
+      operator: operator?.value,
+      kind: NodeType.LoneExpression
+    } as ILoneExpression;
+
+    return node;
+  }
+
+  /**
+   * @description
    * Parses an additive expression
    */
   private parseAdditiveExpression(): IExpressionNode {
     let left = this.parseMultiplicativeExpression();
 
-    while (this.at().value === '+' || this.at().value === '-') {
+    while ([Char.Plus, Char.Minus, Char.Equals, Char.Less, Char.Greater, Char.Ampersand, Char.Pipe].includes(this.at().value as Char)) {
       const operator = (this.eat() as TToken).value;
       const right = this.parseMultiplicativeExpression();
 
@@ -283,6 +302,10 @@ export class Parser extends Consumer<TToken> {
         return value;
       }
 
+      case TokenType.LoneOp: {
+        return this.parseLoneExpression();
+      }
+
       case TokenType.EOF: {
         this.errorManager.raise(new IncompleteExpressionError(this.at().location));
 
@@ -299,7 +322,6 @@ export class Parser extends Consumer<TToken> {
           end: this.at().location,
           start: this.at().location
         } as ISkipNode;
-
         this.errorManager.raise(new UnrecognizedTokenError(this.at().location));
         this.eat();
 

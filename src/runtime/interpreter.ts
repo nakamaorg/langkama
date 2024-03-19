@@ -2,7 +2,7 @@ import { Char } from '../core/enums/char.enum';
 import { NodeType } from '../core/enums/node-type.enum';
 
 import { IBooleanVal, IFunctionVal, INativeFunctionVal, INumberVal, IRuntimeVal, IStringVal } from '../core/types/runtime-values.type';
-import { IAssignmentNode, IBinaryExpression, ICallNode, IFunctionDeclarationNode, IIdentifierNode, INumberNode, IProgramNode, IReturnNode, IStatementNode, IStringNode, IVariableDeclarationNode } from '../core/types/ast.type';
+import { IAssignmentNode, IBinaryExpression, ICallNode, IFunctionDeclarationNode, IIdentifierNode, ILoneExpression, INumberNode, IProgramNode, IReturnNode, IStatementNode, IStringNode, IVariableDeclarationNode } from '../core/types/ast.type';
 
 import { Environment } from './environment';
 import { RuntimeHelper } from '../core/helpers/runtime.helper';
@@ -69,6 +69,18 @@ export class Evaluator {
     } as IFunctionVal;
 
     return env.declareVariable(declaration.name, fn, true);
+  }
+
+  /**
+   * @description
+   * Evaluates a lone expression
+   *
+   * @param loneExpression The lone expression to evaluate
+   * @param env The scope of the evaluation
+   */
+  private evaluateLoneExpression(loneExpression: ILoneExpression, env: Environment): IRuntimeVal {
+    const val = this.evaluate(loneExpression.expression, env) as IBooleanVal;
+    return RuntimeHelper.createBoolean(!Boolean(val.value));
   }
 
   /**
@@ -311,6 +323,10 @@ export class Evaluator {
 
       case NodeType.BinaryExpression: {
         return this.evaluateBinaryExpression(node as IBinaryExpression, env);
+      }
+
+      case NodeType.LoneExpression: {
+        return this.evaluateLoneExpression(node as ILoneExpression, env);
       }
 
       case NodeType.Program: {
