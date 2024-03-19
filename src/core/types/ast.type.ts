@@ -44,10 +44,16 @@ export interface IAssignmentNode extends IExpressionNode {
 }
 
 export interface IBinaryExpression extends IExpressionNode {
-  kind: NodeType.BinaryExpression;
+  operator: string;
   left: IExpressionNode;
   right: IExpressionNode;
+  kind: NodeType.BinaryExpression;
+}
+
+export interface ILoneExpression extends IExpressionNode {
   operator: string;
+  expression: IExpressionNode;
+  kind: NodeType.LoneExpression;
 }
 
 export interface IIdentifierNode extends IExpressionNode {

@@ -8,6 +8,7 @@ export enum NodeType {
   Program = 'Program',
   Property = 'Property',
   Identifier = 'Identifier',
+  LoneExpression = 'LoneExpression',
   BinaryExpression = 'BinaryExpression',
   VariableDeclaration = 'VariableDeclaration',
   FunctionDeclaration = 'FunctionDeclaration',
