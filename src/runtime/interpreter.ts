@@ -1,6 +1,7 @@
+import { Char } from '../core/enums/char.enum';
 import { NodeType } from '../core/enums/node-type.enum';
 
-import { IFunctionVal, INativeFunctionVal, INumberVal, IRuntimeVal, IStringVal } from '../core/types/runtime-values.type';
+import { IBooleanVal, IFunctionVal, INativeFunctionVal, INumberVal, IRuntimeVal, IStringVal } from '../core/types/runtime-values.type';
 import { IAssignmentNode, IBinaryExpression, ICallNode, IFunctionDeclarationNode, IIdentifierNode, INumberNode, IProgramNode, IReturnNode, IStatementNode, IStringNode, IVariableDeclarationNode } from '../core/types/ast.type';
 
 import { Environment } from './environment';
@@ -86,24 +87,69 @@ export class Evaluator {
       return RuntimeHelper.createNull();
     }
 
-    switch (lhs.type) {
-      case Type.Number: {
-        return this.evaluateNumericBinaryExpression(lhs as INumberVal, rhs as INumberVal, binaryExpression.operator);
-      }
+    if ([Char.Equals, Char.Greater, Char.Less, Char.Ampersand, Char.Pipe].includes(binaryExpression.operator as Char)) {
+      return this.evaluateBooleanBinaryExpression(lhs as INumberVal, rhs as INumberVal, binaryExpression.operator);
+    } else {
+      switch (lhs.type) {
+        case Type.Number: {
+          return this.evaluateNumericBinaryExpression(lhs as INumberVal, rhs as INumberVal, binaryExpression.operator);
+        }
 
-      case Type.String: {
-        if (binaryExpression.operator === '+') {
-          return RuntimeHelper.createString((lhs as IStringVal).value + (rhs as IStringVal).value);
-        } else {
-          env.errorManager?.raise(new InvalidOperationError(binaryExpression.start));
+        case Type.String: {
+          if (binaryExpression.operator === '+') {
+            return RuntimeHelper.createString((lhs as IStringVal).value + (rhs as IStringVal).value);
+          } else {
+            env.errorManager?.raise(new InvalidOperationError(binaryExpression.start));
+            return RuntimeHelper.createNull();
+          }
+        }
+
+        default: {
           return RuntimeHelper.createNull();
         }
       }
+    }
+  }
 
-      default: {
-        return RuntimeHelper.createNull();
+  /**
+   * @description
+   * Evaluates a boolean expression
+   *
+   * @param lhs The left hand assignment
+   * @param rhs The right hand assignment
+   * @param operator The operator
+   */
+  private evaluateBooleanBinaryExpression(lhs: INumberVal, rhs: INumberVal, operator: string): IBooleanVal {
+    let result = false;
+
+    switch (operator) {
+      case Char.Equals: {
+        result = lhs.value === rhs.value;
+        break;
+      }
+
+      case Char.Greater: {
+        result = lhs.value > rhs.value;
+        break;
+      }
+
+      case Char.Less: {
+        result = lhs.value < rhs.value;
+        break;
+      }
+
+      case Char.Ampersand: {
+        result = Boolean(lhs.value && rhs.value);
+        break;
+      }
+
+      case Char.Pipe: {
+        result = Boolean(lhs.value || rhs.value);
+        break;
       }
     }
+
+    return RuntimeHelper.createBoolean(result);
   }
 
   /**
@@ -118,27 +164,27 @@ export class Evaluator {
     let result = 0;
 
     switch (operator) {
-      case '+': {
+      case Char.Plus: {
         result = lhs.value + rhs.value;
         break;
       }
 
-      case '-': {
+      case Char.Minus: {
         result = lhs.value - rhs.value;
         break;
       }
 
-      case '*': {
+      case Char.Star: {
         result = lhs.value * rhs.value;
         break;
       }
 
-      case '/': {
+      case Char.Slash: {
         result = lhs.value / rhs.value;
         break;
       }
 
-      case '%': {
+      case Char.Percentage: {
         result = lhs.value % rhs.value;
         break;
       }

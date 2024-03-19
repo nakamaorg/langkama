@@ -7,6 +7,7 @@ export enum TokenType {
   Equals = 'Equals',
   Return = 'Return',
   Number = 'Number',
+  LoneOp = 'LoneOp',
   String = 'String',
   Comment = 'Comment',
   Function = 'Function',

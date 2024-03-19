@@ -194,12 +194,22 @@ export class Lexer extends Consumer<string> {
           break;
         }
 
+        case Char.Pipe:
+        case Char.Less:
         case Char.Plus:
-        case Char.Minus:
         case Char.Star:
+        case Char.Minus:
         case Char.Slash:
-        case Char.Percentage: {
+        case Char.Equals:
+        case Char.Greater:
+        case Char.Ampersand:
+        case Char.Percentage:{
           this.addToken(TokenType.BinaryOp, this.eat());
+          break;
+        }
+
+        case Char.Exclamation: {
+          this.addToken(TokenType.LoneOp, this.eat());
           break;
         }
 

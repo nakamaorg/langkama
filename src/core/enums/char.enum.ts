@@ -8,11 +8,17 @@ export enum Char {
   DoubleQuotes = '"',
 
   // Operators
+  Pipe = '|',
+  Less = '<',
   Plus = '+',
   Star = '*',
   Minus = '-',
   Slash = '/',
+  Equals = '=',
+  Greater = '>',
+  Ampersand = '&',
   Percentage = '%',
+  Exclamation = '!',
 
   // Whitespace
   Space = ' ',
