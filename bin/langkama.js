@@ -13,7 +13,7 @@ import {
   LangKamaEvent,
   InvalidFileError,
   UnknownFileError
-} from './../dist/langkama.js';
+} from './../dist/@nakamaorg/langkama.js';
 
 
 /**

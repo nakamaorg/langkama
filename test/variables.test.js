@@ -1,7 +1,7 @@
-const Type = require('../dist/langkama.umd.cjs').Type;
-const Errno = require('../dist/langkama.umd.cjs').Errno;
-const LangKama = require('../dist/langkama.umd.cjs').LangKama;
-const LangKamaEvent = require('../dist/langkama.umd.cjs').LangKamaEvent;
+const Type = require('../dist/@nakamaorg/langkama.umd.cjs').Type;
+const Errno = require('../dist/@nakamaorg/langkama.umd.cjs').Errno;
+const LangKama = require('../dist/@nakamaorg/langkama.umd.cjs').LangKama;
+const LangKamaEvent = require('../dist/@nakamaorg/langkama.umd.cjs').LangKamaEvent;
 
 
 
