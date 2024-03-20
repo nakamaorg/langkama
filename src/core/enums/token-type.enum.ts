@@ -5,6 +5,7 @@ export enum TokenType {
   Let = 'Let',
   Else = 'Else',
   Const = 'Const',
+  While = 'While',
   Comma = 'Comma',
   Equals = 'Equals',
   Return = 'Return',

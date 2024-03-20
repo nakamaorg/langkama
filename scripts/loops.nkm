@@ -1,0 +1,6 @@
+hear me out i is 0;
+
+cook until (i > 10) {
+  loncina("iteration " + bait(i));
+  i is i + 1;
+}

@@ -1,6 +1,7 @@
 export enum NodeType {
   Skip = 'Skip',
   Call = 'Call',
+  Loop = 'Loop',
   Number = 'Number',
   Return = 'Return',
   String = 'String',
