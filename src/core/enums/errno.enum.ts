@@ -15,6 +15,7 @@ export enum Errno {
   InvalidFunctionError,
   VariableDefinedError,
   InvalidOperationError,
+  InvalidConditionError,
   InvalidAssignmentError,
   ExpectedOpenParenError,
   MissingIdentifierError,
