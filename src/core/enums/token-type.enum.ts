@@ -3,6 +3,7 @@ export enum TokenType {
   EOF = 'EOF',
   Dot = 'Dot',
   Let = 'Let',
+  Else = 'Else',
   Const = 'Const',
   Comma = 'Comma',
   Equals = 'Equals',

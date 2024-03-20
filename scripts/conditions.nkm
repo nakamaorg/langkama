@@ -1,6 +1,8 @@
 a sa7 hear me out age is 16;
 a sa7 hear me out requiredAge is 18;
 
-big if true (age < requiredAge) {
+big if true (age > requiredAge) {
   loncina("Allowed");
+} sike {
+  loncina("Not Allowed");
 }

@@ -2,7 +2,7 @@ import { Char } from '../core/enums/char.enum';
 import { NodeType } from '../core/enums/node-type.enum';
 import { TokenType } from '../core/enums/token-type.enum';
 
-import { MissingEqualsError, MissingIdentifierError, MissingDotError, UnclosedParenthesisError, UninitializedConstantError, UnrecognizedTokenError, IncompleteExpressionError, ExpectedOpenParenError, ExpectedFunctionNameError, ExpectedIdentifierError, ExpectedOpenBraceError, ExpectedCloseBraceError } from '../core';
+import { MissingEqualsError, MissingIdentifierError, MissingDotError, UnclosedParenthesisError, UninitializedConstantError, UnrecognizedTokenError, IncompleteExpressionError, ExpectedOpenParenError, ExpectedFunctionNameError, ExpectedIdentifierError, ExpectedOpenBraceError, ExpectedCloseBraceError, InvalidConditionError } from '../core';
 
 import { TToken } from '../core/types/token.type';
 import { TOnErrorCallbackFn } from '../core/types/on-error-callback.type';
@@ -47,27 +47,7 @@ export class Parser extends Consumer<TToken> {
       }
 
       case TokenType.If: {
-        const ifKeyword = this.eat();
-        const condition = this.parseExpression();
-
-        this.expect(TokenType.OpenBrace, new ExpectedOpenBraceError(this.at().location));
-        const body: Array<IStatementNode> = [];
-
-        while (this.at() && this.at().type !== TokenType.CloseBrace) {
-          body.push(this.parseStatement());
-        }
-
-        this.expect(TokenType.CloseBrace, new ExpectedCloseBraceError(this.at().location));
-
-        const node = {
-          condition,
-          true: body,
-          end: condition.end,
-          kind: NodeType.Condition,
-          start: ifKeyword?.location
-        } as IConditionNode;
-
-        return node;
+        return this.parseCondition();
       }
 
       case TokenType.Comment: {
@@ -329,6 +309,16 @@ export class Parser extends Consumer<TToken> {
         return this.parseLoneExpression();
       }
 
+      case TokenType.Else: {
+        this.errorManager.raise(new InvalidConditionError(this.at().location));
+
+        return {
+          kind: NodeType.Skip,
+          end: this.at().location,
+          start: this.at().location
+        } as ISkipNode;
+      }
+
       case TokenType.EOF: {
         this.errorManager.raise(new IncompleteExpressionError(this.at().location));
 
@@ -440,6 +430,58 @@ export class Parser extends Consumer<TToken> {
     } as IFunctionDeclarationNode;
 
     return fn;
+  }
+
+  /**
+   * @description
+   * Parses a condition statement
+   */
+  private parseCondition(): IStatementNode {
+    let node: IConditionNode;
+
+    const ifKeyword = this.eat();
+    const condition = this.parseExpression();
+
+    this.expect(TokenType.OpenBrace, new ExpectedOpenBraceError(this.at().location));
+    const trueBody: Array<IStatementNode> = [];
+
+    while (this.at() && this.at().type !== TokenType.CloseBrace) {
+      trueBody.push(this.parseStatement());
+    }
+
+    this.expect(TokenType.CloseBrace, new ExpectedCloseBraceError(this.at().location));
+
+    if (this.at().type !== TokenType.Else) {
+      node = {
+        condition,
+        false: [],
+        true: trueBody,
+        end: condition.end,
+        kind: NodeType.Condition,
+        start: ifKeyword?.location
+      } as IConditionNode;
+    } else {
+      this.eat();
+      this.expect(TokenType.OpenBrace, new ExpectedOpenBraceError(this.at().location));
+      const falseBody: Array<IStatementNode> = [];
+
+      while (this.at() && this.at().type !== TokenType.CloseBrace) {
+        falseBody.push(this.parseStatement());
+      }
+
+      this.expect(TokenType.CloseBrace, new ExpectedCloseBraceError(this.at().location));
+
+      node = {
+        condition,
+        true: [],
+        false: falseBody,
+        end: condition.end,
+        kind: NodeType.Condition,
+        start: ifKeyword?.location
+      } as IConditionNode;
+    }
+
+    return node;
   }
 
   /**

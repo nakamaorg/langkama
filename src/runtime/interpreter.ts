@@ -82,7 +82,9 @@ export class Evaluator {
     const val = this.evaluate(ifStatement.condition, env) as IBooleanVal;
 
     if (val.value) {
-      ifStatement.true.forEach(e => this.evaluate(e, env))
+      ifStatement.true.forEach(e => this.evaluate(e, env));
+    } else {
+      ifStatement.false.forEach(e => this.evaluate(e, env));
     }
 
     return RuntimeHelper.createSkip();

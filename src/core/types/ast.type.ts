@@ -25,6 +25,7 @@ export interface IConditionNode extends IStatementNode {
   kind: NodeType.Condition;
   condition: IExpressionNode;
   true: Array<IStatementNode>;
+  false: Array<IStatementNode>;
 }
 
 export interface IVariableDeclarationNode extends IStatementNode {
