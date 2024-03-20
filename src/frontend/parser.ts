@@ -473,7 +473,7 @@ export class Parser extends Consumer<TToken> {
 
       node = {
         condition,
-        true: [],
+        true: trueBody,
         false: falseBody,
         end: condition.end,
         kind: NodeType.Condition,
