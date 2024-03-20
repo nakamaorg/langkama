@@ -21,13 +21,10 @@ describe('Functions', () => {
     `;
 
     compiler
-    .on(LangKamaEvent.Error, error => {
-      console.log(error.toString());
-    })
-    .on(LangKamaEvent.Success, result => {
-      expect(result.value).toBe(3);
-      done();
-    })
+      .on(LangKamaEvent.Success, result => {
+        expect(result.value).toBe(3);
+        done();
+      })
       .interpret(code);
   });
 });
