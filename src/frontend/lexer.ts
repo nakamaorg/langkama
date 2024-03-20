@@ -71,7 +71,7 @@ export class Lexer extends Consumer<string> {
       }
 
       identifier += this.eat();
-      identifier = identifier.split('').filter(e => (e === ' ' || CharHelper.isAlpha(e) || CharHelper.isNumber(e))).join('');
+      identifier = identifier.split('').filter(e => (e === ' ' || CharHelper.isAlpha(e) || CharHelper.isNumber(e)) || e === Char.ClosePren).join('');
     }
 
     key = keys.find(e => e === identifier) as string;
@@ -203,7 +203,7 @@ export class Lexer extends Consumer<string> {
         case Char.Equals:
         case Char.Greater:
         case Char.Ampersand:
-        case Char.Percentage:{
+        case Char.Percentage: {
           this.addToken(TokenType.BinaryOp, this.eat());
           break;
         }

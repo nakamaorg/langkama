@@ -110,7 +110,7 @@ export class Parser extends Consumer<TToken> {
    */
   private parseLoneExpression(): IExpressionNode {
     const operator = this.eat();
-    const expression = this.parseAdditiveExpression();
+    const expression = this.parseExpression();
 
     const node = {
       expression,
@@ -119,7 +119,6 @@ export class Parser extends Consumer<TToken> {
       operator: operator?.value,
       kind: NodeType.LoneExpression
     } as ILoneExpression;
-
     return node;
   }
 
