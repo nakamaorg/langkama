@@ -6,7 +6,7 @@ import { MissingEqualsError, MissingIdentifierError, MissingDotError, UnclosedPa
 
 import { TToken } from '../core/types/token.type';
 import { TOnErrorCallbackFn } from '../core/types/on-error-callback.type';
-import { IAssignmentNode, IBinaryExpression, ICallNode, IExpressionNode, IFunctionDeclarationNode, IIdentifierNode, ILoneExpression, INumberNode, IProgramNode, IReturnNode, ISkipNode, IStatementNode, IStringNode, IVariableDeclarationNode } from '../core/types/ast.type';
+import { IAssignmentNode, IBinaryExpression, ICallNode, IConditionNode, IExpressionNode, IFunctionDeclarationNode, IIdentifierNode, ILoneExpression, INumberNode, IProgramNode, IReturnNode, ISkipNode, IStatementNode, IStringNode, IVariableDeclarationNode } from '../core/types/ast.type';
 
 import { Consumer } from './consumer';
 
@@ -44,6 +44,30 @@ export class Parser extends Consumer<TToken> {
     switch (this.at().type) {
       case TokenType.Return: {
         return this.parseReturn();
+      }
+
+      case TokenType.If: {
+        const ifKeyword = this.eat();
+        const condition = this.parseExpression();
+
+        this.expect(TokenType.OpenBrace, new ExpectedOpenBraceError(this.at().location));
+        const body: Array<IStatementNode> = [];
+
+        while (this.at() && this.at().type !== TokenType.CloseBrace) {
+          body.push(this.parseStatement());
+        }
+
+        this.expect(TokenType.CloseBrace, new ExpectedCloseBraceError(this.at().location));
+
+        const node = {
+          condition,
+          true: body,
+          end: condition.end,
+          kind: NodeType.Condition,
+          start: ifKeyword?.location
+        } as IConditionNode;
+
+        return node;
       }
 
       case TokenType.Comment: {

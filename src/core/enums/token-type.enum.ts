@@ -1,4 +1,5 @@
 export enum TokenType {
+  If = 'If',
   EOF = 'EOF',
   Dot = 'Dot',
   Let = 'Let',

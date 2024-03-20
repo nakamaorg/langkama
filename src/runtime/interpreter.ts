@@ -2,7 +2,7 @@ import { Char } from '../core/enums/char.enum';
 import { NodeType } from '../core/enums/node-type.enum';
 
 import { IBooleanVal, IFunctionVal, INativeFunctionVal, INumberVal, IRuntimeVal, IStringVal } from '../core/types/runtime-values.type';
-import { IAssignmentNode, IBinaryExpression, ICallNode, IFunctionDeclarationNode, IIdentifierNode, ILoneExpression, INumberNode, IProgramNode, IReturnNode, IStatementNode, IStringNode, IVariableDeclarationNode } from '../core/types/ast.type';
+import { IAssignmentNode, IBinaryExpression, ICallNode, IConditionNode, IFunctionDeclarationNode, IIdentifierNode, ILoneExpression, INumberNode, IProgramNode, IReturnNode, IStatementNode, IStringNode, IVariableDeclarationNode } from '../core/types/ast.type';
 
 import { Environment } from './environment';
 import { RuntimeHelper } from '../core/helpers/runtime.helper';
@@ -69,6 +69,23 @@ export class Evaluator {
     } as IFunctionVal;
 
     return env.declareVariable(declaration.name, fn, true);
+  }
+
+  /**
+   * @description
+   * Evaluates a condition statement
+   *
+   * @param ifStatement The condition statement
+   * @param env The scope of the evaluation
+   */
+  private evaluateCondition(ifStatement: IConditionNode, env: Environment): IRuntimeVal {
+    const val = this.evaluate(ifStatement.condition, env) as IBooleanVal;
+
+    if (val.value) {
+      ifStatement.true.forEach(e => this.evaluate(e, env))
+    }
+
+    return RuntimeHelper.createSkip();
   }
 
   /**
@@ -339,6 +356,10 @@ export class Evaluator {
 
       case NodeType.FunctionDeclaration: {
         return this.evaluateFunctionDeclaration(node as IFunctionDeclarationNode, env);
+      }
+
+      case NodeType.Condition: {
+        return this.evaluateCondition(node as IConditionNode, env);
       }
 
       case NodeType.Skip: {

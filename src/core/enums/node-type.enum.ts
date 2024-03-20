@@ -5,6 +5,7 @@ export enum NodeType {
   Return = 'Return',
   String = 'String',
   Program = 'Program',
+  Condition = 'Condition',
   Identifier = 'Identifier',
   LoneExpression = 'LoneExpression',
   BinaryExpression = 'BinaryExpression',

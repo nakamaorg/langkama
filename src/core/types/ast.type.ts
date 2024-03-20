@@ -21,6 +21,12 @@ export interface IReturnNode extends IStatementNode {
   value: IExpressionNode;
 }
 
+export interface IConditionNode extends IStatementNode {
+  kind: NodeType.Condition;
+  condition: IExpressionNode;
+  true: Array<IStatementNode>;
+}
+
 export interface IVariableDeclarationNode extends IStatementNode {
   kind: NodeType.VariableDeclaration;
   constant: boolean;
