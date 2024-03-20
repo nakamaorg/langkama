@@ -28,6 +28,12 @@ export interface IConditionNode extends IStatementNode {
   false: Array<IStatementNode>;
 }
 
+export interface ILoopNode extends IStatementNode {
+  kind: NodeType.Loop;
+  condition: IExpressionNode;
+  body: Array<IStatementNode>;
+}
+
 export interface IVariableDeclarationNode extends IStatementNode {
   kind: NodeType.VariableDeclaration;
   constant: boolean;

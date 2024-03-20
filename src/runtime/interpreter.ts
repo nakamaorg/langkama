@@ -2,7 +2,7 @@ import { Char } from '../core/enums/char.enum';
 import { NodeType } from '../core/enums/node-type.enum';
 
 import { IBooleanVal, IFunctionVal, INativeFunctionVal, INumberVal, IRuntimeVal, IStringVal } from '../core/types/runtime-values.type';
-import { IAssignmentNode, IBinaryExpression, ICallNode, IConditionNode, IFunctionDeclarationNode, IIdentifierNode, ILoneExpression, INumberNode, IProgramNode, IReturnNode, IStatementNode, IStringNode, IVariableDeclarationNode } from '../core/types/ast.type';
+import { IAssignmentNode, IBinaryExpression, ICallNode, IConditionNode, IFunctionDeclarationNode, IIdentifierNode, ILoneExpression, ILoopNode, INumberNode, IProgramNode, IReturnNode, IStatementNode, IStringNode, IVariableDeclarationNode } from '../core/types/ast.type';
 
 import { Environment } from './environment';
 import { RuntimeHelper } from '../core/helpers/runtime.helper';
@@ -85,6 +85,21 @@ export class Evaluator {
       ifStatement.true.forEach(e => this.evaluate(e, env));
     } else {
       ifStatement.false.forEach(e => this.evaluate(e, env));
+    }
+
+    return RuntimeHelper.createSkip();
+  }
+
+  /**
+   * @description
+   * Evaluates a loop statement
+   *
+   * @param loopStatement The loop statement
+   * @param env The scope of the evaluation
+   */
+  private evaluateLoop(loopStatement: ILoopNode, env: Environment): IRuntimeVal {
+    while (!(this.evaluate(loopStatement.condition, env) as IBooleanVal).value) {
+      loopStatement.body.forEach(e => this.evaluate(e, env));
     }
 
     return RuntimeHelper.createSkip();
@@ -362,6 +377,10 @@ export class Evaluator {
 
       case NodeType.Condition: {
         return this.evaluateCondition(node as IConditionNode, env);
+      }
+
+      case NodeType.Loop: {
+        return this.evaluateLoop(node as ILoopNode, env);
       }
 
       case NodeType.Skip: {

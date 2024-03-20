@@ -6,7 +6,7 @@ import { MissingEqualsError, MissingIdentifierError, MissingDotError, UnclosedPa
 
 import { TToken } from '../core/types/token.type';
 import { TOnErrorCallbackFn } from '../core/types/on-error-callback.type';
-import { IAssignmentNode, IBinaryExpression, ICallNode, IConditionNode, IExpressionNode, IFunctionDeclarationNode, IIdentifierNode, ILoneExpression, INumberNode, IProgramNode, IReturnNode, ISkipNode, IStatementNode, IStringNode, IVariableDeclarationNode } from '../core/types/ast.type';
+import { IAssignmentNode, IBinaryExpression, ICallNode, IConditionNode, IExpressionNode, IFunctionDeclarationNode, IIdentifierNode, ILoneExpression, ILoopNode, INumberNode, IProgramNode, IReturnNode, ISkipNode, IStatementNode, IStringNode, IVariableDeclarationNode } from '../core/types/ast.type';
 
 import { Consumer } from './consumer';
 
@@ -48,6 +48,10 @@ export class Parser extends Consumer<TToken> {
 
       case TokenType.If: {
         return this.parseCondition();
+      }
+
+      case TokenType.While: {
+        return this.parseLoop();
       }
 
       case TokenType.Comment: {
@@ -482,6 +486,32 @@ export class Parser extends Consumer<TToken> {
     }
 
     return node;
+  }
+
+  /**
+   * @description
+   * Parses a while loop
+   */
+  private parseLoop(): IStatementNode {
+    const whileKeyword = this.eat();
+    const condition = this.parseExpression();
+
+    this.expect(TokenType.OpenBrace, new ExpectedOpenBraceError(this.at().location));
+    const body: Array<IStatementNode> = [];
+
+    while (this.at() && this.at().type !== TokenType.CloseBrace) {
+      body.push(this.parseStatement());
+    }
+
+    this.expect(TokenType.CloseBrace, new ExpectedCloseBraceError(this.at().location));
+
+    return {
+      body,
+      condition,
+      end: condition.end,
+      kind: NodeType.Loop,
+      start: whileKeyword?.location
+    } as ILoopNode;
   }
 
   /**
