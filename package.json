@@ -23,9 +23,11 @@
     "start": "node ./bin/langkama.js",
     "prod": "pnpm build && pnpm test"
   },
+  "dependencies": {
+    "chalk": "^5.3.0"
+  },
   "devDependencies": {
     "@types/node": "^20.11.25",
-    "chalk": "^5.3.0",
     "jest": "^29.7.0",
     "typescript": "^5.2.2",
     "vite": "^5.1.4",
