@@ -2,7 +2,7 @@
   "private": true,
   "type": "module",
   "name": "langkama",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "license": "Apache-2.0",
   "packageManager": "pnpm@8.13.1",
   "description": "Retard complete programming language.",
