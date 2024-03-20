@@ -98,7 +98,6 @@ export class Parser extends Consumer<TToken> {
     if (this.at().type === TokenType.Equals) {
       this.eat();
       const right = this.parseAssignmentExpression();
-      this.expect(TokenType.Semicolon, new MissingDotError(this.at().location));
 
       return {
         value: right,
