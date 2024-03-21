@@ -1,0 +1,7 @@
+a sa7 hear me out x is 3;
+a sa7 hear me out arr[] is [1, x - 1, x * x];
+
+arr[1] is 0;
+
+loncina(x);
+loncina(arr);
