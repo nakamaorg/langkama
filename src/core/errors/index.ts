@@ -21,6 +21,7 @@ export * from './unrecognized-token.error';
 export * from './expected-open-brace.error';
 export * from './expected-open-paren.error';
 export * from './expected-identifier.error';
+export * from './expected-close-brack.error';
 export * from './expected-close-brace.error';
 export * from './variable-not-defined.error';
 export * from './unclosed-parenthesis.error';

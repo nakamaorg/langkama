@@ -21,6 +21,7 @@ export enum Errno {
   MissingIdentifierError,
   UnrecognizedTokenError,
   ExpectedOpenBraceError,
+  ExpectedCloseBrackError,
   ExpectedIdentifierError,
   ExpectedCloseBraceError,
   VariableNotDefinedError,
