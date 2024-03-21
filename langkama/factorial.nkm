@@ -10,4 +10,7 @@ let me cook factorial(n) {
   reda val;
 }
 
-loncina(factorial(5)); bs Outputs: 120
+a sa7 hear me out result is factorial(5);
+loncina("5! =", result); bs Outputs: 120
+
+reda result;

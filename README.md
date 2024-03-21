@@ -102,13 +102,14 @@ const compiler = new LangKama();
 
 compiler
   .on(LangKamaEvent.Success, result => {
-    console.log('LangKama script compiled!');
+    console.info('LangKama script interpreted!');
     console.log({ result });
   })
   .on(LangKamaEvent.Error, error => { console.error(error) })
-  .on(LangKamaEvent.Lexer, () => console.log(`Tokenizing...`))
-  .on(LangKamaEvent.Parser, tokens => console.log(`Parsing...`))
-  .on(LangKamaEvent.Interpreter, () => console.log(`Interpreting...`))
+  .on(LangKamaEvent.Stdout, stdout => { console.info(stdout) })
+  .on(LangKamaEvent.Lexer, () => console.info(`Tokenizing...`))
+  .on(LangKamaEvent.Parser, tokens => console.info(`Parsing...`))
+  .on(LangKamaEvent.Interpreter, () => console.info(`Interpreting...`))
   .interpret(code);
 ```
 
