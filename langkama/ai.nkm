@@ -12,15 +12,3 @@ big if true (show) {
 } sike {
   loncina("calculated!");
 }
-
-let me cook test() {
-  big if true (W) {
-   reda 1;
-  } sike {
-    reda 2;
-  }
-
-  loncina("should NOT execute");
-}
-
-bs reda test(); Script output should be 1

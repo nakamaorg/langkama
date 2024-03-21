@@ -96,6 +96,31 @@ describe('Conditions', () => {
       })
       .interpret(code);
   });
+ 
+  test('If else statement 3', done => {
+    const code = `
+        a sa7 hear me out age is 21;
+        a sa7 hear me out entryAge is 18;
+        hear me out value is L;
+  
+        big if true (age = entryAge) {
+          value is 50;
+        } jk (age > entryAge) {
+          value is 100;
+        } sike {
+          value is 0;
+        }
+        
+        reda value;
+      `;
+
+    compiler
+      .on(LangKamaEvent.Success, result => {
+        expect(result.value).toBe(100);
+        done();
+      })
+      .interpret(code);
+  });
 });
 
 describe('Condition errors', () => {
