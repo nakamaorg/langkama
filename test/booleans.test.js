@@ -104,11 +104,7 @@ describe('Booleans', () => {
     `;
 
     compiler
-      .on(LangKamaEvent.Error, err => {
-        console.log(err.toString());
-      })
       .on(LangKamaEvent.Success, result => {
-        console.log({ result });
         expect(result.value).toBe(true);
         done();
       })
