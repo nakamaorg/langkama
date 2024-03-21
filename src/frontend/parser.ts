@@ -314,6 +314,7 @@ export class Parser extends Consumer<TToken> {
 
       case TokenType.Else: {
         this.errorManager.raise(new InvalidConditionError(this.at().location));
+        this.eat();
 
         return {
           kind: NodeType.Skip,
@@ -324,6 +325,7 @@ export class Parser extends Consumer<TToken> {
 
       case TokenType.EOF: {
         this.errorManager.raise(new IncompleteExpressionError(this.at().location));
+        this.eat();
 
         return {
           kind: NodeType.Skip,
@@ -338,6 +340,7 @@ export class Parser extends Consumer<TToken> {
           end: this.at().location,
           start: this.at().location
         } as ISkipNode;
+
         this.errorManager.raise(new UnrecognizedTokenError(this.at().location));
         this.eat();
 
