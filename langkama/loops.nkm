@@ -1,6 +1,29 @@
 hear me out i is 0;
 
+loncina("Iterations from 0 to 9:");
 cook until (i > (10 - 1)) {
   loncina("iteration " + bait(i));
   i is i + 1;
 }
+loncina("-----------------------");
+
+hear me out numsFound is 0;
+a sa7 hear me out minNum is 0;
+a sa7 hear me out maxNum is 100;
+a sa7 hear me out evenNums is 5;
+i is minNum;
+
+loncina("The first", evenNums, "even numbers from ", minNum, "to ", bait(maxNum) + ":");
+cook until (i > maxNum) {
+  big if true (numsFound = evenNums) {
+    i is maxNum + 1;
+  }
+
+  big if true ((i % 2) = 0) {
+    loncina(i);
+    numsFound is numsFound + 1;
+  }
+
+  i is i + 1;
+}
+loncina("-----------------------");
