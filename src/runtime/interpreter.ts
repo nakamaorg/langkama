@@ -6,7 +6,7 @@ import { IAssignmentNode, IBinaryExpression, ICallNode, IConditionNode, IFunctio
 
 import { Environment } from './environment';
 import { RuntimeHelper } from '../core/helpers/runtime.helper';
-import { InvalidAssignmentError, InvalidFunctionError, InvalidOperationError, Type, UnmatchingTypesError, UnrecognizedStatementError } from '..';
+import { InvalidAssignmentError, InvalidFunctionError, InvalidOperationError, TOnStdOutCallbackFn, Type, UnmatchingTypesError, UnrecognizedStatementError } from '..';
 
 
 
@@ -15,6 +15,12 @@ import { InvalidAssignmentError, InvalidFunctionError, InvalidOperationError, Ty
  * Evaluates an AST tree
  */
 export class Evaluator {
+
+  /**
+ * @description
+ * The stdout callback function
+ */
+  private onStdoutEventHandler: TOnStdOutCallbackFn;
 
   /**
    * @description
@@ -328,12 +334,24 @@ export class Evaluator {
 
   /**
    * @description
+   * Creates an evaluator instance
+   *
+   * @param onStdoutEventHandler The stdout event handler function
+   */
+  constructor(onStdoutEventHandler?: TOnStdOutCallbackFn) {
+    this.onStdoutEventHandler = onStdoutEventHandler ?? (() => { });
+  }
+
+  /**
+   * @description
    * Evaluates an AST tree
    *
    * @param node The root of the AST tree
    * @param env The scope to attach to the tree
    */
   public evaluate(node: IStatementNode, env: Environment): IRuntimeVal {
+    env.setStdoutCallback(this.onStdoutEventHandler);
+
     switch (node.kind) {
       case NodeType.Number: {
         return RuntimeHelper.createNumber((node as INumberNode).value);

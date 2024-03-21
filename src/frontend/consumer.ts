@@ -23,14 +23,12 @@ export class Consumer<T> {
    * @description
    * Content to traverse 
   */
-  // @ts-ignore
   protected content!: Array<T>;
 
   /**
    * @description
    * The index where the traversal is currently on 
    */
-  // @ts-ignore
   protected index!: number;
 
   /**

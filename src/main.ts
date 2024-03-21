@@ -2,12 +2,12 @@ import { Lexer } from './frontend/lexer';
 import { Parser } from './frontend/parser';
 import { Environment } from './runtime/environment';
 
-import { Evaluator, IRuntimeVal, LangKamaError } from '.';
 import { LangKamaEvent } from './core/enums/langkama-event.enum';
 
 import { TToken } from './core/types/token.type';
 import { IProgramNode } from './core/types/ast.type';
 import { TOnErrorCallbackFn } from './core/types/on-error-callback.type';
+import { Evaluator, IRuntimeVal, LangKamaError, TOnStdOutCallbackFn } from '.';
 
 import { ErrorManager } from './core/managers/error.manager';
 
@@ -18,6 +18,12 @@ import { ErrorManager } from './core/managers/error.manager';
  * The entry point to the compiler
  */
 export class LangKama {
+
+  /**
+   * @description
+   * The stdout callback function
+   */
+  private onOutEventHandler: TOnStdOutCallbackFn;
 
   /**
    * @description
@@ -54,6 +60,7 @@ export class LangKama {
    * Instantiates a compiler instance for LangKama
    */
   constructor() {
+    this.onOutEventHandler = () => { };
     this.onErrorEventListener = () => { };
     this.onLexerEventListener = () => { };
     this.onParserEventListener = () => { };
@@ -72,7 +79,7 @@ export class LangKama {
     const errorManager = new ErrorManager(this.onErrorEventListener, code);
 
     try {
-      const evaluator = new Evaluator();
+      const evaluator = new Evaluator(this.onOutEventHandler);
       const lexer = new Lexer(errorManager.raise.bind(errorManager));
       const parser = new Parser(errorManager.raise.bind(errorManager));
       const env = environment ?? new Environment(null, errorManager.raise.bind(errorManager));
@@ -107,6 +114,11 @@ export class LangKama {
     switch (event) {
       case LangKamaEvent.Error: {
         this.onErrorEventListener = eventListener;
+        break;
+      }
+
+      case LangKamaEvent.Stdout: {
+        this.onOutEventHandler = eventListener;
         break;
       }
 

@@ -1,4 +1,4 @@
-import { ConstantReassignmentError, VariableDefinedError, VariableNotDefinedError } from '..';
+import { ConstantReassignmentError, TOnStdOutCallbackFn, VariableDefinedError, VariableNotDefinedError } from '..';
 
 import { ErrorManager } from '../core/managers/error.manager';
 import { RuntimeHelper } from '../core/helpers/runtime.helper';
@@ -35,6 +35,12 @@ export class Environment {
   private variables: Map<string, TVariable>;
 
   /**
+ * @description
+ * The stdout callback function
+ */
+  private onStdoutEventHandler!: TOnStdOutCallbackFn;
+
+  /**
    * @description
    * Initializes the global scope
    */
@@ -45,7 +51,7 @@ export class Environment {
 
     this.declareVariable('loncina', RuntimeHelper.createFunction(args => {
       const values = args.filter(e => 'value' in e).map(e => (e as IStringVal).value);
-      console.log(...values);
+      this.onStdoutEventHandler(values.join(' '));
 
       return RuntimeHelper.createNull();
     }), true);
@@ -74,6 +80,16 @@ export class Environment {
     if (!parent) {
       this.setupScope();
     }
+  }
+
+  /**
+   * @description
+   * Sets the callback function for the stdout stream
+   *
+   * @param onStdout The stdout callback function
+   */
+  public setStdoutCallback(onStdout: TOnStdOutCallbackFn): void {
+    this.onStdoutEventHandler = onStdout;
   }
 
   /**
