@@ -8,6 +8,9 @@
   "keywords": [
     "programming-language"
   ],
+  "bin": {
+    "@nakamaorg/langkama": "./bin/langkama.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/nakamaorg/langkama.git"

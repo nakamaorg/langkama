@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import { fileURLToPath } from 'url';
 import { createInterface } from 'node:readline';
 import { extname, resolve, basename } from 'path';
