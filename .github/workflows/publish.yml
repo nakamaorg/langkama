@@ -28,6 +28,6 @@ jobs:
         corepack enable
     
     - name: Publishing Package
-      run: pnpm publish
+      run: pnpm publish --publish-branch build
       env:
         NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
