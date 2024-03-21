@@ -1,11 +1,11 @@
-import { ConstantReassignmentError, TOnStdOutCallbackFn, VariableDefinedError, VariableNotDefinedError } from '..';
+import { ConstantReassignmentError, TOnStdOutCallbackFn, Type, VariableDefinedError, VariableNotDefinedError } from '..';
 
 import { ErrorManager } from '../core/managers/error.manager';
 import { RuntimeHelper } from '../core/helpers/runtime.helper';
 
 import { TNullable } from '../core/types/nullable.type';
 import { TVariable } from '../core/types/variable.type';
-import { IRuntimeVal, IStringVal } from '../core/types/runtime-values.type';
+import { IArrayVal, IRuntimeVal, IStringVal } from '../core/types/runtime-values.type';
 import { TOnErrorCallbackFn } from '../core/types/on-error-callback.type';
 
 
@@ -50,7 +50,16 @@ export class Environment {
     this.declareVariable('L', RuntimeHelper.createBoolean(false), true);
 
     this.declareVariable('loncina', RuntimeHelper.createFunction(args => {
-      const values = args.filter(e => 'value' in e).map(e => (e as IStringVal).value);
+      const values = args
+        .filter(e => 'value' in e)
+        .map(e => {
+          if (e.type === Type.Array) {
+            return JSON.stringify((e as IArrayVal).value);
+          } else {
+            return (e as IStringVal).value;
+          }
+        });
+
       this.onStdoutEventHandler(values.join(' '));
 
       return RuntimeHelper.createNull();
