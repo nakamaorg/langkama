@@ -51,9 +51,11 @@ export class Evaluator {
    * @param env The scope of the evaluation
    */
   private evaluateVariableDeclaration(declaration: IVariableDeclarationNode, env: Environment): IRuntimeVal {
-    const value = declaration.value
+    let value = declaration.value
       ? this.evaluate(declaration.value, env)
-      : RuntimeHelper.createNull();
+      : declaration.array
+        ? RuntimeHelper.createArray([])
+        : RuntimeHelper.createNull();
 
     return env.declareVariable(declaration.identifier, value, declaration.constant);
   }
@@ -361,7 +363,6 @@ export class Evaluator {
         const index = (this.evaluate(indexingNode.index, env) as INumberVal).value;
         newArray[index] = (this.evaluate(node.value, env) as INumberVal).value;
         const updatedArray = RuntimeHelper.createArray(newArray);
-
         return env.assignVariable(name, updatedArray);
       }
 
