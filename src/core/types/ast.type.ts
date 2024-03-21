@@ -38,10 +38,11 @@ export interface ILoopNode extends IStatementNode {
 }
 
 export interface IVariableDeclarationNode extends IStatementNode {
-  kind: NodeType.VariableDeclaration;
+  array: boolean;
   constant: boolean;
   identifier: string;
   value?: IExpressionNode;
+  kind: NodeType.VariableDeclaration;
 }
 
 export interface IFunctionDeclarationNode extends IStatementNode {
@@ -85,6 +86,11 @@ export interface INumberNode extends IExpressionNode {
 export interface IStringNode extends IExpressionNode {
   kind: NodeType.String;
   value: string;
+}
+
+export interface IArrayNode extends IExpressionNode {
+  kind: NodeType.Array;
+  items: Array<IExpressionNode>;
 }
 
 export interface ICallNode extends IExpressionNode {

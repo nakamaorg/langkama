@@ -2,11 +2,11 @@ import { Char } from '../core/enums/char.enum';
 import { NodeType } from '../core/enums/node-type.enum';
 import { TokenType } from '../core/enums/token-type.enum';
 
-import { MissingEqualsError, MissingIdentifierError, MissingDotError, UnclosedParenthesisError, UninitializedConstantError, UnrecognizedTokenError, IncompleteExpressionError, ExpectedOpenParenError, ExpectedFunctionNameError, ExpectedIdentifierError, ExpectedOpenBraceError, ExpectedCloseBraceError, InvalidConditionError } from '../core';
+import { MissingEqualsError, MissingIdentifierError, MissingDotError, UnclosedParenthesisError, UninitializedConstantError, UnrecognizedTokenError, IncompleteExpressionError, ExpectedOpenParenError, ExpectedFunctionNameError, ExpectedIdentifierError, ExpectedOpenBraceError, ExpectedCloseBraceError, InvalidConditionError, ExpectedCloseBrackError } from '../core';
 
 import { TToken } from '../core/types/token.type';
 import { TOnErrorCallbackFn } from '../core/types/on-error-callback.type';
-import { IAssignmentNode, IBinaryExpression, ICallNode, IConditionBlockNode, IConditionNode, IExpressionNode, IFunctionDeclarationNode, IIdentifierNode, ILoneExpression, ILoopNode, INumberNode, IProgramNode, IReturnNode, ISkipNode, IStatementNode, IStringNode, IVariableDeclarationNode } from '../core/types/ast.type';
+import { IArrayNode, IAssignmentNode, IBinaryExpression, ICallNode, IConditionBlockNode, IConditionNode, IExpressionNode, IFunctionDeclarationNode, IIdentifierNode, ILoneExpression, ILoopNode, INumberNode, IProgramNode, IReturnNode, ISkipNode, IStatementNode, IStringNode, IVariableDeclarationNode } from '../core/types/ast.type';
 
 import { Consumer } from './consumer';
 
@@ -126,6 +126,33 @@ export class Parser extends Consumer<TToken> {
       operator: operator?.value,
       kind: NodeType.LoneExpression
     } as ILoneExpression;
+    return node;
+  }
+
+  /**
+   * @description
+   * Parses array expressions
+   */
+  private parseArray(): IExpressionNode {
+    const openBracket = this.eat();
+    const items: Array<IExpressionNode> = [];
+
+    while (this.at() && this.at().type !== TokenType.CloseBrack) {
+      items.push(this.parseExpression());
+
+      if (this.at().type === TokenType.Comma) {
+        this.eat();
+      }
+    }
+
+    const closeBracket = this.expect(TokenType.CloseBrack, new ExpectedCloseBrackError(this.at().location));
+
+    const node = {
+      items,
+      kind: NodeType.Array,
+      end: closeBracket.location,
+      start: openBracket?.location,
+    } as IArrayNode;
     return node;
   }
 
@@ -300,6 +327,10 @@ export class Parser extends Consumer<TToken> {
         return node;
       }
 
+      case TokenType.OpenBrack: {
+        return this.parseArray();
+      }
+
       case TokenType.OpenParen: {
         this.eat();
         const value = this.parseExpression();
@@ -355,9 +386,17 @@ export class Parser extends Consumer<TToken> {
    * Parses a variable declaration
    */
   private parseVariableDeclaration(): IExpressionNode {
+    let isArray = false;
     const constToken = this.eat() as TToken;
     const isConstant = constToken.type === TokenType.Const;
     const token = this.expect<TokenType>(TokenType.Identifier, new MissingIdentifierError(this.at().location));
+
+    if (this.at().type === TokenType.OpenBrack) {
+      this.eat();
+      this.expect<TokenType>(TokenType.CloseBrack, new ExpectedCloseBrackError(this.at().location));
+
+      isArray = true;
+    }
 
     if (this.at().type === TokenType.Semicolon) {
       const dotToken = this.eat() as TToken;
@@ -373,6 +412,7 @@ export class Parser extends Consumer<TToken> {
       }
 
       return {
+        array: isArray,
         constant: false,
         end: dotToken.location,
         identifier: token.value,
@@ -385,6 +425,7 @@ export class Parser extends Consumer<TToken> {
 
     const valueExpression = this.parseExpression();
     const declaration = {
+      array: isArray,
       constant: isConstant,
       value: valueExpression,
       identifier: token.value,
