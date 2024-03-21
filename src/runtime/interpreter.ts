@@ -2,7 +2,7 @@ import { Char } from '../core/enums/char.enum';
 import { NodeType } from '../core/enums/node-type.enum';
 
 import { IBooleanVal, IFunctionVal, INativeFunctionVal, INumberVal, IRuntimeVal, IStringVal } from '../core/types/runtime-values.type';
-import { IAssignmentNode, IBinaryExpression, ICallNode, IConditionBlockNode, IFunctionDeclarationNode, IIdentifierNode, ILoneExpression, ILoopNode, INumberNode, IProgramNode, IReturnNode, IStatementNode, IStringNode, IVariableDeclarationNode } from '../core/types/ast.type';
+import { IArrayNode, IAssignmentNode, IBinaryExpression, ICallNode, IConditionBlockNode, IFunctionDeclarationNode, IIdentifierNode, ILoneExpression, ILoopNode, INumberNode, IProgramNode, IReturnNode, IStatementNode, IStringNode, IVariableDeclarationNode } from '../core/types/ast.type';
 
 import { Environment } from './environment';
 import { RuntimeHelper } from '../core/helpers/runtime.helper';
@@ -253,6 +253,18 @@ export class Evaluator {
 
   /**
    * @description
+   * Evaluates an array
+   *
+   * @param array The array to evaluate
+   * @param env The scope of the evaluation
+   */
+  private evaluateArray(array: IArrayNode, env: Environment): IRuntimeVal {
+    const items: Array<any> = array.items.map(e => (this.evaluate(e, env) as INumberVal).value);
+    return RuntimeHelper.createArray(items);
+  }
+
+  /**
+   * @description
    * Evaluates an identifier
    *
    * @param identifier The identifier to evaluate
@@ -365,6 +377,10 @@ export class Evaluator {
 
       case NodeType.String: {
         return RuntimeHelper.createString((node as IStringNode).value);
+      }
+
+      case NodeType.Array: {
+        return this.evaluateArray(node as IArrayNode, env);
       }
 
       case NodeType.Identifier: {

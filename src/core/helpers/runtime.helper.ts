@@ -1,6 +1,6 @@
 import { TPrimitive } from '../types/primitive.type';
 import { TFunctionCall } from '../types/function.type';
-import { INativeFunctionVal, IRuntimeVal } from '../types/runtime-values.type';
+import { IArrayVal, INativeFunctionVal, IRuntimeVal } from '../types/runtime-values.type';
 import { IBooleanVal, INullVal, INumberVal, IStringVal, ISkipVal, Type } from '..';
 
 
@@ -82,6 +82,16 @@ export class RuntimeHelper {
    */
   public static createBoolean(boolean: boolean): IBooleanVal {
     return { type: Type.Boolean, value: boolean };
+  }
+
+  /**
+   * @description
+   * Creates an array value
+   *
+   * @param items The elements of the array
+   */
+  public static createArray(items: Array<any>): IArrayVal {
+    return { type: Type.Array, value: Array.from(items) };
   }
 
   /**

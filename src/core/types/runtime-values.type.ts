@@ -32,6 +32,11 @@ export interface IBooleanVal extends IRuntimeVal {
   value: boolean;
 }
 
+export interface IArrayVal extends IRuntimeVal {
+  type: Type.Array;
+  value: Array<any>;
+}
+
 export interface INativeFunctionVal extends IRuntimeVal {
   type: Type.NativeFunction;
   call: TFunctionCall;
