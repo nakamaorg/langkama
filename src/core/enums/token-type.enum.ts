@@ -19,6 +19,8 @@ export enum TokenType {
   Semicolon = 'Semicolon',
   OpenParen = 'OpenParen',
   OpenBrace = 'OpenBrace',
+  OpenBrack = 'OpenBrack',
+  CloseBrack = 'CloseBrack',
   CloseBrace = 'CloseBrace',
   CloseParen = 'CloseParen',
   Identifier = 'Identifier'

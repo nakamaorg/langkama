@@ -179,6 +179,16 @@ export class Lexer extends Consumer<string> {
           this.addToken(TokenType.CloseBrace, this.eat());
           break;
         }
+       
+        case Char.OpenBrack: {
+          this.addToken(TokenType.OpenBrack, this.eat());
+          break;
+        }
+
+        case Char.CloseBrack: {
+          this.addToken(TokenType.CloseBrack, this.eat());
+          break;
+        }
 
         case Char.DoubleQuotes: {
           let string: string = '';

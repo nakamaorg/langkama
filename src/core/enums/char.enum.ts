@@ -4,7 +4,9 @@ export enum Char {
   OpenPren = '(',
   ClosePren = ')',
   OpenBrace = '{',
+  OpenBrack = '[',
   CloseBrace = '}',
+  CloseBrack = ']',
   DoubleQuotes = '"',
 
   // Operators
