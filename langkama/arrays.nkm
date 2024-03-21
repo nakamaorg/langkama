@@ -1,7 +1,16 @@
-a sa7 hear me out x is 3;
-a sa7 hear me out arr[] is [1, x - 1, x * x];
+hear me out i is 0;
+bs hear me out arr[] is [];
+a sa7 hear me out x is 2;
 
-arr[1] is 0;
-
-loncina(x);
+hear me out arr[];
 loncina(arr);
+
+cook until (i = 100) {
+  big if true ((i % x) = 0) {
+    push("arr", i);
+  }
+
+  i is i + 1;
+}
+
+reda length(arr)

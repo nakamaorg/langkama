@@ -11,6 +11,12 @@ import { IBooleanVal, INullVal, INumberVal, IStringVal, ISkipVal, Type } from '.
  */
 export class RuntimeHelper {
 
+  /**
+   * @description
+   * Creates a runtime value given the primitive type of the input
+   *
+   * @param value The value to create the runtime value for
+   */
   public static createValue(value: TPrimitive): IRuntimeVal {
     let type: Type;
 

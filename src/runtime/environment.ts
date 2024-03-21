@@ -5,7 +5,7 @@ import { RuntimeHelper } from '../core/helpers/runtime.helper';
 
 import { TNullable } from '../core/types/nullable.type';
 import { TVariable } from '../core/types/variable.type';
-import { IArrayVal, IRuntimeVal, IStringVal } from '../core/types/runtime-values.type';
+import { IArrayVal, INumberVal, IRuntimeVal, IStringVal } from '../core/types/runtime-values.type';
 import { TOnErrorCallbackFn } from '../core/types/on-error-callback.type';
 
 
@@ -68,6 +68,56 @@ export class Environment {
     this.declareVariable('bait', RuntimeHelper.createFunction(args => {
       const value = (args[0] as IStringVal).value ?? 'bruh';
       return RuntimeHelper.createString(value.toString());
+    }), true);
+
+    this.declareVariable('length', RuntimeHelper.createFunction(args => {
+      const [arr] = args;
+
+      if (arr.type !== Type.Array) {
+        throw 'needs to be an array';
+      }
+
+      return RuntimeHelper.createNumber((arr as IArrayVal).value.length);
+    }), true);
+
+    this.declareVariable('push', RuntimeHelper.createFunction(args => {
+      const [arrName, value] = args;
+
+      if (arrName.type !== Type.String) {
+        throw 'needs to ne a string';
+      }
+
+      const arrayVal = this.getValue((arrName as IStringVal).value).value as IArrayVal;
+
+      if (arrayVal.type !== Type.Array) {
+        throw 'needs to be an array';
+      }
+
+      const newArray = [...arrayVal.value];
+      newArray.push((value as INumberVal).value);
+      this.assignVariable((arrName as IStringVal).value, RuntimeHelper.createArray(newArray));
+
+      return RuntimeHelper.createNumber(newArray.length);
+    }), true);
+
+    this.declareVariable('pop', RuntimeHelper.createFunction(args => {
+      const [arrName] = args;
+
+      if (arrName.type !== Type.String) {
+        throw 'needs to ne a string';
+      }
+
+      const arrayVal = this.getValue((arrName as IStringVal).value).value as IArrayVal;
+
+      if (arrayVal.type !== Type.Array) {
+        throw 'needs to be an array';
+      }
+
+      const newArray = [...arrayVal.value];
+      const removedValue = newArray.pop();
+      this.assignVariable((arrName as IStringVal).value, RuntimeHelper.createArray(newArray));
+
+      return RuntimeHelper.createNumber(removedValue);
     }), true);
   }
 

@@ -93,6 +93,12 @@ export interface IArrayNode extends IExpressionNode {
   items: Array<IExpressionNode>;
 }
 
+export interface IIndexingNode extends IExpressionNode {
+  index: IExpressionNode;
+  kind: NodeType.Indexing;
+  identifier: IExpressionNode;
+}
+
 export interface ICallNode extends IExpressionNode {
   kind: NodeType.Call;
   caller: IExpressionNode;

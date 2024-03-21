@@ -1,8 +1,8 @@
 import { Char } from '../core/enums/char.enum';
 import { NodeType } from '../core/enums/node-type.enum';
 
-import { IBooleanVal, IFunctionVal, INativeFunctionVal, INumberVal, IRuntimeVal, IStringVal } from '../core/types/runtime-values.type';
-import { IArrayNode, IAssignmentNode, IBinaryExpression, ICallNode, IConditionBlockNode, IFunctionDeclarationNode, IIdentifierNode, ILoneExpression, ILoopNode, INumberNode, IProgramNode, IReturnNode, IStatementNode, IStringNode, IVariableDeclarationNode } from '../core/types/ast.type';
+import { IArrayVal, IBooleanVal, IFunctionVal, INativeFunctionVal, INumberVal, IRuntimeVal, IStringVal } from '../core/types/runtime-values.type';
+import { IArrayNode, IAssignmentNode, IBinaryExpression, ICallNode, IConditionBlockNode, IFunctionDeclarationNode, IIdentifierNode, IIndexingNode, ILoneExpression, ILoopNode, INumberNode, IProgramNode, IReturnNode, IStatementNode, IStringNode, IVariableDeclarationNode } from '../core/types/ast.type';
 
 import { Environment } from './environment';
 import { RuntimeHelper } from '../core/helpers/runtime.helper';
@@ -277,6 +277,21 @@ export class Evaluator {
 
   /**
    * @description
+   * Evaluates an indexable
+   *
+   * @param array The indexable to evaluate
+   * @param env The scope of the evaluation
+   */
+  private evaluateIndexing(array: IIndexingNode, env: Environment): IRuntimeVal {
+    const index = this.evaluate(array.index, env) as INumberVal;
+    const identifier = this.evaluate(array.identifier, env) as IArrayVal;
+    const arr = (identifier as IArrayVal).value;
+
+    return RuntimeHelper.createValue(arr[index.value]);
+  }
+
+  /**
+   * @description
    * Evaluates a function
    *
    * @param call The function to evaluate
@@ -329,13 +344,32 @@ export class Evaluator {
    * @param env The scope of the evaluation
    */
   private evaluateAssignment(node: IAssignmentNode, env: Environment): IRuntimeVal {
-    if (node.assigne.kind !== NodeType.Identifier) {
-      env.errorManager?.raise(new InvalidAssignmentError(node.start));
-      return RuntimeHelper.createNull();
-    }
+    switch (node.assigne.kind) {
+      case NodeType.Identifier: {
+        const name = (node.assigne as IIdentifierNode).symbol;
+        return env.assignVariable(name, this.evaluate(node.value, env));
+      }
 
-    const name = (node.assigne as IIdentifierNode).symbol;
-    return env.assignVariable(name, this.evaluate(node.value, env));
+      case NodeType.Indexing: {
+        const indexingNode = node.assigne as IIndexingNode;
+        const indexingidentifier = indexingNode.identifier as IIdentifierNode;
+
+        const name = indexingidentifier.symbol;
+        const array = env.getValue(name).value as IArrayVal;
+        const newArray = [...array.value];
+
+        const index = (this.evaluate(indexingNode.index, env) as INumberVal).value;
+        newArray[index] = (this.evaluate(node.value, env) as INumberVal).value;
+        const updatedArray = RuntimeHelper.createArray(newArray);
+
+        return env.assignVariable(name, updatedArray);
+      }
+
+      default: {
+        env.errorManager?.raise(new InvalidAssignmentError(node.start));
+        return RuntimeHelper.createNull();
+      }
+    }
   }
 
   /**
@@ -346,8 +380,7 @@ export class Evaluator {
    * @param env The scope of evaluation
    */
   private evaluateReturn(node: IReturnNode, env: Environment): IRuntimeVal {
-    const val = this.evaluate(node.value, env) as IStringVal;
-    return RuntimeHelper.createValue(val.value);
+    return this.evaluate(node.value, env);
   }
 
   /**
@@ -385,6 +418,10 @@ export class Evaluator {
 
       case NodeType.Identifier: {
         return this.evaluateIdentifier(node as IIdentifierNode, env);
+      }
+
+      case NodeType.Indexing: {
+        return this.evaluateIndexing(node as IIndexingNode, env);
       }
 
       case NodeType.Call: {

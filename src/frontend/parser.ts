@@ -6,7 +6,7 @@ import { MissingEqualsError, MissingIdentifierError, MissingDotError, UnclosedPa
 
 import { TToken } from '../core/types/token.type';
 import { TOnErrorCallbackFn } from '../core/types/on-error-callback.type';
-import { IArrayNode, IAssignmentNode, IBinaryExpression, ICallNode, IConditionBlockNode, IConditionNode, IExpressionNode, IFunctionDeclarationNode, IIdentifierNode, ILoneExpression, ILoopNode, INumberNode, IProgramNode, IReturnNode, ISkipNode, IStatementNode, IStringNode, IVariableDeclarationNode } from '../core/types/ast.type';
+import { IArrayNode, IAssignmentNode, IBinaryExpression, ICallNode, IConditionBlockNode, IConditionNode, IExpressionNode, IFunctionDeclarationNode, IIdentifierNode, IIndexingNode, ILoneExpression, ILoopNode, INumberNode, IProgramNode, IReturnNode, ISkipNode, IStatementNode, IStringNode, IVariableDeclarationNode } from '../core/types/ast.type';
 
 import { Consumer } from './consumer';
 
@@ -55,14 +55,7 @@ export class Parser extends Consumer<TToken> {
       }
 
       case TokenType.Comment: {
-        const node = {
-          kind: NodeType.Skip,
-          end: this.at().location,
-          start: this.at().location
-        } as ISkipNode;
-
-        this.eat();
-        return node;
+        return this.parseComment();
       }
 
       case TokenType.Let:
@@ -78,6 +71,21 @@ export class Parser extends Consumer<TToken> {
         return this.parseExpression();
       }
     }
+  }
+
+  /**
+   * @description
+   * Parses a comment node
+   */
+  private parseComment(): IExpressionNode {
+    const node = {
+      kind: NodeType.Skip,
+      end: this.at().location,
+      start: this.at().location
+    } as ISkipNode;
+
+    this.eat();
+    return node;
   }
 
   /**
@@ -211,11 +219,40 @@ export class Parser extends Consumer<TToken> {
   private parseCallPrimaryExpression(): IExpressionNode {
     const member = this.parsePrimaryExpression();
 
-    if (this.at().type === TokenType.OpenParen) {
-      return this.parseCallExpression(member);
-    }
+    switch (this.at().type) {
+      case TokenType.OpenParen: {
+        return this.parseCallExpression(member);
+      }
 
-    return member;
+      case TokenType.OpenBrack: {
+        return this.parseIndexingExpression(member);
+      }
+
+      default: {
+        return member;
+      }
+    }
+  }
+
+  /**
+   * @description
+   * Parses array indexing
+   *
+   * @param identifier The indexable identifier
+   */
+  private parseIndexingExpression(identifier: IExpressionNode): IExpressionNode {
+    this.eat();
+
+    const index = this.parseExpression();
+    const closeBracket = this.expect(TokenType.CloseBrack, new ExpectedCloseBrackError(this.at().location));
+
+    return {
+      index: index,
+      identifier: identifier,
+      kind: NodeType.Indexing,
+      start: identifier.start,
+      end: closeBracket?.location
+    } as IIndexingNode;
   }
 
   /**
