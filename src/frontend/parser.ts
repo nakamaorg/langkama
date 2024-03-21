@@ -6,7 +6,7 @@ import { MissingEqualsError, MissingIdentifierError, MissingDotError, UnclosedPa
 
 import { TToken } from '../core/types/token.type';
 import { TOnErrorCallbackFn } from '../core/types/on-error-callback.type';
-import { IAssignmentNode, IBinaryExpression, ICallNode, IConditionNode, IExpressionNode, IFunctionDeclarationNode, IIdentifierNode, ILoneExpression, ILoopNode, INumberNode, IProgramNode, IReturnNode, ISkipNode, IStatementNode, IStringNode, IVariableDeclarationNode } from '../core/types/ast.type';
+import { IAssignmentNode, IBinaryExpression, ICallNode, IConditionBlockNode, IConditionNode, IExpressionNode, IFunctionDeclarationNode, IIdentifierNode, ILoneExpression, ILoopNode, INumberNode, IProgramNode, IReturnNode, ISkipNode, IStatementNode, IStringNode, IVariableDeclarationNode } from '../core/types/ast.type';
 
 import { Consumer } from './consumer';
 
@@ -312,7 +312,8 @@ export class Parser extends Consumer<TToken> {
         return this.parseLoneExpression();
       }
 
-      case TokenType.Else: {
+      case TokenType.Else:
+      case TokenType.ElseIf: {
         this.errorManager.raise(new InvalidConditionError(this.at().location));
         this.eat();
 
@@ -443,51 +444,53 @@ export class Parser extends Consumer<TToken> {
    * Parses a condition statement
    */
   private parseCondition(): IStatementNode {
-    let node: IConditionNode;
+    const bodies: Array<IConditionNode> = [];
 
-    const ifKeyword = this.eat();
-    const condition = this.parseExpression();
+    const parse = () => {
+      const conditionKeyword = this.eat();
+      const condition = this.parseExpression();
 
-    this.expect(TokenType.OpenBrace, new ExpectedOpenBraceError(this.at().location));
-    const trueBody: Array<IStatementNode> = [];
-
-    while (this.at() && this.at().type !== TokenType.CloseBrace) {
-      trueBody.push(this.parseStatement());
-    }
-
-    this.expect(TokenType.CloseBrace, new ExpectedCloseBraceError(this.at().location));
-
-    if (this.at().type !== TokenType.Else) {
-      node = {
-        condition,
-        false: [],
-        true: trueBody,
-        end: condition.end,
-        kind: NodeType.Condition,
-        start: ifKeyword?.location
-      } as IConditionNode;
-    } else {
-      this.eat();
       this.expect(TokenType.OpenBrace, new ExpectedOpenBraceError(this.at().location));
-      const falseBody: Array<IStatementNode> = [];
+      const body: Array<IStatementNode> = [];
 
       while (this.at() && this.at().type !== TokenType.CloseBrace) {
-        falseBody.push(this.parseStatement());
+        body.push(this.parseStatement());
       }
 
-      this.expect(TokenType.CloseBrace, new ExpectedCloseBraceError(this.at().location));
-
-      node = {
-        condition,
-        true: trueBody,
-        false: falseBody,
-        end: condition.end,
-        kind: NodeType.Condition,
-        start: ifKeyword?.location
-      } as IConditionNode;
+      const closeBrace = this.expect(TokenType.CloseBrace, new ExpectedCloseBraceError(this.at().location));
+      return { startNode: conditionKeyword, condition, body, endNode: closeBrace };
     }
 
-    return node;
+    let { startNode, body, condition, endNode } = parse();
+    bodies.push({ body, condition });
+
+    while ([TokenType.Else, TokenType.ElseIf].includes(this.at().type)) {
+      if (this.at().type === TokenType.ElseIf) {
+        const { endNode: closeBrace, body, condition } = parse();
+
+        endNode = closeBrace;
+        bodies.push({ body, condition });
+      } else {
+        this.eat();
+        this.expect(TokenType.OpenBrace, new ExpectedOpenBraceError(this.at().location));
+
+        const body: Array<IStatementNode> = [];
+        while (this.at() && this.at().type !== TokenType.CloseBrace) {
+          body.push(this.parseStatement());
+        }
+
+        bodies.push({ body });
+        this.expect(TokenType.CloseBrace, new ExpectedCloseBraceError(this.at().location));
+
+        break;
+      }
+    }
+    return {
+      conditions: bodies,
+      end: endNode?.location,
+      kind: NodeType.Condition,
+      start: startNode?.location
+    } as IConditionBlockNode;
   }
 
   /**

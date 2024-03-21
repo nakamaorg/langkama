@@ -2,7 +2,7 @@ import { Char } from '../core/enums/char.enum';
 import { NodeType } from '../core/enums/node-type.enum';
 
 import { IBooleanVal, IFunctionVal, INativeFunctionVal, INumberVal, IRuntimeVal, IStringVal } from '../core/types/runtime-values.type';
-import { IAssignmentNode, IBinaryExpression, ICallNode, IConditionNode, IFunctionDeclarationNode, IIdentifierNode, ILoneExpression, ILoopNode, INumberNode, IProgramNode, IReturnNode, IStatementNode, IStringNode, IVariableDeclarationNode } from '../core/types/ast.type';
+import { IAssignmentNode, IBinaryExpression, ICallNode, IConditionBlockNode, IFunctionDeclarationNode, IIdentifierNode, ILoneExpression, ILoopNode, INumberNode, IProgramNode, IReturnNode, IStatementNode, IStringNode, IVariableDeclarationNode } from '../core/types/ast.type';
 
 import { Environment } from './environment';
 import { RuntimeHelper } from '../core/helpers/runtime.helper';
@@ -81,16 +81,22 @@ export class Evaluator {
    * @description
    * Evaluates a condition statement
    *
-   * @param ifStatement The condition statement
+   * @param conditionBlock The condition block statement
    * @param env The scope of the evaluation
    */
-  private evaluateCondition(ifStatement: IConditionNode, env: Environment): IRuntimeVal {
-    const val = this.evaluate(ifStatement.condition, env) as IBooleanVal;
+  private evaluateConditionBlock(conditionBlock: IConditionBlockNode, env: Environment): IRuntimeVal {
+    for (const conditionStatement of conditionBlock.conditions) {
+      if (conditionStatement.condition) {
+        const val = this.evaluate(conditionStatement.condition, env) as IBooleanVal;
 
-    if (val.value) {
-      ifStatement.true.forEach(e => this.evaluate(e, env));
-    } else {
-      ifStatement.false.forEach(e => this.evaluate(e, env));
+        if (val.value) {
+          conditionStatement.body.forEach(e => this.evaluate(e, env));
+          break;
+        }
+      } else {
+        conditionStatement.body.forEach(e => this.evaluate(e, env));
+        break;
+      }
     }
 
     return RuntimeHelper.createSkip();
@@ -394,7 +400,7 @@ export class Evaluator {
       }
 
       case NodeType.Condition: {
-        return this.evaluateCondition(node as IConditionNode, env);
+        return this.evaluateConditionBlock(node as IConditionBlockNode, env);
       }
 
       case NodeType.Loop: {

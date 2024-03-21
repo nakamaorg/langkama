@@ -21,11 +21,14 @@ export interface IReturnNode extends IStatementNode {
   value: IExpressionNode;
 }
 
-export interface IConditionNode extends IStatementNode {
+export interface IConditionNode {
+  condition?: IExpressionNode;
+  body: Array<IStatementNode>;
+}
+
+export interface IConditionBlockNode extends IStatementNode {
   kind: NodeType.Condition;
-  condition: IExpressionNode;
-  true: Array<IStatementNode>;
-  false: Array<IStatementNode>;
+  conditions: Array<IConditionNode>;
 }
 
 export interface ILoopNode extends IStatementNode {

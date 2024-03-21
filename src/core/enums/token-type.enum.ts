@@ -8,6 +8,7 @@ export enum TokenType {
   While = 'While',
   Comma = 'Comma',
   Equals = 'Equals',
+  ElseIf = 'ElseIf',
   Return = 'Return',
   Number = 'Number',
   LoneOp = 'LoneOp',
