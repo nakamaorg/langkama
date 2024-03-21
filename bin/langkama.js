@@ -100,12 +100,13 @@ class Cmd {
 
       compiler
         .on(LangKamaEvent.Success, result => {
-          this.#info('LangKama script compiled!\n');
+          this.#info('LangKama script interpreted!\n');
           this.#info(chalk.green(JSON.stringify(result.value, null, 2)));
 
           process.exit(0);
         })
         .on(LangKamaEvent.Error, error => { this.#error(error) })
+        .on(LangKamaEvent.Stdout, stdout => { this.#info(stdout) })
         .on(LangKamaEvent.Lexer, () => this.#info(`Tokenizing "${fileName}" script...`))
         .on(LangKamaEvent.Parser, tokens => this.#info(`Parsing "${tokens.length}" tokens...`))
         .on(LangKamaEvent.Interpreter, ast => this.#info(`Interpreting "${fileName}" script...`))
@@ -122,6 +123,15 @@ class Cmd {
   static #repl() {
     const rl = createInterface({ input: process.stdin, output: process.stdout });
     const env = new Environment();
+
+    const onSuccessCallback = result => {
+      this.#info(chalk.green(result.value));
+      prompt();
+    };
+
+    const onStdoutCallback = stdout => {
+      this.#info(stdout);
+    };
 
     const onErrorCallback = error => {
       this.#error(error, false);
@@ -140,11 +150,9 @@ class Cmd {
           env.setErrorCallback(errorManager.raise.bind(errorManager));
 
           compiler
-            .on(LangKamaEvent.Success, result => {
-              this.#info(chalk.green(result.value));
-              prompt();
-            })
             .on(LangKamaEvent.Error, onErrorCallback)
+            .on(LangKamaEvent.Stdout, onStdoutCallback)
+            .on(LangKamaEvent.Success, onSuccessCallback)
             .interpret(input, env);
         }
       });
