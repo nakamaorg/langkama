@@ -204,9 +204,9 @@ export class Parser extends Consumer<TToken> {
     let call = {
       caller,
       arguments: args,
-      end: lastArg.end,
       kind: NodeType.Call,
-      start: caller.start
+      start: caller.start,
+      end: lastArg?.end ?? caller.start
     } as ICallNode;
 
     if (this.at().type === TokenType.OpenParen) {
@@ -420,7 +420,6 @@ export class Parser extends Consumer<TToken> {
     this.expect(TokenType.OpenBrace, new ExpectedOpenBraceError(this.at().location));
 
     const body: Array<IStatementNode> = [];
-
     while (this.notEof() && this.at().type !== TokenType.CloseBrace) {
       body.push(this.parseStatement());
     }
