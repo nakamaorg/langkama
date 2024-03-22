@@ -290,7 +290,7 @@ export class Evaluator {
     const arr = (identifier as IArrayVal).value;
     const value = arr[index.value];
 
-    return value ? RuntimeHelper.createValue(value) : RuntimeHelper.createNull();
+    return value != null ? RuntimeHelper.createValue(value) : RuntimeHelper.createNull();
   }
 
   /**
