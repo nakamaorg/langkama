@@ -288,8 +288,9 @@ export class Evaluator {
     const index = this.evaluate(array.index, env) as INumberVal;
     const identifier = this.evaluate(array.identifier, env) as IArrayVal;
     const arr = (identifier as IArrayVal).value;
+    const value = arr[index.value];
 
-    return RuntimeHelper.createValue(arr[index.value]);
+    return value ? RuntimeHelper.createValue(value) : RuntimeHelper.createNull();
   }
 
   /**

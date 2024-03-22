@@ -6,6 +6,8 @@ export enum Errno {
   InvalidFileError,
   UnknownFileError,
   MissingColonError,
+  InvalidArrayError,
+  InvalidStringError,
   MissingEqualsError,
   ExpectedCommaError,
   UnclosedStringError,

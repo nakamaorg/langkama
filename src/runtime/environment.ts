@@ -1,4 +1,4 @@
-import { ConstantReassignmentError, TOnStdOutCallbackFn, Type, VariableDefinedError, VariableNotDefinedError } from '..';
+import { ConstantReassignmentError, InvalidArrayError, InvalidStringError, TOnStdOutCallbackFn, Type, VariableDefinedError, VariableNotDefinedError } from '..';
 
 import { ErrorManager } from '../core/managers/error.manager';
 import { RuntimeHelper } from '../core/helpers/runtime.helper';
@@ -74,7 +74,7 @@ export class Environment {
       const [arr] = args;
 
       if (arr.type !== Type.Array) {
-        throw 'needs to be an array';
+        this.errorManager?.raise(new InvalidArrayError());
       }
 
       return RuntimeHelper.createNumber((arr as IArrayVal).value.length);
@@ -84,13 +84,13 @@ export class Environment {
       const [arrName, value] = args;
 
       if (arrName.type !== Type.String) {
-        throw 'needs to ne a string';
+        this.errorManager?.raise(new InvalidStringError());
       }
 
       const arrayVal = this.getValue((arrName as IStringVal).value).value as IArrayVal;
 
       if (arrayVal.type !== Type.Array) {
-        throw 'needs to be an array';
+        this.errorManager?.raise(new InvalidArrayError());
       }
 
       const newArray = [...arrayVal.value];
@@ -104,13 +104,13 @@ export class Environment {
       const [arrName] = args;
 
       if (arrName.type !== Type.String) {
-        throw 'needs to ne a string';
+        this.errorManager?.raise(new InvalidStringError());
       }
 
       const arrayVal = this.getValue((arrName as IStringVal).value).value as IArrayVal;
 
       if (arrayVal.type !== Type.Array) {
-        throw 'needs to be an array';
+        this.errorManager?.raise(new InvalidArrayError());
       }
 
       const newArray = [...arrayVal.value];
