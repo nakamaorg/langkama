@@ -1,6 +1,6 @@
 export enum Char {
+  Dot = '.',
   Comma = ',',
-  Semicolon = ';',
   OpenPren = '(',
   ClosePren = ')',
   OpenBrace = '{',

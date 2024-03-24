@@ -317,7 +317,7 @@ export class Parser extends Consumer<TToken> {
     const token = this.at();
 
     switch (token.type) {
-      case TokenType.Semicolon: {
+      case TokenType.StatementEnd: {
         const node = {
           kind: NodeType.Skip,
           end: this.at().location,
@@ -435,7 +435,7 @@ export class Parser extends Consumer<TToken> {
       isArray = true;
     }
 
-    if (this.at().type === TokenType.Semicolon) {
+    if (this.at().type === TokenType.StatementEnd) {
       const dotToken = this.eat() as TToken;
 
       if (isConstant) {
@@ -471,7 +471,7 @@ export class Parser extends Consumer<TToken> {
       kind: NodeType.VariableDeclaration
     } as IVariableDeclarationNode;
 
-    this.expect(TokenType.Semicolon, new MissingDotError(declaration.end));
+    this.expect(TokenType.StatementEnd, new MissingDotError(declaration.end));
 
     return declaration;
   }

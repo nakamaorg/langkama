@@ -110,7 +110,7 @@ export class LangKama {
    * @param event The event to subscribe to
    * @param eventListener The event listener callback function
    */
-  public on(event: LangKamaEvent, eventListener: () => void): LangKama {
+  public on(event: LangKamaEvent, eventListener: <T = any>(args?: T) => void): LangKama {
     switch (event) {
       case LangKamaEvent.Error: {
         this.onErrorEventListener = eventListener;

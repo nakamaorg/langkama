@@ -155,8 +155,8 @@ export class Lexer extends Consumer<string> {
           break;
         }
 
-        case Char.Semicolon: {
-          this.addToken(TokenType.Semicolon, this.eat());
+        case Char.Dot: {
+          this.addToken(TokenType.StatementEnd, this.eat());
           break;
         }
 
