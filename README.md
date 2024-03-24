@@ -30,6 +30,8 @@ loncina(factorial(5)); bs Outputs: 120
 
 More examples can be found inside of the [scripts](./scripts/) directory.
 
+LangKama has an [online interpreter](https://nakamaorg.github.io/langkama-online/) to play with.
+
 
 ## Build
 
