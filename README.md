@@ -14,18 +14,18 @@ The following is a typical LangKama script:
 
 ```php
 let me cook factorial(n) {
-  hear me out val is 0;
+  hear me out val is 0.
 
   big if true (n = 0) {
-    val is 1;
+    val is 1.
   } sike {
-    val is n * factorial(n - 1);
+    val is n * factorial(n - 1).
   }
 
-  reda val;
+  reda val.
 }
 
-loncina(factorial(5)); bs Outputs: 120
+loncina(factorial(5)). bs Outputs: 120
 ```
 
 More examples can be found inside of the [langkama](./langkama/) directory.
