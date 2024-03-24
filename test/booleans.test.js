@@ -13,7 +13,7 @@ describe('Booleans', () => {
 
   test('Truthy value', done => {
     const code = `
-      reda W;
+      reda W.
     `;
 
     compiler
@@ -26,7 +26,7 @@ describe('Booleans', () => {
 
   test('Falsy value', done => {
     const code = `
-      reda L;
+      reda L.
     `;
 
     compiler
@@ -39,10 +39,10 @@ describe('Booleans', () => {
 
   test('Equality operator 1', done => {
     const code = `
-      a sa7 hear me out a is 1;
-      a sa7 hear me out b is 2;
+      a sa7 hear me out a is 1.
+      a sa7 hear me out b is 2.
       
-      reda a = b;
+      reda a = b.
     `;
 
     compiler
@@ -55,10 +55,10 @@ describe('Booleans', () => {
 
   test('Equality operator 2', done => {
     const code = `
-      a sa7 hear me out a is 1;
-      a sa7 hear me out b is 1;
+      a sa7 hear me out a is 1.
+      a sa7 hear me out b is 1.
       
-      reda a = b;
+      reda a = b.
     `;
 
     compiler
@@ -71,7 +71,7 @@ describe('Booleans', () => {
 
   test('Not operator 1', done => {
     const code = `
-      reda !W;
+      reda !W.
     `;
 
     compiler
@@ -84,7 +84,7 @@ describe('Booleans', () => {
 
   test('Not operator 2', done => {
     const code = `
-      reda !L;
+      reda !L.
     `;
 
     compiler
@@ -97,10 +97,10 @@ describe('Booleans', () => {
 
   test('Not operator 2', done => {
     const code = `
-      a sa7 hear me out a is 1;
-      a sa7 hear me out b is 2;
+      a sa7 hear me out a is 1.
+      a sa7 hear me out b is 2.
       
-      reda !(b = a);
+      reda !(b = a).
     `;
 
     compiler
@@ -113,7 +113,7 @@ describe('Booleans', () => {
 
   test('And operator 1', done => {
     const code = `
-      reda L & W;
+      reda L & W.
     `;
 
     compiler
@@ -126,7 +126,7 @@ describe('Booleans', () => {
   
   test('And operator 2', done => {
     const code = `
-      reda W & W;
+      reda W & W.
     `;
 
     compiler
@@ -139,7 +139,7 @@ describe('Booleans', () => {
   
   test('And operator 3', done => {
     const code = `
-      reda L & L;
+      reda L & L.
     `;
 
     compiler
@@ -152,7 +152,7 @@ describe('Booleans', () => {
 
   test('Or operator 1', done => {
     const code = `
-      reda L | W;
+      reda L | W.
     `;
 
     compiler
@@ -165,7 +165,7 @@ describe('Booleans', () => {
   
   test('Or operator 2', done => {
     const code = `
-      reda W | W;
+      reda W | W.
     `;
 
     compiler
@@ -178,7 +178,7 @@ describe('Booleans', () => {
   
   test('Or operator 3', done => {
     const code = `
-      reda L | L;
+      reda L | L.
     `;
 
     compiler

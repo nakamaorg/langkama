@@ -13,15 +13,15 @@ describe('Loops', () => {
 
   test('Loop statement', done => {
     const code = `
-      hear me out index is 0;
-      hear me out sum is 0;
+      hear me out index is 0.
+      hear me out sum is 0.
 
       cook until (index = 10) {
-        sum is sum + index;
-        index is index + 1;
+        sum is sum + index.
+        index is index + 1.
       }
       
-      reda sum;
+      reda sum.
     `;
 
     compiler
@@ -43,7 +43,7 @@ describe('Loops errors', () => {
   test('Missing open brace', done => {
     const code = `
       cook until (W)
-        loncina("this should not be reached");
+        loncina("this should not be reached").
       }
     `;
 

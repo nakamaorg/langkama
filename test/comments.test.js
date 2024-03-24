@@ -14,7 +14,7 @@ describe('Functions', () => {
   test('Function definition', done => {
     const code = `
       bs printing 'Hello, World!' statement
-      loncina("Hello, World!");
+      loncina("Hello, World!").
     `;
 
     compiler.on(LangKamaEvent.Success, result => {

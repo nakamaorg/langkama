@@ -13,14 +13,14 @@ describe('Conditions', () => {
 
   test('If statement 1', done => {
     const code = `
-      a sa7 hear me out a is 10;
-      hear me out value is L;
+      a sa7 hear me out a is 10.
+      hear me out value is L.
 
       big if true (a > 20) {
-        value is W;
+        value is W.
       }
       
-      reda value;
+      reda value.
     `;
 
     compiler
@@ -33,14 +33,14 @@ describe('Conditions', () => {
 
   test('If statement 2', done => {
     const code = `
-        a sa7 hear me out a is 10;
-        hear me out value is L;
+        a sa7 hear me out a is 10.
+        hear me out value is L.
   
         big if true (a < 20) {
-          value is W;
+          value is W.
         }
         
-        reda value;
+        reda value.
       `;
 
     compiler
@@ -53,17 +53,17 @@ describe('Conditions', () => {
 
   test('If else statement 1', done => {
     const code = `
-        a sa7 hear me out age is 21;
-        a sa7 hear me out entryAge is 18;
-        hear me out value is L;
+        a sa7 hear me out age is 21.
+        a sa7 hear me out entryAge is 18.
+        hear me out value is L.
   
         big if true (age > entryAge) {
-          value is W;
+          value is W.
         } sike {
-          value is L;
+          value is L.
         }
         
-        reda value;
+        reda value.
       `;
 
     compiler
@@ -76,17 +76,17 @@ describe('Conditions', () => {
  
   test('If else statement 2', done => {
     const code = `
-        a sa7 hear me out age is 21;
-        a sa7 hear me out entryAge is 18;
-        hear me out value is L;
+        a sa7 hear me out age is 21.
+        a sa7 hear me out entryAge is 18.
+        hear me out value is L.
   
         big if true (age < entryAge) {
-          value is W;
+          value is W.
         } sike {
-          value is L;
+          value is L.
         }
         
-        reda value;
+        reda value.
       `;
 
     compiler
@@ -99,19 +99,19 @@ describe('Conditions', () => {
  
   test('If else statement 3', done => {
     const code = `
-        a sa7 hear me out age is 21;
-        a sa7 hear me out entryAge is 18;
-        hear me out value is L;
+        a sa7 hear me out age is 21.
+        a sa7 hear me out entryAge is 18.
+        hear me out value is L.
   
         big if true (age = entryAge) {
-          value is 50;
+          value is 50.
         } jk (age > entryAge) {
-          value is 100;
+          value is 100.
         } sike {
-          value is 0;
+          value is 0.
         }
         
-        reda value;
+        reda value.
       `;
 
     compiler
@@ -133,7 +133,7 @@ describe('Condition errors', () => {
   test('Missing open brace', done => {
     const code = `
       big if true(W)
-        loncina("this should not be reached");
+        loncina("this should not be reached").
       }
     `;
 

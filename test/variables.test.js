@@ -13,7 +13,7 @@ describe('Variables', () => {
   });
 
   test('Variable declaration without value', done => {
-    const code = `hear me out var;`;
+    const code = `hear me out var.`;
 
     compiler.on(LangKamaEvent.Success, result => {
 
@@ -23,7 +23,7 @@ describe('Variables', () => {
   });
 
   test('Variable declaration with value', done => {
-    const code = `hear me out var is 123;`;
+    const code = `hear me out var is 123.`;
 
     compiler.on(LangKamaEvent.Success, result => {
       expect(result.value).toBe(123);
@@ -33,9 +33,9 @@ describe('Variables', () => {
 
   test('Multiple variable declarations with value', done => {
     const code = `
-      hear me out firstName is "John";
-      hear me out lastName is "Doe";
-      hear me out fullName is firstName + " " + lastName;
+      hear me out firstName is "John".
+      hear me out lastName is "Doe".
+      hear me out fullName is firstName + " " + lastName.
     `;
 
     compiler.on(LangKamaEvent.Success, result => {
@@ -46,8 +46,8 @@ describe('Variables', () => {
 
   test('Variable reassignment', done => {
     const code = `
-      hear me out name is "Lang";
-      name is "Kama";
+      hear me out name is "Lang".
+      name is "Kama".
     `;
 
     compiler.on(LangKamaEvent.Success, result => {
@@ -93,7 +93,7 @@ describe('Variables errors', () => {
   
   test('Variable reassignment without a valid value after the equals keyword', done => {
     const code = `
-    hear me out x is 1;
+    hear me out x is 1.
     x is
     `;
     
@@ -105,8 +105,8 @@ describe('Variables errors', () => {
 
   test('Variable duplication', done => {
     const code = `
-      hear me out myVar is 1;
-      hear me out myVar is 2;
+      hear me out myVar is 1.
+      hear me out myVar is 2.
     `;
 
     compiler.on(LangKamaEvent.Error, error => {

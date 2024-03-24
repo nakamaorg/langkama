@@ -13,8 +13,8 @@ describe('Arrays', () => {
 
   test('Array declaration with value 1', done => {
     const code = `
-      a sa7 hear me out arr[] is [];
-      reda arr;
+      a sa7 hear me out arr[] is [].
+      reda arr.
     `;
 
     compiler
@@ -27,8 +27,8 @@ describe('Arrays', () => {
 
   test('Array declaration with value 2', done => {
     const code = `
-      a sa7 hear me out arr[] is [1, 2, 3];
-      reda arr;
+      a sa7 hear me out arr[] is [1, 2, 3].
+      reda arr.
     `;
 
     compiler
@@ -41,8 +41,8 @@ describe('Arrays', () => {
 
   test('Array declaration without value', done => {
     const code = `
-      hear me out arr[];
-      reda arr;
+      hear me out arr[].
+      reda arr.
     `;
 
     compiler
@@ -55,8 +55,8 @@ describe('Arrays', () => {
 
   test('Array indexing inbound', done => {
     const code = `
-      a sa7 hear me out arr[] is [1, 2, 3];
-      reda arr[1];
+      a sa7 hear me out arr[] is [1, 2, 3].
+      reda arr[1].
     `;
 
     compiler
@@ -69,8 +69,8 @@ describe('Arrays', () => {
 
   test('Array indexing out of bound', done => {
     const code = `
-      a sa7 hear me out arr[] is [1, 2, 3];
-      reda arr[3];
+      a sa7 hear me out arr[] is [1, 2, 3].
+      reda arr[3].
     `;
 
     compiler
@@ -83,10 +83,10 @@ describe('Arrays', () => {
 
   test('Array index assignment', done => {
     const code = `
-      hear me out arr[] is [1, 2, 3];
-      arr[0] is 100;
+      hear me out arr[] is [1, 2, 3].
+      arr[0] is 100.
 
-      reda arr;
+      reda arr.
     `;
 
     compiler
@@ -99,8 +99,8 @@ describe('Arrays', () => {
 
   test('Array length', done => {
     const code = `
-      hear me out arr[] is [1, 2, 3];
-      reda length(arr);
+      hear me out arr[] is [1, 2, 3].
+      reda length(arr).
     `;
 
     compiler
@@ -113,13 +113,13 @@ describe('Arrays', () => {
 
   test('Array push 1', done => {
     const code = `
-      hear me out arr[];
+      hear me out arr[].
 
-      push("arr", 0);
-      push("arr", 1);
-      push("arr", 2);
+      push("arr", 0).
+      push("arr", 1).
+      push("arr", 2).
 
-      reda arr;
+      reda arr.
     `;
 
     compiler
@@ -132,18 +132,18 @@ describe('Arrays', () => {
 
   test('Array push 2', done => {
     const code = `
-      hear me out arr[];
-      hear me out i is 0;
+      hear me out arr[].
+      hear me out i is 0.
 
       cook until (i = 100) {
         big if true ((i % 2) = 0) {
-          push("arr", i);
+          push("arr", i).
         }
 
-        i is i + 1;
+        i is i + 1.
       }
 
-      reda push("arr", 100);
+      reda push("arr", 100).
     `;
 
     compiler
@@ -156,12 +156,12 @@ describe('Arrays', () => {
 
   test('Array pop 1', done => {
     const code = `
-      hear me out arr[] is [1, 2, 3];
+      hear me out arr[] is [1, 2, 3].
 
-      pop("arr");
-      pop("arr");
+      pop("arr").
+      pop("arr").
 
-      reda arr;
+      reda arr.
     `;
 
     compiler
@@ -174,24 +174,24 @@ describe('Arrays', () => {
 
   test('Array pop 2', done => {
     const code = `
-      hear me out arr[];
-      hear me out i is 0;
+      hear me out arr[].
+      hear me out i is 0.
 
       cook until (i = 100) {
-        push("arr", i);
-        i is i + 1;
+        push("arr", i).
+        i is i + 1.
       }
       
-      i is 0;
+      i is 0.
       cook until (i = 100) {
         big if true ((i % 2) = 0) {
-          pop("arr");
+          pop("arr").
         }
 
-        i is i + 1;
+        i is i + 1.
       }
 
-      reda pop("arr");
+      reda pop("arr").
     `;
 
     compiler
@@ -212,7 +212,7 @@ describe('Arrays errors', () => {
 
   test('Missing close bracket', done => {
     const code = `
-      hear me out arr[ is [];
+      hear me out arr[ is [].
     `;
 
     compiler

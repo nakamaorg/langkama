@@ -13,7 +13,7 @@ describe('Null', () => {
 
   test('Nullish value', done => {
     const code = `
-      reda bruh;
+      reda bruh.
     `;
 
     compiler

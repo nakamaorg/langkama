@@ -14,10 +14,10 @@ describe('Functions', () => {
   test('Function definition', done => {
     const code = `
       let me cook add(a, b) {
-        reda a + b;
+        reda a + b.
       }
 
-      add(1, 2);
+      add(1, 2).
     `;
 
     compiler
