@@ -28,7 +28,7 @@ let me cook factorial(n) {
 loncina(factorial(5)); bs Outputs: 120
 ```
 
-More examples can be found inside of the [scripts](./scripts/) directory.
+More examples can be found inside of the [langkama](./langkama/) directory.
 
 LangKama has an [online interpreter](https://nakamaorg.github.io/langkama-online/) to play with.
 
