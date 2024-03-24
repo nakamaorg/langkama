@@ -1,15 +1,15 @@
-hear me out i is 0;
+hear me out i is 0.
 
 cook until (i > 100) {
     big if true ((i % 15) = 0) {
-        loncina("FizzBuzz");
+        loncina("FizzBuzz").
     } jk ((i % 3) = 0) {
-        loncina("Fizz");
+        loncina("Fizz").
     } jk ((i % 5) = 0) {
-        loncina("Buzz");
+        loncina("Buzz").
     } sike {
-        loncina(i);
+        loncina(i).
     }
 
-    i is i + 1;
+    i is i + 1.
 }

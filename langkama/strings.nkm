@@ -1,4 +1,4 @@
-hear me out firstName is "john";
-hear me out lastName is "doe";
+hear me out firstName is "john".
+hear me out lastName is "doe".
 
 "The full name is '" + firstName + " " + lastName + "'."
